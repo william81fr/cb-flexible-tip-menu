@@ -8,6 +8,8 @@ Why not configure everything in the Chaturbate interface? One example is the num
 
 One great feature is the ability to fill in the tip menu items as you think them up, and not worry about the order in which you write them or the specifics of what you write. Just put the amount first in the box, and the display format will be handled globally by the app. It's configurable too.
 
+Please feel free to [discuss issues on GitHub](https://github.com/william81fr/cb-flexible-tip-menu).
+
 ## Variables in the source code
 
 - **nb_of_items**: the number of configurable menu items from the admin panel
