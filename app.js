@@ -195,7 +195,7 @@ for(i=0; i<nb_of_items; ++i) {
 function alert_error(setting_name, error_lbl, bg_color=null, txt_color=null) {
     bg_color = bg_color ? bg_color : color_bright_red;
     txt_color = txt_color ? txt_color : color_white;
-    const msg = '/!\\ ATTN '+cb.room_slug+': "'+setting_name+'" setting in the tip menu app '+error_lbl;
+    const msg = '/!\\ ATTN '+cb.room_slug+': "'+setting_name+'" setting in the Flexible Tip Menu app '+error_lbl;
 
     switch(cb.settings.errors_shown_to) {
         case lbl_errors_shown_to_host:
