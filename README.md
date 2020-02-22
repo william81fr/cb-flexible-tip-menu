@@ -13,8 +13,6 @@ Please feel free to [discuss issues on GitHub](https://github.com/william81fr/cb
 ## Variables in the source code
 
 - **nb_of_items**: the number of configurable menu items from the admin panel
-- **min_repeat_minutes**: the minimum value for "repeat minutes" in the admin panel
-- **max_repeat_minutes**: the maximum value for "repeat minutes" in the admin panel
 
 ## Settings in the admin panel
 
@@ -25,12 +23,12 @@ Please feel free to [discuss issues on GitHub](https://github.com/william81fr/cb
 - **Tip menu footer**: if set, will be displayed at the end of the tip menu
 - **Inline separator**: if set, the tip menu will be displayed all in one line; but if left empty, the tip menu will be multiline
 - **Inline spacing**: if the inline separator is set, the spacing can be used to separate items from each other
-- **Background color**: color of the background for the whole tip menu; this needs to be in CSS/HTML format [1]
-- **Text color**: color of the text for the whole tip menu; this needs to be in CSS/HTML format [1]
-- **Boldness**: how thick the text is, for emphasis
+- **Menu background color**: color of the background for the whole tip menu; this needs to be in CSS/HTML format [1]
+- **Menu text color**: color of the text for the whole tip menu; this needs to be in CSS/HTML format [1]
+- **Menu boldness**: how thick the text is, for emphasis
+- **Menu repeat minutes**: number of minutes before the menu is displayed again in the chat; set to zero to display only once (on app startup)
 - **Menu item prefix**: Prefix to all menu items; should allow for `:emoticons`
 - **Menu item suffix**: Suffix to all menu items; should allow for `:emoticons`
-- **Menu repeat minutes**: number of minutes before the menu is displayed again in the chat
 - **Menu item display format**: all subsequent menu items will be reformatted to this pattern; remember to include both `{AMOUNT}` and `{LABEL}` in there; for example you could write `{AMOUNT} tokens - {LABEL}` or `{LABEL} ({AMOUNT}tk)`; should allow for `:emoticons`
 - **Sort order**: in which order to sort the items (can be disabled too)
 - **Menu item XYZ**: must start with a number followed by a text label; anything else will be ignored by the app (handy to disable an item temporarily); all items are sorted by lowest to highest amount before display; should allow for `:emoticons`
