@@ -7,6 +7,8 @@ const nb_of_menu_items = 99; // max number of configurable menu items
 const enable_thank_tippers = true; // whether the Thank Tippers module appears at all
 
 // don't modify anything from here on
+const is_debug = false; // this prevents the app from running, and instead show debug info in the chat
+
 const color_black = '#000000';
 const color_white = '#FFFFFF';
 const color_bright_red = '#FF0000';
@@ -608,12 +610,77 @@ function check_template_format(cfg_setting, expected_options) {
     return true;
 }
 
+/*
+ * Replacement for the official cb.log() function, which does not appear to work
+ */
+function basic_log(obj, lbl) {
+    let dbgRows = [];
+
+    const dbgStart = new Date(Date.now());
+    dbgRows.push('dbg start for "'+lbl+'" object at '+dbgStart.toTimeString());
+
+    for(const idx in obj) {
+        const type = typeof(obj[idx]);
+        let msg = idx+': '+type;
+        switch(type) {
+            case 'string': // pass through
+            case 'number':
+                msg += ' ('+obj[idx]+')';
+            break;
+
+            case 'boolean':
+                msg += ' ('+(obj[idx] ? 'true' : 'false')+')';
+            break;
+
+            case 'function':
+                msg += ' ('+(obj[idx].length)+' params)';
+            break;
+
+            case 'object':
+                let innerObj = [];
+                for(const innerIdx in obj[idx]) {
+                    const innerType = obj[idx][innerIdx];
+                    innerObj.push(`in ${idx}[${innerIdx}]: ${innerType} (${obj[idx][innerIdx]})`);
+                }
+
+                if(0 === innerObj.length) {
+                    dbgRows.push(msg+' (empty)');
+                    continue;
+                }
+
+                if(idx === 'settings' || idx === 'settings_choices') {
+                    dbgRows.push(msg+' ('+innerObj.length+' elements)');
+                    continue;
+                }
+
+                dbgRows.push(msg+' ('+innerObj.length+' elements):');
+                dbgRows.push(innerObj.join("\n"));
+                continue;
+            break;
+
+            default:
+                // nvm
+        }
+
+        dbgRows.push(msg);
+    }
+
+    const dbgEnd = new Date(Date.now());
+    dbgRows.push('dbg end for "'+lbl+'" object at '+dbgEnd.toTimeString());
+
+    return dbgRows;
+}
+
 
 //
 // launch the app
 //
 
-if(lbl_not_applicable === cb.settings.tip_menu_shown_to) {
+if(is_debug) {
+    cb.sendNotice(basic_log(cbjs, 'cbjs').join("\n"), cb.room_slug, color_black, color_white);
+    cb.sendNotice(basic_log(cb, 'cb').join("\n"), cb.room_slug, color_white, color_black);
+}
+else if(lbl_not_applicable === cb.settings.tip_menu_shown_to) {
     alert_error('tip_menu_shown_to', 'is set to "'+lbl_not_applicable+'": app is stopped');
 }
 else if (!check_template_format('menu_item_display_format', ['AMOUNT', 'LABEL'])) {
