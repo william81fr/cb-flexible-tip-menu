@@ -12,25 +12,45 @@ Please feel free to [discuss improvements and issues on GitHub](https://github.c
 
 ## Variables in the source code
 
-- **nb_of_items**: the number of configurable menu items from the admin panel
+- **nb_of_menu_items**: the number of configurable menu items from the admin panel
+- **enable_thank_tippers**: enable/disable the "Thank Tippers" module of the app in the admin panel (its options will or will not be shown in the admin panel depending on this)
 
 ## Settings in the admin panel
 
 - **App name**: if set, this will be displayed in the chat at the top of the tip menu
 - **Tip menu shown to**: Whether to enable the tip menu at all, show it to everyone or to a subset of users
 - **Errors shown to**: either the room host or the moderators will be able to see the errors in the configuration of the app (in the chat), or nobody
+- **Thank tippers**: if set to "n/a", the module is disabled; otherwise, tippers are thanked either publicly or privately
+
+- **Thank tippers above tokens**: limits the tip amount that triggers the thanks notice; please not that this is off-by-one on purpose, so that to thank people for their tips from 25 tokens and up, you have o set this to 24
+- **Thank tippers publicly background color**: color of the text for the public notice; this needs to be in CSS/HTML format [1]
+- **Thank tippers publicly text color**: color of the text for the public notice; this needs to be in CSS/HTML format [1]
+- **Thank tippers publicly boldness**: thickness of the the text for the public notice (NB: not all browsers differentiate "bold" and "bolder")
+- **Thank tippers publicly format**: template to format the public notice
+- **Thank tippers privately background color**: color of the text for the private notice; this needs to be in CSS/HTML format [1]
+- **Thank tippers privately text color**: color of the text for the private notice; this needs to be in CSS/HTML format [1]
+- **Thank tippers privately boldness**: thickness of the the text for the private notice (NB: not all browsers differentiate "bold" and "bolder")
+- **Thank tippers privately format**: template to format the private notice
+- **Thank tippers remind tip note format**: template to format the personal reminder of the tip message (to its author, not in public chat); same format options as the private thanks
+
 - **Tip menu header**: if set, will be displayed after the app name and before the first item
 - **Tip menu footer**: if set, will be displayed at the end of the tip menu
-- **Inline separator**: if set, the tip menu will be displayed all in one line; but if left empty, the tip menu will be multiline
-- **Inline spacing**: if the inline separator is set, the spacing can be used to separate items from each other
+- **Inline separator**: if left empty, the tip menu will be multiline; but if set, the tip menu will be displayed all in one line: in that case, the separator an be a comma or a dash or whatever text should appear between two tip menu items
+- **Inline spacing**: if the inline separator is set, this option can be used to apply spacing to either side of the separator; for example a comma might need only "right" spacing, while a dash might be better with spacing on both sides
 - **Menu background color**: color of the background for the whole tip menu; this needs to be in CSS/HTML format [1]
 - **Menu text color**: color of the text for the whole tip menu; this needs to be in CSS/HTML format [1]
-- **Menu boldness**: how thick the text is, for emphasis
+- **Menu boldness**: thickness of the the text (NB: not all browsers differentiate "bold" and "bolder")
 - **Menu repeat minutes**: number of minutes before the menu is displayed again in the chat; set to zero to display only once (on app startup)
-- **Menu item prefix**: Prefix to all menu items; should allow for `:emoticons`
-- **Menu item suffix**: Suffix to all menu items; should allow for `:emoticons`
-- **Menu item display format**: all subsequent menu items will be reformatted to this pattern; remember to include both `{AMOUNT}` and `{LABEL}` in there; for example you could write `{AMOUNT} tokens - {LABEL}` or `{LABEL} ({AMOUNT}tk)`; should allow for `:emoticons`
+- **Menu item prefix**: Prefix to all menu items; should allow for `:emoticon`s
+- **Menu item suffix**: Suffix to all menu items; should allow for `:emoticon`s
+- **Menu item display format**: all subsequent menu items will be rewritten to this pattern; remember to include both `{AMOUNT}` and `{LABEL}`; see examples below; should allow for `:emoticon`s
 - **Sort order**: in which order to sort the items (can be disabled too)
-- **Menu item XYZ**: must start with a number followed by a text label; anything else will be ignored by the app (handy to disable an item temporarily); all items are sorted by lowest to highest amount before display; should allow for `:emoticons`
+- **Menu item XYZ**: must start with a number followed by a text label; anything else will be ignored by the app (handy to disable an item temporarily); should allow for `:emoticon`s
+
+Examples of menu item display formats:
+- `{AMOUNT} tokens - {LABEL}`
+- `{LABEL} ({AMOUNT}tk)`
+- `tip {AMOUNT} tokens for: {LABEL}`
+- simply write `{AMOUNT}` and `{LABEL}` anywhere in the box, with anything around them
 
 [1] Use [a tool like this one](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool) to pick your colors (focus on the "HEXA" label that changes as you click on different colors)
