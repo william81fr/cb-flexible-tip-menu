@@ -16,12 +16,14 @@ Please feel free to [discuss improvements and issues on GitHub](https://github.c
 - **nb_of_menu_items**: the number of configurable menu items from the admin panel
 - **enable_thank_tippers**: enable/disable the "Thank Tippers" module of the app in the admin panel (its options will or will not be present in the admin panel depending on this); true to enable, or false to disable
 
-## Settings in the admin panel
+## Global settings in the admin panel
 
 - **App name**: if set, this will be displayed in the chat at the top of the tip menu
 - **Tip menu shown to**: Whether to enable the tip menu at all, show it to everyone or to a subset of users
 - **Errors shown to**: either the broadcaster or the moderators will be able to see the errors in the configuration of the app (in the chat), or nobody
 - **Thank tippers**: if set to "n/a", the module is disabled; otherwise, tippers are thanked either publicly or privately
+
+## Thank Tippers module settings in the admin panel
 
 - **Thank tippers above tokens**: allows to avoid thanking every single low tip; NB: this is off-by-one on purpose, so that to thank people for their tips from 25 tokens and up, you have to set this to 24
 - **Thank tippers publicly background color**: color of the text for the public notice; written in CSS/HTML format [1]
@@ -33,6 +35,8 @@ Please feel free to [discuss improvements and issues on GitHub](https://github.c
 - **Thank tippers privately boldness**: thickness of the the text for the private notice (NB: "bold" and "bolder" are often the same)
 - **Thank tippers privately format**: template to format the private notice; available variables are: {AMOUNT} for the tip amount, {TIPPER} for the tipper's nickname, {SERVICE} for the label of the item corresponding to the tip amount
 - **Thank tippers remind tip note format**: template to format the personal reminder of the tip message (to its author, not in public chat); same format options as the private thanks; available variables are: {MESSAGE}
+
+## Tip Menu settings in the admin panel
 
 - **Tip menu header**: if set, will be displayed after the app name and before the first item
 - **Tip menu footer**: if set, will be displayed at the end of the tip menu
