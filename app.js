@@ -288,6 +288,12 @@ for(let i=0; i<nb_of_menu_items; ++i) {
     cb.settings_choices.push(new_item);
 }
 
+/*
+ * Removes remaining {VAR} syntax from a string
+ */
+function clear(str) {
+    return str.replace(/\s*{[A-Z_ -]+}\s*/, ' ').trim();
+}
 
 /*
  * Display errors in the chat
@@ -299,12 +305,12 @@ function alert_error(setting_name, error_lbl, bg_color=null, txt_color=null) {
 
     switch(cb.settings.errors_shown_to) {
         case lbl_errors_shown_to_host:
-            cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
+            cb.sendNotice(clear(msg), cb.room_slug, bg_color, txt_color, weight_bolder);
         break;
 
         case lbl_errors_shown_to_hostmods:
-            cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
-            cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder, group_mods);
+            cb.sendNotice(clear(msg), cb.room_slug, bg_color, txt_color, weight_bolder);
+            cb.sendNotice(clear(msg), cb.room_slug, bg_color, txt_color, weight_bolder, group_mods);
         break;
 
         default:
@@ -452,17 +458,17 @@ function show_menu() {
 
     switch(cb.settings.tip_menu_shown_to) {
         case lbl_tip_menu_shown_to_all:
-            cb.sendNotice(tip_menu, '', background_color, text_color, cb.settings.menu_boldness);
+            cb.sendNotice(clear(tip_menu), '', background_color, text_color, cb.settings.menu_boldness);
         break;
 
         case lbl_tip_menu_shown_to_fans:
-            cb.sendNotice(tip_menu, '', background_color, text_color, cb.settings.menu_boldness, group_fans); // send notice only to group
-            cb.sendNotice(tip_menu, cb.room_slug, background_color, text_color, cb.settings.menu_boldness); // also to the broadcaster for good measure
+            cb.sendNotice(clear(tip_menu), '', background_color, text_color, cb.settings.menu_boldness, group_fans); // send notice only to group
+            cb.sendNotice(clear(tip_menu), cb.room_slug, background_color, text_color, cb.settings.menu_boldness); // also to the broadcaster for good measure
         break;
 
         case lbl_tip_menu_shown_to_havetk:
-            cb.sendNotice(tip_menu, '', background_color, text_color, cb.settings.menu_boldness, group_havetk); // send notice only to group
-            cb.sendNotice(tip_menu, cb.room_slug, background_color, text_color, cb.settings.menu_boldness); // also tp the broadcaster for good measure
+            cb.sendNotice(clear(tip_menu), '', background_color, text_color, cb.settings.menu_boldness, group_havetk); // send notice only to group
+            cb.sendNotice(clear(tip_menu), cb.room_slug, background_color, text_color, cb.settings.menu_boldness); // also tp the broadcaster for good measure
         break;
 
         default:
@@ -529,7 +535,7 @@ function get_thanks_notice(tip) {
         notice = notice.replace('{SERVICE}', service_lbl);
     }
 
-    return notice.replace(/\s*{[A-Z_ -]+}\s*/, ' ').trim(); // clear any remaining vars
+    return notice;
 }
 
 /*
@@ -565,19 +571,19 @@ function thank_tipper(tip) {
     if(is_public_thanks()) {
         background_color = get_color_code('thank_tippers_publicly_background_color', color_white);
         text_color = get_color_code('thank_tippers_publicly_text_color', color_black);
-        cb.sendNotice(notice, '', background_color, text_color, cb.settings.thank_tippers_publicly_boldness);
+        cb.sendNotice(clear(notice), '', background_color, text_color, cb.settings.thank_tippers_publicly_boldness);
     }
     else {
         background_color = get_color_code('thank_tippers_privately_background_color', color_white);
         text_color = get_color_code('thank_tippers_privately_text_color', color_black);
-        cb.sendNotice(notice, tip.from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
+        cb.sendNotice(clear(notice), tip.from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
     }
 
     const private_notice = get_thank_tippers_remind_tip_note_notice(tip.message);
     if(private_notice) {
         background_color = get_color_code('thank_tippers_privately_background_color', color_white);
         text_color = get_color_code('thank_tippers_privately_text_color', color_black);
-        cb.sendNotice(private_notice, tip.from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
+        cb.sendNotice(clear(private_notice), tip.from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
     }
 }
 

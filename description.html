@@ -1,0 +1,135 @@
+<h1>Flexible tip menu usage &amp; configuration details</h1>
+
+<p>This is a tip menu app for Chaturbate. Fill in your prices and their description, and the app will repeat them in the chat as notices for your viewers to see.</p>
+<p>There are two levels of configuration: the settings in the standard Chaturbate admin panel to make the menu look how you want it to, and inside the source code to adjust the admin panel itself. All the options are described below.</p>
+<p>Why not configure everything in the Chaturbate interface? One example is the number of items: if 99 menu items are too many for you, feel free to reduce that value in the code of the app: the admin panel will be shorter as a result.</p>
+<p>One great feature is the ability to fill in the tip menu items as you think them up, and not worry about the order in which you write them or the specifics of what you write. Just put the amount first in the box, and the display format will be handled globally by the app. It's configurable too. Any empty menu item box will be ignored. Menu items that don't start with a number are ignored as well.</p>
+
+<p>Please feel free to <a href="https://github.com/william81fr/cb-flexible-tip-menu" target="_blank" rel="noreferer noopener">discuss improvements and issues on GitHub</a> (or to read a proper changelog).</p>
+
+<h2>Variables in the source code</h2>
+<dl>
+    <dt><span style="font-weight:bold">nb_of_menu_items</span>:</dt>
+    <dd>&middot; the number of configurable menu items from the admin panel</dd>
+
+    <dt><span style="font-weight:bold">enable_thank_tippers</span>:</dt>
+    <dd>&middot; enable/disable the "Thank Tippers" module of the app (its options will or will not be present in the admin panel depending on this)</dd>
+    <dd>&middot; true to enable, or false to disable</dd>
+</dl>
+
+<h2>Global settings in the admin panel</h2>
+<dl>
+    <dt><span style="font-weight:bold">App name</span>:</dt>
+    <dd>&middot; if set, this will be displayed in the chat at the top of the tip menu</dd>
+
+    <dt><span style="font-weight:bold">Tip menu shown to</span>:</dt>
+    <dd>&middot; whether to enable the tip menu at all, show it to everyone or to a subset of users</dd>
+
+    <dt><span style="font-weight:bold">Errors shown to</span>:</dt>
+    <dd>&middot; either the broadcaster or the moderators will be able to see the errors in the configuration of the app (in the chat), or nobody</dd>
+
+    <dt><span style="font-weight:bold">Thank tippers</span>:</dt>
+    <dd>&middot; if set to "n/a", the module is disabled</dd>
+    <dd>&middot; otherwise, tippers are thanked either publicly or privately</dd>
+</dl>
+
+<h2>Thank Tippers module settings in the admin panel</h2>
+<dl>
+    <dt><span style="font-weight:bold">Thank tippers above tokens</span>:</dt>
+    <dd>&middot; allows to avoid thanking every single low tip</dd>
+    <dd>&middot; NB: this is off-by-one on purpose, so that to thank people for their tips from 25 tokens and up, you have to set this to 24</dd>
+
+    <dt><span style="font-weight:bold">Thank tippers publicly background color</span>:</dt>
+    <dd>&middot; color of the background for the public notice</dd>
+    <dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+
+    <dt><span style="font-weight:bold">Thank tippers publicly text color</span>:</dt>
+    <dd>&middot; color of the text for the public notice</dd>
+    <dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+
+    <dt><span style="font-weight:bold">Thank tippers publicly boldness</span>:</dt>
+    <dd>&middot; thickness of the the text for the public notice</dd>
+    <dd>&middot; NB: "bold" and "bolder" are often the same</dd>
+
+    <dt><span style="font-weight:bold">Thank tippers publicly format</span>:</dt>
+    <dd>&middot; template to format the public notice</dd>
+    <dd>&middot; available variables are: {AMOUNT} for the tip amount, {TIPPER} for the tipper's nickname, {SERVICE} for the label of the item corresponding to the tip amount</dd>
+
+    <dt><span style="font-weight:bold">Thank tippers privately background color</span>:</dt>
+    <dd>&middot; color of the text for the private notice</dd>
+    <dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+
+    <dt><span style="font-weight:bold">Thank tippers privately text color</span>:</dt>
+    <dd>&middot; color of the text for the private notice</dd>
+    <dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+
+    <dt><span style="font-weight:bold">Thank tippers privately boldness</span>:</dt>
+    <dd>&middot; thickness of the the text for the private notice</dd>
+    <dd>&middot; NB: "bold" and "bolder" are often the same</dd>
+
+    <dt><span style="font-weight:bold">Thank tippers privately format</span>:</dt>
+    <dd>&middot; template to format the private notice</dd>
+    <dd>&middot; available variables are: {AMOUNT} for the tip amount, {TIPPER} for the tipper's nickname, {SERVICE} for the label of the item corresponding to the tip amount</dd>
+
+    <dt><span style="font-weight:bold">Thank tippers remind tip note format</span>:</dt>
+    <dd>&middot; template to format the personal reminder of the tip message (to its author, not in public chat)</dd>
+    <dd>&middot; same format options as the private thanks</dd>
+    <dd>&middot; available variables are: {MESSAGE}</dd>
+</dl>
+
+<h2>Tip Menu settings in the admin panel</h2>
+<dl>
+    <dt><span style="font-weight:bold">Tip menu header</span>:</dt>
+    <dd>&middot; if set, will be displayed after the app name and before the first item</dd>
+
+    <dt><span style="font-weight:bold">Tip menu footer</span>:</dt>
+    <dd>&middot; if set, will be displayed at the end of the tip menu</dd>
+
+    <dt><span style="font-weight:bold">Inline separator</span>:</dt>
+    <dd>&middot; if left empty, the tip menu will be multiline</dd>
+    <dd>&middot; otherwise, the tip menu will be displayed all in one line: in that case, the separator an be a comma or a dash or whatever text should appear between two tip menu items</dd>
+
+    <dt><span style="font-weight:bold">Inline spacing</span>:</dt>
+    <dd>&middot; if the inline separator is set, this option can be used to apply spacing to either side of the separator</dd>
+    <dd>&middot; for example, a comma might need only "right" spacing, while a dash might be better with spacing on both sides</dd>
+
+    <dt><span style="font-weight:bold">Menu background color</span>:</dt>
+    <dd>&middot; color of the background for the whole tip menu</dd>
+    <dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+
+    <dt><span style="font-weight:bold">Menu text color</span>:</dt>
+    <dd>&middot; color of the text for the whole tip menu</dd>
+    <dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+
+    <dt><span style="font-weight:bold">Menu boldness</span>:</dt>
+    <dd>&middot; thickness of the the text</dd>
+    <dd>&middot; NB: "bold" and "bolder" are often the same</dd>
+
+    <dt><span style="font-weight:bold">Menu repeat minutes</span>:</dt>
+    <dd>&middot; number of minutes before the menu is displayed again in the chat</dd>
+
+    <dt><span style="font-weight:bold">Menu item prefix</span>:</dt>
+    <dd>&middot; text that is prepended to all menu items</dd>
+    <dd>&middot; should allow for <code>:emoticons</code></dd>
+
+    <dt><span style="font-weight:bold">Menu item suffix</span>:</dt>
+    <dd>&middot; text that is appended to all menu items</dd>
+    <dd>&middot; should allow for <code>:emoticons</code></dd>
+
+    <dt><span style="font-weight:bold">Menu item display format</span>:</dt>
+    <dd>&middot; all subsequent menu items will be reformatted to this pattern</dd>
+    <dd>&middot; remember to include both <code>{AMOUNT}</code> and <code>{LABEL}</code></dd>
+    <dd>&middot; available variables are: {AMOUNT}, {LABEL}</dd>
+    <dd>&middot; see examples below</dd>
+    <dd>&middot; should allow for <code>:emoticons</code></dd>
+
+    <dt><span style="font-weight:bold">Sort order</span>:</dt>
+    <dd>&middot; in which order to sort the items (can be disabled too)</dd>
+
+    <dt><span style="font-weight:bold">Menu item XYZ</span>:</dt>
+    <dd>&middot; must start with a number followed by a text label</dd>
+    <dd>&middot; anything else will be ignored by the app (handy to disable an item temporarily)</dd>
+    <dd>&middot; should allow for <code>:emoticons</code></dd>
+</dl>
+
+<p><span style="font-weight:bold">[1]</span> Feel free to use <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool" target="_blank" rel="noreferer noopener">a tool like this one</a> to pick your colors (focus on the "HEXA" label that changes as you click on different colors). This app accepts both lowercase and uppercase color codes, and the # symbol is not required at the start.</p>
