@@ -7,7 +7,7 @@ const nb_of_menu_items = 99; // max number of configurable menu items
 const enable_thank_tippers = true; // whether the Thank Tippers module appears at all
 
 // don't modify anything from here on
-const is_debug = false; // this prevents the app from running, and instead show debug info in the chat
+const is_debug = false; // this prevents the app from running, and instead shows debug info in the chat
 
 const color_black = '#000000';
 const color_white = '#FFFFFF';
@@ -476,9 +476,16 @@ function show_menu() {
         default:
             // never mind
     }
+}
+
+/*
+ * Start the tip menu with a repeating timer
+ */
+function show_menu_handler() {
+    show_menu();
 
     if(0 < cb.settings.menu_repeat_minutes) {
-        cb.setTimeout(show_menu, 1000 * 60 * cb.settings.menu_repeat_minutes);
+        cb.setTimeout(show_menu_handler, 1000 * 60 * cb.settings.menu_repeat_minutes);
     }
 }
 
@@ -510,8 +517,7 @@ function is_public_thanks() {
 /*
  * Gets the formatted message to display in the chat for a tip
  */
-function get_thanks_notice(tip) {
-    const tip_amount = parseInt(tip.amount);
+function get_thanks_notice(tip_amount, from_user) {
     if(tip_amount <= cb.settings.thank_tippers_above_tokens) {
         return false;
     }
@@ -526,7 +532,7 @@ function get_thanks_notice(tip) {
 
     let notice = notice_tpl;
     notice = notice.replace('{AMOUNT}', tip_amount);
-    notice = notice.replace('{TIPPER}', tip.from_user);
+    notice = notice.replace('{TIPPER}', from_user);
 
     if(notice.includes('{SERVICE}')) {
         const service_lbl = find_service(tip_amount);
@@ -543,9 +549,9 @@ function get_thanks_notice(tip) {
 /*
  * Gets the formatted message to display as a private notice to remind the tipper of their tip note
  */
-function get_thank_tippers_remind_tip_note_notice(message){
+function get_thank_tippers_remind_tip_note_notice(tip_note){
     let res;
-    if('' === tip.message) {
+    if('' === tip_note) {
         res = false;
     }
     else if (!cb.settings.thank_tippers_remind_tip_note_format) {
@@ -555,20 +561,20 @@ function get_thank_tippers_remind_tip_note_notice(message){
         res = false;
     }
     else {
-        res = cb.settings.thank_tippers_remind_tip_note_format.replace('{MESSAGE}', message);
+        res = cb.settings.thank_tippers_remind_tip_note_format.replace('{MESSAGE}', tip_note);
     }
 
     return res;
 }
 
 /*
- * Callback for when a tip is sent, displays a notice to thank the tipper
+ * Displays a notice to thank the tipper
  */
-function thank_tipper(tip) {
+function thank_tipper(tip_amount, from_user, tip_note) {
     let background_color;
     let text_color;
 
-    const notice = get_thanks_notice(tip);
+    const notice = get_thanks_notice(tip_amount, from_user);
 
     if(is_public_thanks()) {
         background_color = get_color_code('thank_tippers_publicly_background_color', color_white);
@@ -578,15 +584,22 @@ function thank_tipper(tip) {
     else {
         background_color = get_color_code('thank_tippers_privately_background_color', color_white);
         text_color = get_color_code('thank_tippers_privately_text_color', color_black);
-        cb.sendNotice(clear(notice), tip.from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
+        cb.sendNotice(clear(notice), from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
     }
 
-    const private_notice = get_thank_tippers_remind_tip_note_notice(tip.message);
+    const private_notice = get_thank_tippers_remind_tip_note_notice(tip_note);
     if(private_notice) {
         background_color = get_color_code('thank_tippers_privately_background_color', color_white);
         text_color = get_color_code('thank_tippers_privately_text_color', color_black);
-        cb.sendNotice(clear(private_notice), tip.from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
+        cb.sendNotice(clear(private_notice), from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
     }
+}
+
+/*
+ * Callback for when a tip is sent
+ */
+function thank_tipper_handler(tip) {
+    thank_tipper(tip.amount, tip.from_user, tip.message);
 }
 
 /*
@@ -689,17 +702,19 @@ else if (!check_template_format('menu_item_display_format', ['AMOUNT', 'LABEL'])
 else {
     if(cb.settings.menu_repeat_minutes <= 0) {
         alert_error('menu_repeat_minutes', 'is set to zero, so the menu will not be shown again in the chat');
+        show_menu();
     }
-
-    // display the menu (it will re-display itself in a timed loop)
-    cb.setTimeout(show_menu, 1000 * 5);
+    else {
+        // display the menu (it will re-display itself in a timed loop)
+        cb.setTimeout(show_menu_handler, 1000 * 5);
+    }
 
 
     if(!enable_thank_tippers) {
         // never mind
     }
     else if(lbl_not_applicable === cb.settings.thank_tippers) {
-        alert_error('thank_tippers', 'is set to '+lbl_not_applicable+', so the thanking module is disabled', color_white, color_black);
+        alert_error('thank_tippers', 'is set to '+lbl_not_applicable+', so the thanking module is disabled', color_black, color_white);
     }
     else if(!check_template_format('thank_tippers_publicly_format', ['TIPPER'])) {
         alert_error('thank_tippers_publicly_format', 'has errors, so the thanking module is disabled', color_pastel_red, color_black);
@@ -709,6 +724,6 @@ else {
     }
     else {
         // start listening for tips
-        cb.onTip(thank_tipper);
+        cb.onTip(thank_tipper_handler);
     }
 }
