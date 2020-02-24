@@ -19,7 +19,6 @@ Please feel free to [discuss improvements and issues on GitHub](https://github.c
 ## Global settings in the admin panel
 
 - **App name**: if set, this will be displayed in the chat at the top of the tip menu
-- **Tip menu shown to**: Whether to enable the tip menu at all, show it to everyone or to a subset of users
 - **Errors shown to**: either the broadcaster or the moderators will be able to see the errors in the configuration of the app (in the chat), or nobody
 - **Thank tippers**: if set to "n/a", the module is disabled; otherwise, tippers are thanked either publicly or privately
 
@@ -38,6 +37,7 @@ Please feel free to [discuss improvements and issues on GitHub](https://github.c
 
 ## Tip Menu settings in the admin panel
 
+- **Tip menu shown to**: Whether to enable the tip menu at all, show it to everyone or to a subset of users
 - **Tip menu header**: if set, will be displayed after the app name and before the first item
 - **Tip menu footer**: if set, will be displayed at the end of the tip menu
 - **Inline separator**: if left empty, the tip menu will be multiline; but if set, the tip menu will be displayed all in one line: in that case, the separator an be a comma or a dash or whatever text should appear between two tip menu items

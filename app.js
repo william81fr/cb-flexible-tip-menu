@@ -41,7 +41,6 @@ const weight_normal = 'normal';
 const weight_bold = 'bold';
 const weight_bolder = 'bolder';
 
-const lbl_menu_item_prefix = 'menu item #';
 const lbl_not_applicable = 'n/a';
 const lbl_tip_menu_shown_to_all = 'everybody';
 const lbl_tip_menu_shown_to_fans = 'fans';
@@ -69,10 +68,54 @@ const default_menu_item_display_format = '{LABEL} ({AMOUNT}tk)';
 let shown_errors = []; // Used to show error messages only once
 
 
+//
+// CB has this feature where a setting name is transposed directly as a label in the admin UI
+//      for example, the "app_name" setting show as "App name" in the UI
+// Apparently, the first letter is capitalized and all underscores are changed into spaces
+//      but most other characters are kept, including punctuation
+//      NB: accentuated letters are stripped
+// Therefore, so as to keep our code readable, here is a map of variables and their labels:
+//
+const i18n = {
+    en: {
+        app_name: 'GLOBAL SETTINGS -------------------------- App name',
+        errors_shown_to: 'Show the errors to...',
+        thank_tippers: 'THANK TIPPERS MODULE -------------------------- Enable/disable',
+        thank_tippers_above_tokens: 'Tips below this limit will not get a thank you',
+        thank_tippers_publicly_background_color: 'Background color for the public thanks (hexa code)',
+        thank_tippers_publicly_text_color: 'Text color for the public thanks (hexa code)',
+        thank_tippers_publicly_boldness: 'Text thickness for the public thanks',
+        thank_tippers_publicly_format: 'Template for the public thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE})',
+        thank_tippers_privately_background_color: 'Background color for the private thanks (hexa code)',
+        thank_tippers_privately_text_color: 'Text color for the private thanks (hexa code)',
+        thank_tippers_privately_boldness: 'Text thickness for the private thanks',
+        thank_tippers_privately_format: 'Template for the private thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE})',
+        thank_tippers_remind_tip_note_format: 'Template for the tip note reminder (variables are: {MESSAGE})',
+        tip_menu_shown_to: 'TIP MENU -------------------------- Show the tip menu to...',
+        tip_menu_header: 'Line before the tip menu',
+        tip_menu_footer: 'Line at the end of the tip menu',
+        inline_separator: 'Separator for a one-line tip menu (leave empty for multi-line)',
+        inline_spacing: 'Spacing around the one-liner separator',
+        menu_background_color: 'Background color for the tip menu (hexa code)',
+        menu_text_color: 'Text color for the tip menu (hexa code)',
+        menu_boldness: 'Text thickness for the tip menu',
+        menu_repeat_minutes: 'Wait this long (in minutes) before repeating the menu',
+        menu_item_prefix: 'Text prefix for the menu items (prepend)',
+        menu_item_suffix: 'Text suffix for the menu items (append)',
+        menu_item_display_format: 'Template for the tip menu items (variables are: {LABEL}, {AMOUNT})',
+        sort_order: 'Sort the menu items before display, regarldless of their order below',
+        menu_item_lbl: 'menu item #',
+    },
+};
+
+
+//
+// Start storing settings
+//
 cb.settings_choices = [];
 
 cb.settings_choices.push({
-    'name': 'app_name',
+    'name': i18n.en.app_name,
     'type': 'str',
     'minLength': 1,
     'maxLength': 99,
@@ -80,17 +123,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'tip_menu_shown_to',
-    'type': 'choice',
-    'choice1': lbl_tip_menu_shown_to_all,
-    'choice2': lbl_tip_menu_shown_to_fans,
-    'choice3': lbl_tip_menu_shown_to_havetk,
-    'choice4': lbl_not_applicable,
-    'defaultValue': lbl_tip_menu_shown_to_all
-});
-
-cb.settings_choices.push({
-    'name': 'errors_shown_to',
+    'name': i18n.en.errors_shown_to,
     'type': 'choice',
     'choice1': lbl_errors_shown_to_host,
     'choice2': lbl_errors_shown_to_hostmods,
@@ -100,7 +133,7 @@ cb.settings_choices.push({
 
 if(enable_thank_tippers) {
     cb.settings_choices.push({
-        'name': 'thank_tippers',
+        'name': i18n.en.thank_tippers,
         'type': 'choice',
         'choice1': lbl_thank_tippers_publicly,
         'choice2': lbl_thank_tippers_privately,
@@ -109,7 +142,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_above_tokens',
+        'name': i18n.en.thank_tippers_above_tokens,
         'type': 'int',
         'minValue': 1,
         'maxValue': 999999,
@@ -117,7 +150,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_publicly_background_color',
+        'name': i18n.en.thank_tippers_publicly_background_color,
         'type': 'str',
         'minLength': 6,
         'maxLength': 7,
@@ -125,7 +158,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_publicly_text_color',
+        'name': i18n.en.thank_tippers_publicly_text_color,
         'type': 'str',
         'minLength': 6,
         'maxLength': 7,
@@ -133,7 +166,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_publicly_boldness',
+        'name': i18n.en.thank_tippers_publicly_boldness,
         'type': 'choice',
         'choice1': weight_normal,
         'choice2': weight_bold,
@@ -142,7 +175,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_publicly_format',
+        'name': i18n.en.thank_tippers_publicly_format,
         'type': 'str',
         'minLength': 10,
         'maxLength': 99,
@@ -150,7 +183,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_privately_background_color',
+        'name': i18n.en.thank_tippers_privately_background_color,
         'type': 'str',
         'minLength': 6,
         'maxLength': 7,
@@ -158,7 +191,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_privately_text_color',
+        'name': i18n.en.thank_tippers_privately_text_color,
         'type': 'str',
         'minLength': 6,
         'maxLength': 7,
@@ -166,7 +199,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_privately_boldness',
+        'name': i18n.en.thank_tippers_privately_boldness,
         'type': 'choice',
         'choice1': weight_normal,
         'choice2': weight_bold,
@@ -175,7 +208,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_privately_format',
+        'name': i18n.en.thank_tippers_privately_format,
         'type': 'str',
         'minLength': 10,
         'maxLength': 99,
@@ -183,7 +216,7 @@ if(enable_thank_tippers) {
     });
 
     cb.settings_choices.push({
-        'name': 'thank_tippers_remind_tip_note_format',
+        'name': i18n.en.thank_tippers_remind_tip_note_format,
         'type': 'str',
         'minLength': 10,
         'maxLength': 99,
@@ -192,7 +225,17 @@ if(enable_thank_tippers) {
 }
 
 cb.settings_choices.push({
-    'name': 'tip_menu_header',
+    'name': i18n.en.tip_menu_shown_to,
+    'type': 'choice',
+    'choice1': lbl_tip_menu_shown_to_all,
+    'choice2': lbl_tip_menu_shown_to_fans,
+    'choice3': lbl_tip_menu_shown_to_havetk,
+    'choice4': lbl_not_applicable,
+    'defaultValue': lbl_tip_menu_shown_to_all
+});
+
+cb.settings_choices.push({
+    'name': i18n.en.tip_menu_header,
     'type': 'str',
     'minLength': 1,
     'maxLength': 99,
@@ -200,7 +243,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'tip_menu_footer',
+    'name': i18n.en.tip_menu_footer,
     'type': 'str',
     'minLength': 1,
     'maxLength': 99,
@@ -208,7 +251,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'inline_separator',
+    'name': i18n.en.inline_separator,
     'type': 'str',
     'minLength': 0,
     'maxLength': 10,
@@ -216,7 +259,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'inline_spacing',
+    'name': i18n.en.inline_spacing,
     'type': 'choice',
     'choice1': lbl_inline_spacing_before,
     'choice2': lbl_inline_spacing_after,
@@ -227,7 +270,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'menu_background_color',
+    'name': i18n.en.menu_background_color,
     'type': 'str',
     'minLength': 6,
     'maxLength': 7,
@@ -235,7 +278,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'menu_text_color',
+    'name': i18n.en.menu_text_color,
     'type': 'str',
     'minLength': 6,
     'maxLength': 7,
@@ -243,7 +286,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'menu_boldness',
+    'name': i18n.en.menu_boldness,
     'type': 'choice',
     'choice1': weight_normal,
     'choice2': weight_bold,
@@ -252,7 +295,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'menu_repeat_minutes',
+    'name': i18n.en.menu_repeat_minutes,
     'type': 'int',
     'minValue': 0,
     'maxValue': 60,
@@ -260,7 +303,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'menu_item_prefix',
+    'name': i18n.en.menu_item_prefix,
     'type': 'str',
     'minLength': 0,
     'maxLength': 100,
@@ -268,7 +311,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'menu_item_suffix',
+    'name': i18n.en.menu_item_suffix,
     'type': 'str',
     'minLength': 0,
     'maxLength': 100,
@@ -276,7 +319,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'menu_item_display_format',
+    'name': i18n.en.menu_item_display_format,
     'type': 'str',
     'minLength': 10,
     'maxLength': 99,
@@ -284,7 +327,7 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-    'name': 'sort_order',
+    'name': i18n.en.sort_order,
     'type': 'choice',
     'choice1': lbl_sort_amount_asc,
     'choice2': lbl_sort_amount_desc,
@@ -294,7 +337,7 @@ cb.settings_choices.push({
 
 for(let i=0; i<nb_of_menu_items; ++i) {
     const new_item = {
-        'name': lbl_menu_item_prefix + (i+1),
+        'name': i18n.en.menu_item_lbl + (i+1),
         'type': 'str',
         'minLength': 1,
         'maxLength': 99,
@@ -309,29 +352,31 @@ for(let i=0; i<nb_of_menu_items; ++i) {
  * Removes remaining {VAR} syntax from a string
  */
 function clean_str(str) {
-    return str.replace(/\s*{[A-Z_ -]+}\s*/, ' ').trim();
+    return str.replace(/\s*{[A-Z_ -]+}\s*/g, ' ').trim();
 }
 
 /*
  * Display errors in the chat
  */
-function alert_error(setting_name, error_lbl, bg_color=null, txt_color=null) {
+function alert_error(cfg_name, error_lbl, bg_color=null, txt_color=null) {
     bg_color = bg_color ? bg_color : color_bright_red;
     txt_color = txt_color ? txt_color : color_white;
-    const app_name = cb.settings.app_name ? cb.settings.app_name : default_app_name
-    const msg = '/!\\ ATTN '+cb.room_slug+': "'+setting_name+'" setting in the '+app_name+' app '+error_lbl;
+    const app_name = cb.settings[i18n.en.app_name] ? cb.settings[i18n.en.app_name] : default_app_name;
+    const setting_name = ('undefined' === typeof i18n.en[cfg_name]) ? cfg_name : i18n.en[cfg_name];
+    const setting_value = ('undefined' === typeof i18n.en[cfg_name]) ? cb.settings[cfg_name] : cb.settings[i18n.en[cfg_name]];
+    const msg = '/!\\ ATTN '+cb.room_slug+': "'+setting_name+'" in '+app_name+' '+error_lbl+' (currently valued at "'+setting_value+'")';
     if(cbjs.arrayContains(shown_errors, msg)) {
         return;
     }
 
-    switch(cb.settings.errors_shown_to) {
+    switch(cb.settings[i18n.en.errors_shown_to]) {
         case lbl_errors_shown_to_host:
-            cb.sendNotice(clean_str(msg), cb.room_slug, bg_color, txt_color, weight_bolder);
+            cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
         break;
 
         case lbl_errors_shown_to_hostmods:
-            cb.sendNotice(clean_str(msg), cb.room_slug, bg_color, txt_color, weight_bolder);
-            cb.sendNotice(clean_str(msg), cb.room_slug, bg_color, txt_color, weight_bolder, group_mods);
+            cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
+            cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder, group_mods);
         break;
 
         default:
@@ -345,7 +390,8 @@ function alert_error(setting_name, error_lbl, bg_color=null, txt_color=null) {
  * Gets the hex value of a color from a settings value
  */
 function get_color_code(cfg_color, default_value) {
-    const color_match = cb.settings[cfg_color].match(/^#?([0-9a-f]{6})$/i);
+    const cfg_varname = i18n.en[cfg_color];
+    const color_match = cb.settings[cfg_varname].match(/^#?([0-9a-f]{6})$/i);
     if(!color_match) {
         alert_error(cfg_color, 'should start with # followed by 6 numbers and letters (0 to 9 numbers and A through F letters)');
         return default_value;
@@ -384,7 +430,7 @@ function get_items_separator(cfg_spacing, cfg_separator) {
 function get_menu_options() {
     let options_list = [];
     for(const setting_name in cb.settings) {
-        if(!setting_name.startsWith(lbl_menu_item_prefix)) continue;
+        if(!setting_name.startsWith(i18n.en.menu_item_lbl)) continue;
         if(typeof cb.settings[setting_name] !== 'string') continue;
 
         const setting_value = cb.settings[setting_name].trim();
@@ -405,10 +451,10 @@ function get_menu_options() {
         return [];
     }
 
-    if(lbl_not_applicable !== cb.settings.sort_order) {
+    if(lbl_not_applicable !== cb.settings[i18n.en.sort_order]) {
         options_list.sort(function(a, b) {
             let res;
-            if(lbl_sort_amount_asc === cb.settings.sort_order) {
+            if(lbl_sort_amount_asc === cb.settings[i18n.en.sort_order]) {
                 res = a.amount - b.amount;
             }
             else {
@@ -426,44 +472,48 @@ function get_menu_options() {
  * Gets the parametrized tip menu lines according to format setting
  */
 function get_tip_menu(options_list) {
+    const inline_spacing = cb.settings[i18n.en.inline_spacing];
+    const menu_item_prefix = cb.settings[i18n.en.menu_item_prefix];
+    const menu_item_suffix = cb.settings[i18n.en.menu_item_suffix];
+
     let tip_menu_items = [];
-    if('' !== cb.settings.app_name) {
-        tip_menu_items.push(cb.settings.app_name);
+    if('' !== cb.settings[i18n.en.app_name]) {
+        tip_menu_items.push(cb.settings[i18n.en.app_name]);
     }
 
-    if('' !== cb.settings.tip_menu_header) {
-        tip_menu_items.push(cb.settings.tip_menu_header);
+    if('' !== cb.settings[i18n.en.tip_menu_header]) {
+        tip_menu_items.push(cb.settings[i18n.en.tip_menu_header]);
     }
 
     for(const menu_option of options_list) {
         let msg = '';
-        if(cb.settings.menu_item_prefix) {
-            if(lbl_not_applicable !== cb.settings.inline_spacing) {
-                msg += cb.settings.menu_item_prefix+' ';
+        if(menu_item_prefix) {
+            if(lbl_not_applicable !== inline_spacing) {
+                msg += menu_item_prefix+' ';
             }
             else {
-                msg += cb.settings.menu_item_prefix;
+                msg += menu_item_prefix;
             }
         }
 
-        msg += cb.settings.menu_item_display_format;
-        msg = msg.replace('{AMOUNT}', menu_option.amount);
-        msg = msg.replace('{LABEL}', menu_option.label);
+        msg += cb.settings[i18n.en.menu_item_display_format];
+        msg = msg.replace(/{AMOUNT}/gi, menu_option.amount);
+        msg = msg.replace(/{LABEL}/gi, menu_option.label);
 
-        if(cb.settings.menu_item_suffix) {
-            if(lbl_not_applicable !== cb.settings.inline_spacing) {
-                msg += ' '+cb.settings.menu_item_suffix;
+        if(menu_item_suffix) {
+            if(lbl_not_applicable !== inline_spacing) {
+                msg += ' '+menu_item_suffix;
             }
             else {
-                msg += cb.settings.menu_item_suffix;
+                msg += menu_item_suffix;
             }
         }
 
         tip_menu_items.push(msg);
     }
 
-    if('' !== cb.settings.tip_menu_footer) {
-        tip_menu_items.push(cb.settings.tip_menu_footer);
+    if('' !== cb.settings[i18n.en.tip_menu_footer]) {
+        tip_menu_items.push(cb.settings[i18n.en.tip_menu_footer]);
     }
 
     return tip_menu_items;
@@ -473,33 +523,34 @@ function get_tip_menu(options_list) {
  * Display the tip menu
  */
 function show_menu(tip_menu_shown_to = null, username = null) {
+    const menu_boldness = cb.settings[i18n.en.menu_boldness];
     const background_color = get_color_code('menu_background_color', color_black);
     const text_color = get_color_code('menu_text_color', color_white);
     const options_list = get_menu_options();
-    const menu_items_separator = get_items_separator(cb.settings.inline_spacing, cb.settings.inline_separator);
+    const menu_items_separator = get_items_separator(cb.settings[i18n.en.inline_spacing], cb.settings[i18n.en.inline_separator]);
     const tip_menu = get_tip_menu(options_list).join(menu_items_separator);
 
     if(tip_menu_shown_to === null) {
-        tip_menu_shown_to = cb.settings.tip_menu_shown_to;
+        tip_menu_shown_to = cb.settings[i18n.en.tip_menu_shown_to];
     }
 
     switch(tip_menu_shown_to) {
         case lbl_tip_menu_shown_to_all:
-            cb.sendNotice(clean_str(tip_menu), '', background_color, text_color, cb.settings.menu_boldness);
+            cb.sendNotice(clean_str(tip_menu), '', background_color, text_color, menu_boldness);
         break;
 
         case lbl_tip_menu_shown_to_fans:
-            cb.sendNotice(clean_str(tip_menu), '', background_color, text_color, cb.settings.menu_boldness, group_fans); // send notice only to group
-            cb.sendNotice(clean_str(tip_menu), cb.room_slug, background_color, text_color, cb.settings.menu_boldness); // also to the broadcaster for good measure
+            cb.sendNotice(clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_fans); // send notice only to group
+            cb.sendNotice(clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
         break;
 
         case lbl_tip_menu_shown_to_havetk:
-            cb.sendNotice(clean_str(tip_menu), '', background_color, text_color, cb.settings.menu_boldness, group_havetk); // send notice only to group
-            cb.sendNotice(clean_str(tip_menu), cb.room_slug, background_color, text_color, cb.settings.menu_boldness); // also tp the broadcaster for good measure
+            cb.sendNotice(clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_havetk); // send notice only to group
+            cb.sendNotice(clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also tp the broadcaster for good measure
         break;
 
         case lbl_tip_menu_shown_to_self:
-            cb.sendNotice(clean_str(tip_menu), username, background_color, text_color, cb.settings.menu_boldness); // send notice only to username who asked for it
+            cb.sendNotice(clean_str(tip_menu), username, background_color, text_color, menu_boldness); // send notice only to username who asked for it
         break;
 
         default:
@@ -513,8 +564,8 @@ function show_menu(tip_menu_shown_to = null, username = null) {
 function show_menu_handler() {
     show_menu();
 
-    if(0 < cb.settings.menu_repeat_minutes) {
-        cb.setTimeout(show_menu_handler, 1000 * 60 * cb.settings.menu_repeat_minutes);
+    if(0 < cb.settings[i18n.en.menu_repeat_minutes]) {
+        cb.setTimeout(show_menu_handler, 1000 * 60 * cb.settings[i18n.en.menu_repeat_minutes]);
     }
 }
 
@@ -540,36 +591,36 @@ function find_service(tip_amount) {
  * Whether the thanks module displays public or private notices
  */
 function is_public_thanks() {
-    return lbl_thank_tippers_publicly === cb.settings.thank_tippers;
+    return lbl_thank_tippers_publicly === cb.settings[i18n.en.thank_tippers];
 }
 
 /*
  * Gets the formatted message to display in the chat for a tip
  */
 function get_thanks_notice(tip_amount, from_user) {
-    if(tip_amount <= cb.settings.thank_tippers_above_tokens) {
+    if(tip_amount <= cb.settings[i18n.en.thank_tippers_above_tokens]) {
         return false;
     }
 
     let notice_tpl;
     if(is_public_thanks()) {
-        notice_tpl = cb.settings.thank_tippers_publicly_format;
+        notice_tpl = cb.settings[i18n.en.thank_tippers_publicly_format];
     }
     else {
-        notice_tpl = cb.settings.thank_tippers_privately_format;
+        notice_tpl = cb.settings[i18n.en.thank_tippers_privately_format];
     }
 
     let notice = notice_tpl;
-    notice = notice.replace('{AMOUNT}', tip_amount);
-    notice = notice.replace('{TIPPER}', from_user);
+    notice = notice.replace(/{AMOUNT}/gi, tip_amount);
+    notice = notice.replace(/{TIPPER}/gi, from_user);
 
-    if(notice.includes('{SERVICE}')) {
+    if(notice.match(/{SERVICE}/gi)) {
         const service_lbl = find_service(tip_amount);
         if(!service_lbl) {
             return false;
         }
 
-        notice = notice.replace('{SERVICE}', service_lbl);
+        notice = notice.replace(/{SERVICE}/gi, service_lbl);
     }
 
     return notice;
@@ -583,14 +634,14 @@ function get_thank_tippers_remind_tip_note_notice(tip_note){
     if('' === tip_note) {
         res = false;
     }
-    else if (!cb.settings.thank_tippers_remind_tip_note_format) {
+    else if (!cb.settings[i18n.en.thank_tippers_remind_tip_note_format]) {
         res = false;
     }
-    else if(!cb.settings.thank_tippers_remind_tip_note_format.includes('{MESSAGE}')) {
+    else if(!cb.settings[i18n.en.thank_tippers_remind_tip_note_format].match(/{MESSAGE}/gi)) {
         res = false;
     }
     else {
-        res = cb.settings.thank_tippers_remind_tip_note_format.replace('{MESSAGE}', tip_note);
+        res = cb.settings[i18n.en.thank_tippers_remind_tip_note_format].replace(/{MESSAGE}/gi, tip_note);
     }
 
     return res;
@@ -608,19 +659,19 @@ function thank_tipper(tip_amount, from_user, tip_note) {
     if(is_public_thanks()) {
         background_color = get_color_code('thank_tippers_publicly_background_color', color_white);
         text_color = get_color_code('thank_tippers_publicly_text_color', color_black);
-        cb.sendNotice(clean_str(notice), '', background_color, text_color, cb.settings.thank_tippers_publicly_boldness);
+        cb.sendNotice(clean_str(notice), '', background_color, text_color, cb.settings[i18n.en.thank_tippers_publicly_boldness]);
     }
     else {
         background_color = get_color_code('thank_tippers_privately_background_color', color_white);
         text_color = get_color_code('thank_tippers_privately_text_color', color_black);
-        cb.sendNotice(clean_str(notice), from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
+        cb.sendNotice(clean_str(notice), from_user, background_color, text_color, cb.settings[i18n.en.thank_tippers_privately_boldness]);
     }
 
     const private_notice = get_thank_tippers_remind_tip_note_notice(tip_note);
     if(private_notice) {
         background_color = get_color_code('thank_tippers_privately_background_color', color_white);
         text_color = get_color_code('thank_tippers_privately_text_color', color_black);
-        cb.sendNotice(clean_str(private_notice), from_user, background_color, text_color, cb.settings.thank_tippers_privately_boldness);
+        cb.sendNotice(clean_str(private_notice), from_user, background_color, text_color, cb.settings[i18n.en.thank_tippers_privately_boldness]);
     }
 }
 
@@ -635,7 +686,8 @@ function thank_tipper_handler(tip) {
  * Whether a template string matches its expected format
  */
 function check_template_format(cfg_setting, expected_options) {
-    const notice_tpl = cb.settings[cfg_setting];
+    const cfg_varname = i18n.en[cfg_setting];
+    const notice_tpl = cb.settings[cfg_varname];
     if(!notice_tpl) {
         alert_error(cfg_setting, 'should not be empty');
         return false;
@@ -643,8 +695,9 @@ function check_template_format(cfg_setting, expected_options) {
 
     for(const i in expected_options) {
         const varname = '{'+expected_options[i]+'}';
-        if(!notice_tpl.includes(varname)) {
-            alert_error(cfg_setting, 'requires a '+varname+' value');
+        const regexp = new RegExp(varname, 'i');
+        if(!regexp.test(notice_tpl)) {
+            alert_error(cfg_setting, 'requires '+varname+' value');
             return false;
         }
     }
@@ -717,7 +770,7 @@ function basic_log(obj, lbl) {
  * Displays the app's list of commands
  */
 function show_commands_help(username, usergroup = null) {
-    const app_name = cb.settings.app_name ? cb.settings.app_name : default_app_name;
+    const app_name = cb.settings[i18n.en.app_name] ? cb.settings[i18n.en.app_name] : default_app_name;
     let commands_list = [];
     commands_list.push('Available commands for '+app_name+':');
     commands_list.push('/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)');
@@ -730,7 +783,7 @@ function show_commands_help(username, usergroup = null) {
  */
 function commands_handler(msg) {
     if('/' !== msg.m.substring(0, 1)) {
-        return; // not a command
+        return msg; // not a command
     }
 
     const command = msg.m.substring(1);
@@ -781,9 +834,9 @@ if(is_debug) {
     cb.sendNotice(basic_log(cbjs, 'cbjs').join("\n"), cb.room_slug, color_black, color_white);
     cb.sendNotice(basic_log(cb, 'cb').join("\n"), cb.room_slug, color_white, color_black);
 }
-else if(lbl_not_applicable === cb.settings.tip_menu_shown_to) {
+else if(lbl_not_applicable === cb.settings[i18n.en.tip_menu_shown_to]) {
     cb.setTimeout(function () {
-        alert_error('tip_menu_shown_to', 'is set to "'+lbl_not_applicable+'": app is stopped');
+        alert_error('tip_menu_shown_to', 'app is stopped');
     }, 1000 * 2);
 }
 else if (!check_template_format('menu_item_display_format', ['AMOUNT', 'LABEL'])) {
@@ -792,13 +845,13 @@ else if (!check_template_format('menu_item_display_format', ['AMOUNT', 'LABEL'])
     }, 1000 * 2);
 }
 else {
-    if(cb.settings.menu_repeat_minutes > 0) {
+    if(cb.settings[i18n.en.menu_repeat_minutes] > 0) {
         // display the menu (it will re-display itself in a timed loop)
         cb.setTimeout(show_menu_handler, 1000 * 2);
     }
     else {
         cb.setTimeout(function () {
-            alert_error('menu_repeat_minutes', 'is set to zero, so the menu will not be shown again in the chat');
+            alert_error('menu_repeat_minutes', 'the menu will not be shown again in the chat');
             show_menu();
         }, 1000 * 2);
     }
@@ -815,9 +868,9 @@ else {
     if(!enable_thank_tippers) {
         // never mind
     }
-    else if(lbl_not_applicable === cb.settings.thank_tippers) {
+    else if(lbl_not_applicable === cb.settings[i18n.en.thank_tippers]) {
         cb.setTimeout(function () {
-            alert_error('thank_tippers', 'is set to '+lbl_not_applicable+', so the thanking module is disabled', color_black, color_white);
+            alert_error('thank_tippers', 'disabled thanking module', color_black, color_white);
         }, 1000 * 2);
     }
     else if(!check_template_format('thank_tippers_publicly_format', ['TIPPER'])) {
