@@ -5,12 +5,12 @@
 
 // modify the next few lines to adjust the admin panel
 const nb_of_menu_items = 99; // max number of configurable menu items
-const enable_thank_tippers = true; // whether the Thank Tippers module appears at all
+const enable_thank_tippers = true; // whether the Thank Tippers module appears in the admin panel at all
+const lang = 'en'; // language of the admin panel; values are 'en' or 'fr'; save and come back to the admin panel to see the changes
 
 // don't modify anything from here on
 const default_app_name = 'Flexible Tip Menu';
 const is_debug = false; // this prevents the app from running, and instead shows debug info in the chat
-const lang = 'en';
 
 const color_black = '#000000';
 const color_white = '#FFFFFF';
@@ -170,7 +170,7 @@ cb.settings_choices.push({
     'type': 'str',
     'minLength': 1,
     'maxLength': 99,
-    'required': false
+    'required': false,
 });
 
 cb.settings_choices.push({
@@ -179,7 +179,7 @@ cb.settings_choices.push({
     'choice1': i18n[lang].lbl_errors_shown_to_host,
     'choice2': i18n[lang].lbl_errors_shown_to_hostmods,
     'choice3': i18n[lang].lbl_not_applicable,
-    'defaultValue': i18n[lang].lbl_errors_shown_to_host
+    'defaultValue': i18n[lang].lbl_errors_shown_to_host,
 });
 
 if(enable_thank_tippers) {
@@ -189,7 +189,7 @@ if(enable_thank_tippers) {
         'choice1': i18n[lang].lbl_thank_tippers_publicly,
         'choice2': i18n[lang].lbl_thank_tippers_privately,
         'choice3': i18n[lang].lbl_not_applicable,
-        'defaultValue': i18n[lang].lbl_not_applicable
+        'defaultValue': i18n[lang].lbl_not_applicable,
     });
 
     cb.settings_choices.push({
@@ -197,7 +197,7 @@ if(enable_thank_tippers) {
         'type': 'int',
         'minValue': 1,
         'maxValue': 999999,
-        'defaultValue': 24
+        'defaultValue': 24,
     });
 
     cb.settings_choices.push({
@@ -205,7 +205,7 @@ if(enable_thank_tippers) {
         'type': 'str',
         'minLength': 6,
         'maxLength': 7,
-        'defaultValue': color_white
+        'defaultValue': color_white,
     });
 
     cb.settings_choices.push({
@@ -213,7 +213,7 @@ if(enable_thank_tippers) {
         'type': 'str',
         'minLength': 6,
         'maxLength': 7,
-        'defaultValue': color_black
+        'defaultValue': color_black,
     });
 
     cb.settings_choices.push({
@@ -222,7 +222,7 @@ if(enable_thank_tippers) {
         'choice1': weight_normal,
         'choice2': weight_bold,
         'choice3': weight_bolder,
-        'defaultValue': weight_bold
+        'defaultValue': weight_bold,
     });
 
     cb.settings_choices.push({
@@ -230,7 +230,7 @@ if(enable_thank_tippers) {
         'type': 'str',
         'minLength': 10,
         'maxLength': 99,
-        'defaultValue': i18n[lang].default_thank_tippers_publicly_format
+        'defaultValue': i18n[lang].default_thank_tippers_publicly_format,
     });
 
     cb.settings_choices.push({
@@ -238,7 +238,7 @@ if(enable_thank_tippers) {
         'type': 'str',
         'minLength': 6,
         'maxLength': 7,
-        'defaultValue': color_white
+        'defaultValue': color_white,
     });
 
     cb.settings_choices.push({
@@ -246,7 +246,7 @@ if(enable_thank_tippers) {
         'type': 'str',
         'minLength': 6,
         'maxLength': 7,
-        'defaultValue': color_black
+        'defaultValue': color_black,
     });
 
     cb.settings_choices.push({
@@ -255,7 +255,7 @@ if(enable_thank_tippers) {
         'choice1': weight_normal,
         'choice2': weight_bold,
         'choice3': weight_bolder,
-        'defaultValue': weight_bold
+        'defaultValue': weight_bold,
     });
 
     cb.settings_choices.push({
@@ -263,7 +263,7 @@ if(enable_thank_tippers) {
         'type': 'str',
         'minLength': 10,
         'maxLength': 99,
-        'defaultValue': i18n[lang].default_thank_tippers_privately_format
+        'defaultValue': i18n[lang].default_thank_tippers_privately_format,
     });
 
     cb.settings_choices.push({
@@ -271,7 +271,7 @@ if(enable_thank_tippers) {
         'type': 'str',
         'minLength': 10,
         'maxLength': 99,
-        'defaultValue': i18n[lang].default_thank_tippers_remind_tip_note_format
+        'defaultValue': i18n[lang].default_thank_tippers_remind_tip_note_format,
     });
 }
 
@@ -282,7 +282,7 @@ cb.settings_choices.push({
     'choice2': i18n[lang].lbl_tip_menu_shown_to_fans,
     'choice3': i18n[lang].lbl_tip_menu_shown_to_havetk,
     'choice4': i18n[lang].lbl_not_applicable,
-    'defaultValue': i18n[lang].lbl_tip_menu_shown_to_all
+    'defaultValue': i18n[lang].lbl_tip_menu_shown_to_all,
 });
 
 cb.settings_choices.push({
@@ -290,7 +290,7 @@ cb.settings_choices.push({
     'type': 'str',
     'minLength': 1,
     'maxLength': 99,
-    'required': false
+    'required': false,
 });
 
 cb.settings_choices.push({
@@ -298,7 +298,7 @@ cb.settings_choices.push({
     'type': 'str',
     'minLength': 1,
     'maxLength': 99,
-    'required': false
+    'required': false,
 });
 
 cb.settings_choices.push({
@@ -306,7 +306,7 @@ cb.settings_choices.push({
     'type': 'str',
     'minLength': 0,
     'maxLength': 10,
-    'required': false
+    'required': false,
 });
 
 cb.settings_choices.push({
@@ -317,7 +317,7 @@ cb.settings_choices.push({
     'choice3': i18n[lang].lbl_inline_spacing_both,
     'choice4': i18n[lang].lbl_not_applicable,
     'defaultValue': i18n[lang].lbl_not_applicable,
-    'required': false
+    'required': false,
 });
 
 cb.settings_choices.push({
@@ -325,7 +325,7 @@ cb.settings_choices.push({
     'type': 'str',
     'minLength': 6,
     'maxLength': 7,
-    'defaultValue': color_black
+    'defaultValue': color_black,
 });
 
 cb.settings_choices.push({
@@ -333,7 +333,7 @@ cb.settings_choices.push({
     'type': 'str',
     'minLength': 6,
     'maxLength': 7,
-    'defaultValue': color_white
+    'defaultValue': color_white,
 });
 
 cb.settings_choices.push({
@@ -342,7 +342,7 @@ cb.settings_choices.push({
     'choice1': weight_normal,
     'choice2': weight_bold,
     'choice3': weight_bolder,
-    'defaultValue': weight_normal
+    'defaultValue': weight_normal,
 });
 
 cb.settings_choices.push({
@@ -350,7 +350,7 @@ cb.settings_choices.push({
     'type': 'int',
     'minValue': 0,
     'maxValue': 60,
-    'defaultValue': 10
+    'defaultValue': 10,
 });
 
 cb.settings_choices.push({
@@ -358,7 +358,7 @@ cb.settings_choices.push({
     'type': 'str',
     'minLength': 0,
     'maxLength': 100,
-    'required': false
+    'required': false,
 });
 
 cb.settings_choices.push({
@@ -366,7 +366,7 @@ cb.settings_choices.push({
     'type': 'str',
     'minLength': 0,
     'maxLength': 100,
-    'required': false
+    'required': false,
 });
 
 cb.settings_choices.push({
@@ -374,7 +374,7 @@ cb.settings_choices.push({
     'type': 'str',
     'minLength': 10,
     'maxLength': 99,
-    'defaultValue': i18n[lang].default_menu_item_display_format
+    'defaultValue': i18n[lang].default_menu_item_display_format,
 });
 
 cb.settings_choices.push({
@@ -383,7 +383,7 @@ cb.settings_choices.push({
     'choice1': i18n[lang].lbl_sort_amount_asc,
     'choice2': i18n[lang].lbl_sort_amount_desc,
     'choice3': i18n[lang].lbl_not_applicable,
-    'defaultValue': i18n[lang].lbl_sort_amount_asc
+    'defaultValue': i18n[lang].lbl_sort_amount_asc,
 });
 
 for(let i=0; i<nb_of_menu_items; ++i) {
@@ -393,7 +393,7 @@ for(let i=0; i<nb_of_menu_items; ++i) {
         'minLength': 1,
         'maxLength': 99,
         'defaultValue': '',
-        'required': false
+        'required': false,
     };
 
     cb.settings_choices.push(new_item);
