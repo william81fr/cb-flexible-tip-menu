@@ -1,12 +1,14 @@
 /*
  * Made by william81fr for goddesssrina
- * Improvements and issues at: https://github.com/william81fr/cb-flexible-tip-menu
+ *
+ * Please discuss improvements and issues at:
+ * https://github.com/william81fr/cb-flexible-tip-menu
  */
 
 // modify the next few lines to adjust the admin panel
+const lang = 'en'; // language of the admin panel; values are 'en' or 'fr'; save and come back to the admin panel to see the changes
 const nb_of_menu_items = 99; // max number of configurable menu items
 const enable_thank_tippers = true; // whether the Thank Tippers module appears in the admin panel at all
-const lang = 'en'; // language of the admin panel; values are 'en' or 'fr'; save and come back to the admin panel to see the changes
 
 // don't modify anything from here on
 const default_app_name = 'Flexible Tip Menu';
@@ -805,7 +807,7 @@ function basic_log(obj, lbl) {
 			break;
 
 			default:
-				// nvm
+				// never mind
 		}
 
 		dbgRows.push(msg);
@@ -870,7 +872,7 @@ function commands_handler(msg) {
 		}
 	}
 	else {
-		// nvm
+		// never mind
 	}
 
 	return msg;
