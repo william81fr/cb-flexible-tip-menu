@@ -6,13 +6,25 @@
  */
 
 
+//
 // modify the next few lines to adjust the admin panel
-const lang = 'en'; // language of the admin panel; values are 'en' or 'fr'; save and come back to the admin panel to see the changes
-const nb_of_menu_items = 99; // max number of configurable menu items
-const enable_thank_tippers = true; // whether the Thank Tippers module appears in the admin panel at all
+//
+
+// lang: language of the admin panel; values are 'en' or 'fr'
+// (save and come back to the admin panel to see the changes)
+const lang = 'en';
+
+// nb_of_menu_items: max number of configurable menu items
+const nb_of_menu_items = 99;
+
+// enable_thank_tippers: whether the Thank Tippers module appears in the admin panel at all
+const enable_thank_tippers = true;
 
 
+//
 // don't modify anything from here on
+//
+
 const default_app_name = 'Flexible Tip Menu'; // can be configured in the admin panel
 const is_debug = false; // this prevents the app from running, and instead shows debug info in the chat
 
@@ -43,28 +55,37 @@ let shown_errors = []; // Used to show error messages only once
 
 //
 // CB has this feature where a setting name is transposed directly as a label in the admin UI
-//	  for example, the "app_name" setting show as "App name" in the UI
+//		for example, a setting called "app_name" is shown as "App name" in the UI
 // Apparently, the first letter is capitalized and all underscores are changed into spaces
-//	  but most other characters are kept, including punctuation
-//	  NB: accentuated letters are stripped
+//		but most other characters are kept, including punctuation
+//		NB: accentuated letters are stripped
+//	All variable names are also converted to CSS class names (unless next to punctuation or as the last word); here are a few examples:
+//		- avoid "banner" in your variable name because it breaks the page layout (2020-02-29)
+//		- use "subject" in your variable name to hide the setting name in the admin panel (but still display the user input)
+//		- placing "message" in your variable name makes a big box with a tame yellow in the background
+//		- placing "importantmessage" in your variable name sets a reddish color as the background
+//		- placing "successmessage" in your variable name sets a green color as the background
+//		- placing "debugmessage" in your variable name sets a purple color as the background
+//		- placing "cambouncernotes" in your variable name sets a bright yellow color as the background
+//		- placing "creat" in your variable name makes a big button with orange background and white text, but also with a white arrow
 // Therefore, so as to keep our code readable, here is a map of variables and their labels:
 //
 const i18n = {
 	en: {
-		app_name: "GLOBAL SETTINGS -------------------------- App name",
-		errors_shown_to: "Show the errors to...",
-		thank_tippers: "THANK TIPPERS MODULE -------------------------- Enable/disable",
+		app_name: "GLOBAL SETTINGS -- importantmessage -- App name",
+		errors_shown_to: "Show the debugmessage errors to...",
+		thank_tippers: "THANK TIPPERS MODULE -- importantmessage -- Enable/disable",
 		thank_tippers_above_tokens: "Only tips above this limit will get a thank you",
 		thank_tippers_publicly_background_color: "Background color for the public thanks (hexa code)",
 		thank_tippers_publicly_text_color: "Text color for the public thanks (hexa code)",
 		thank_tippers_publicly_boldness: "Text thickness for the public thanks",
-		thank_tippers_publicly_format: "Template for the public thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE})",
+		thank_tippers_publicly_format: "Template for the public thanks (variables in successmessage are: {TIPPER}, {AMOUNT}, {SERVICE}) - english recommended",
 		thank_tippers_privately_background_color: "Background color for the private thanks (hexa code)",
 		thank_tippers_privately_text_color: "Text color for the private thanks (hexa code)",
 		thank_tippers_privately_boldness: "Text thickness for the private thanks",
-		thank_tippers_privately_format: "Template for the private thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE})",
-		thank_tippers_remind_tip_note_format: "Template for the tip note reminder (variables are: {MESSAGE})",
-		tip_menu_shown_to: "TIP MENU -------------------------- Show the tip menu to...",
+		thank_tippers_privately_format: "Template for the private thanks (variables in successmessage are: {TIPPER}, {AMOUNT}, {SERVICE}) - english recommended",
+		thank_tippers_remind_tip_note_format: "Template for the tip note reminder (variables in successmessage are: {MESSAGE}) - english recommended",
+		tip_menu_shown_to: "TIP MENU -- importantmessage -- Show the tip menu to...",
 		tip_menu_header: "Line before the tip menu",
 		tip_menu_footer: "Line at the end of the tip menu",
 		inline_separator: "Separator for a one-line tip menu (leave empty for multi-line)",
@@ -75,7 +96,7 @@ const i18n = {
 		menu_repeat_minutes: "Wait this long (in minutes) before repeating the menu",
 		menu_item_prefix: "Text prefix for the menu items (prepend)",
 		menu_item_suffix: "Text suffix for the menu items (append)",
-		menu_item_display_format: "Template for the tip menu items (variables are: {LABEL}, {AMOUNT})",
+		menu_item_display_format: "Template for the tip menu items (variables in successmessage are: {LABEL}, {AMOUNT}) - english recommended",
 		sort_order: "Sort the menu items before display, regardless of their order below",
 		menu_item_lbl: "menu item #",
 		lbl_not_applicable: "n/a",
@@ -100,22 +121,39 @@ const i18n = {
 		default_thank_tippers_privately_format: "Thank you {TIPPER} for your {AMOUNT}tk tip",
 		default_thank_tippers_remind_tip_note_format: "Your tip note was: {MESSAGE}",
 		default_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
+		errmsg_format: "/!\\ ATTN {BROADCASTER}: '{SETTING}' in {APP} {LABEL} (currently valued at '{VALUE}')",
+		errmsg_app_disabled: "app is stopped",
+		errmsg_app_errors: "has errors: app is stopped",
+		errmsg_missing: "requires {LABEL} value",
+		errmsg_empty: "should not be empty",
+		errmsg_color_format: "should start with # followed by 6 numbers and letters (0 to 9 numbers and A through F letters)",
+		errmsg_tipmenu_once: "the menu will not be shown again in the chat",
+		errmsg_tipmenu_entire: "tip menu as a whole",
+		errmsg_tipmenu_noitems: "requires at least one valid item: the app will not display anything at this time",
+		errmsg_tipmenu_item_format: "should start with a number followed by a label: disabled for now",
+		errmsg_thanks_module_disabled: "disabled thanking module",
+		errmsg_thanks_module_errors: "has errors, so the thanking module is disabled",
+		errmsg_dbg_start: "dbg start for '{LABEL}' object at {TIME}",
+		errmsg_dbg_end: "dbg end for '{LABEL}' object at {TIME}",
+		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
+		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
+		expl_commands_colorslist_recommend_english: "/colors or /colorslist -- Display a list of color codes",
 	},
 	es: {
-		app_name: "OPCIONES GLOBALES -------------------------- Nombre de la aplicacion",
+		app_name: "OPCIONES GLOBALES -- importantmessage -- Nombre de la aplicacion",
 		errors_shown_to: "Quien puede ver los errors...",
-		thank_tippers: "MODULO AGRADECIMIENTOS -------------------------- Activar/desactivar",
+		thank_tippers: "MODULO AGRADECIMIENTOS -- importantmessage -- Activar/desactivar",
 		thank_tippers_above_tokens: "Solo los tips que superan este limite tendran gracias",
 		thank_tippers_publicly_background_color: "Color de fondo para las gracias en publico (codigo hexa)",
 		thank_tippers_publicly_text_color: "Color del texto para las gracias en publico (codigo hexa)",
 		thank_tippers_publicly_boldness: "Grosor de la letra para las gracias en publico",
-		thank_tippers_publicly_format: "Modelo del mensaje para las gracias en publico (variables son: {TIPPER}, {AMOUNT}, {SERVICE})",
+		thank_tippers_publicly_format: "Modelo del mensaje para las gracias en publico (variables son: {TIPPER}, {AMOUNT}, {SERVICE}) - ingles recommendado",
 		thank_tippers_privately_background_color: "Color de fondo para las gracias en privado (codigo hexa)",
 		thank_tippers_privately_text_color: "Color del texto para las gracias en privado (codigo hexa)",
 		thank_tippers_privately_boldness: "Grosor de la letra para las gracias en privado",
-		thank_tippers_privately_format: "Modelo del mensaje para las gracias en privado (variables son: {TIPPER}, {AMOUNT}, {SERVICE})",
-		thank_tippers_remind_tip_note_format: "Modelo del mensaje para el recordatorio de tip note (variables son: {MESSAGE})",
-		tip_menu_shown_to: "MENU DE TIPS -------------------------- Quien ve el menu...",
+		thank_tippers_privately_format: "Modelo del mensaje para las gracias en privado (variables son: {TIPPER}, {AMOUNT}, {SERVICE}) - ingles recommendado",
+		thank_tippers_remind_tip_note_format: "Modelo del mensaje para el recordatorio de tip note (variables son: {MESSAGE}) - ingles recommendado",
+		tip_menu_shown_to: "MENU DE TIPS -- importantmessage -- Quien ve el menu...",
 		tip_menu_header: "Linea antes del menu de tips",
 		tip_menu_footer: "Linea despues del menu de tips",
 		inline_separator: "Separacion para un menu monolinea (dejar vacio para multi ligne)",
@@ -126,7 +164,7 @@ const i18n = {
 		menu_repeat_minutes: "Esperar este tiempo (en minutos) y repetir el menu",
 		menu_item_prefix: "Prefijo para cada elemento del menu",
 		menu_item_suffix: "Sufijo para cada elemento del menu",
-		menu_item_display_format: "Modelo del mensaje para el menu de tips (variables son: {LABEL}, {AMOUNT})",
+		menu_item_display_format: "Modelo del mensaje para el menu de tips (variables son: {LABEL}, {AMOUNT}) - ingles recommendado",
 		sort_order: "Ordenar el menu, sin tener cuenta de la orden aqui abajo",
 		menu_item_lbl: "elemento del menu #",
 		lbl_not_applicable: "n/a",
@@ -151,22 +189,39 @@ const i18n = {
 		default_thank_tippers_privately_format: "Thank you {TIPPER} for your {AMOUNT}tk tip",
 		default_thank_tippers_remind_tip_note_format: "Your tip note was: {MESSAGE}",
 		default_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
+		errmsg_format: "/!\\ ATTN {BROADCASTER}: '{SETTING}' in {APP} {LABEL} (currently valued at '{VALUE}')",
+		errmsg_app_disabled: "app is stopped",
+		errmsg_app_errors: "has errors: app is stopped",
+		errmsg_missing: "requires {LABEL} value",
+		errmsg_empty: "should not be empty",
+		errmsg_color_format: "should start with # followed by 6 numbers and letters (0 to 9 numbers and A through F letters)",
+		errmsg_tipmenu_once: "the menu will not be shown again in the chat",
+		errmsg_tipmenu_entire: "tip menu as a whole",
+		errmsg_tipmenu_noitems: "requires at least one valid item: the app will not display anything at this time",
+		errmsg_tipmenu_item_format: "should start with a number followed by a label: disabled for now",
+		errmsg_thanks_module_disabled: "disabled thanking module",
+		errmsg_thanks_module_errors: "has errors, so the thanking module is disabled",
+		errmsg_dbg_start: "dbg start for '{LABEL}' object at {TIME}",
+		errmsg_dbg_end: "dbg end for '{LABEL}' object at {TIME}",
+		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
+		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
+		expl_commands_colorslist_recommend_english: "/colors or /colorslist -- Display a list of color codes",
 	},
 	fr: {
-		app_name: "PARAMETRES GENERAUX -------------------------- Nom de l'aplication",
+		app_name: "PARAMETRES GENERAUX -- importantmessage -- Nom de l'aplication",
 		errors_shown_to: "A qui montrer les erreurs...",
-		thank_tippers: "MODULE REMERCIEMENT -------------------------- Activer/desactiver",
+		thank_tippers: "MODULE REMERCIEMENT -- importantmessage -- Activer/desactiver",
 		thank_tippers_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
 		thank_tippers_publicly_background_color: "Couleur de fond pour les remerciements en public (code hexa)",
 		thank_tippers_publicly_text_color: "Couleur du texte pour les remerciements en public (code hexa)",
 		thank_tippers_publicly_boldness: "Epaisseur du texte pour les remerciements en public",
-		thank_tippers_publicly_format: "Modele du message pour les remerciements en public (variables sont : {TIPPER}, {AMOUNT}, {SERVICE})",
+		thank_tippers_publicly_format: "Modele du message pour les remerciements en public (variables sont : {TIPPER}, {AMOUNT}, {SERVICE}) - anglais recommande",
 		thank_tippers_privately_background_color: "Couleur de fond pour les remerciements prives (code hexa)",
 		thank_tippers_privately_text_color: "Couleur du texte pour les remerciements prives (code hexa)",
 		thank_tippers_privately_boldness: "Epaisseur du texte pour les remerciements prives",
-		thank_tippers_privately_format: "Modele du message pour les remerciements prives (variables sont : {TIPPER}, {AMOUNT}, {SERVICE})",
-		thank_tippers_remind_tip_note_format: "Modele du message pour le rappel de tip note (variables sont : {MESSAGE})",
-		tip_menu_shown_to: "MENU DE TIPS -------------------------- A qui proposer le menu...",
+		thank_tippers_privately_format: "Modele du message pour les remerciements prives (variables sont : {TIPPER}, {AMOUNT}, {SERVICE}) - anglais recommande",
+		thank_tippers_remind_tip_note_format: "Modele du message pour le rappel de tip note (variables sont : {MESSAGE}) - anglais recommande",
+		tip_menu_shown_to: "MENU DE TIPS -- importantmessage -- A qui proposer le menu...",
 		tip_menu_header: "Ligne avant le menu de tips",
 		tip_menu_footer: "Ligne apres le menu de tips",
 		inline_separator: "Separateur pour un menu monoligne (laisser vide pour multi ligne)",
@@ -177,7 +232,7 @@ const i18n = {
 		menu_repeat_minutes: "Attendre ce delai (en minutes) avant de repeter le menu",
 		menu_item_prefix: "Prefixe pour chaque element du menu",
 		menu_item_suffix: "Suffixe pour chaque element du menu",
-		menu_item_display_format: "Modele du message pour le menu de tips (variables sont : {LABEL}, {AMOUNT})",
+		menu_item_display_format: "Modele du message pour le menu de tips (variables sont : {LABEL}, {AMOUNT}) - anglais recommande",
 		sort_order: "Trier le menu avant affichage, peu importe l'ordre ci dessous",
 		menu_item_lbl: "element du menu #",
 		lbl_not_applicable: "n/a",
@@ -202,6 +257,23 @@ const i18n = {
 		default_thank_tippers_privately_format: "Thank you {TIPPER} for your {AMOUNT}tk tip",
 		default_thank_tippers_remind_tip_note_format: "Your tip note was: {MESSAGE}",
 		default_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
+		errmsg_format: "/!\\ ATTN {BROADCASTER}: '{SETTING}' dans {APP} {LABEL} (vaut actuellement '{VALUE}')",
+		errmsg_app_disabled: "l'app est arretee",
+		errmsg_app_errors: "a des erreurs : l'app est arretee",
+		errmsg_missing: "necessite une valeur {LABEL}",
+		errmsg_empty: "ne devrait pas etre vide",
+		errmsg_color_format: "devrait commencer par un # suivi de 6 chiffres et lettres (chiffres de 0 jusque 9 et lettres de A jusque F)",
+		errmsg_tipmenu_once: "le menu ne sera pas repete dans le chat",
+		errmsg_tipmenu_entire: "le menu dans son ensemble",
+		errmsg_tipmenu_noitems: "requiert au moins un element valide: l'app ne peut rien afficher",
+		errmsg_tipmenu_item_format: "devrait commencer par un nombre suivi d'un libelle : desactive pour le moment",
+		errmsg_thanks_module_disabled: "module de remerciements inactif",
+		errmsg_thanks_module_errors: "contient des erreurs, ainsi le module de remerciements est inactif",
+		errmsg_dbg_start: "debut dbg pour '{LABEL}' a {TIME}",
+		errmsg_dbg_end: "fin dbg pour '{LABEL}' a {TIME}",
+		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
+		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
+		expl_commands_colorslist_recommend_english: "/colors or /colorslist -- Display a list of color codes",
 	},
 };
 
@@ -461,7 +533,7 @@ function alert_error(cfg_name, error_lbl, bg_color=null, txt_color=null) {
 	const app_name = cb.settings[i18n[lang].app_name] ? cb.settings[i18n[lang].app_name] : i18n[lang].default_app_name;
 	const setting_name = ('undefined' === typeof i18n[lang][cfg_name]) ? cfg_name : i18n[lang][cfg_name];
 	const setting_value = ('undefined' === typeof i18n[lang][cfg_name]) ? cb.settings[cfg_name] : cb.settings[i18n[lang][cfg_name]];
-	const msg = '/!\\ ATTN '+cb.room_slug+': "'+setting_name+'" in '+app_name+' '+error_lbl+' (currently valued at "'+setting_value+'")';
+	const msg = i18n[lang].errmsg_format.replace(/{BROADCASTER}/, cb.room_slug).replace(/{SETTING}/, setting_name).replace(/{APP}/, app_name).replace(/{LABEL}/, error_lbl).replace(/{VALUE}/, setting_value);
 	if(cbjs.arrayContains(shown_errors, msg)) {
 		return;
 	}
@@ -490,7 +562,7 @@ function get_color_code(cfg_color, default_value) {
 	const cfg_varname = i18n[lang][cfg_color];
 	const color_match = cb.settings[cfg_varname].match(/^#?([0-9a-f]{6})$/i);
 	if(!color_match) {
-		alert_error(cfg_color, 'should start with # followed by 6 numbers and letters (0 to 9 numbers and A through F letters)');
+		alert_error(cfg_color, i18n[lang].errmsg_color_format);
 		return default_value;
 	}
 
@@ -535,7 +607,7 @@ function get_menu_options() {
 
 		const menu_item = setting_value.match(/^([0-9]+)(.+)$/i);
 		if(null === menu_item) {
-			alert_error(setting_name, 'should start with a number followed by a label: disabled for now', colors_list['pastel red'], colors_list.black);
+			alert_error(setting_name, i18n[lang].errmsg_tipmenu_item_format, colors_list['pastel red'], colors_list.black);
 			continue;
 		}
 
@@ -544,7 +616,7 @@ function get_menu_options() {
 	};
 
 	if(0 === options_list.length) {
-		alert_error('tip menu as a whole', 'requires at least one valid item: the app will not display anything at this time');
+		alert_error(i18n[lang].errmsg_tipmenu_entire, i18n[lang].errmsg_tipmenu_noitems);
 		return [];
 	}
 
@@ -786,7 +858,7 @@ function check_template_format(cfg_setting, expected_options) {
 	const cfg_varname = i18n[lang][cfg_setting];
 	const notice_tpl = cb.settings[cfg_varname];
 	if(!notice_tpl) {
-		alert_error(cfg_setting, 'should not be empty');
+		alert_error(cfg_setting, i18n[lang].errmsg_empty);
 		return false;
 	}
 
@@ -794,7 +866,7 @@ function check_template_format(cfg_setting, expected_options) {
 		const varname = '{'+expected_options[i]+'}';
 		const regexp = new RegExp(varname, 'i');
 		if(!regexp.test(notice_tpl)) {
-			alert_error(cfg_setting, 'requires '+varname+' value');
+			alert_error(cfg_setting, i18n[lang].errmsg_missing.replace(/{LABEL}/, varname));
 			return false;
 		}
 	}
@@ -809,7 +881,7 @@ function basic_log(obj, lbl) {
 	let dbgRows = [];
 
 	const dbgStart = new Date(Date.now());
-	dbgRows.push('dbg start for "'+lbl+'" object at '+dbgStart.toTimeString());
+	dbgRows.push(i18n[lang].errmsg_dbg_start.replace(/{LABEL}/, lbl).replace(/{TIME}/, dbgStart.toTimeString()));
 
 	for(const idx in obj) {
 		const type = typeof(obj[idx]);
@@ -858,7 +930,7 @@ function basic_log(obj, lbl) {
 	}
 
 	const dbgEnd = new Date(Date.now());
-	dbgRows.push('dbg end for "'+lbl+'" object at '+dbgEnd.toTimeString());
+	dbgRows.push(i18n[lang].errmsg_dbg_end.replace(/{LABEL}/, lbl).replace(/{TIME}/, dbgEnd.toTimeString()));
 
 	return dbgRows;
 }
@@ -869,9 +941,9 @@ function basic_log(obj, lbl) {
 function show_commands_help(username, usergroup = null) {
 	const app_name = cb.settings[i18n[lang].app_name] ? cb.settings[i18n[lang].app_name] : i18n[lang].default_app_name;
 	let commands_list = [];
-	commands_list.push('Available commands for '+app_name+':');
-	commands_list.push('/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)');
-	commands_list.push('/colors or /colorslist -- Display a list of color codes');
+	commands_list.push(i18n[lang].expl_commands_available_recommend_english.replace(/{LABEL}/, app_name));
+	commands_list.push(i18n[lang].expl_commands_tipmenu_recommend_english);
+	commands_list.push(i18n[lang].expl_commands_colorslist_recommend_english);
 	cb.sendNotice(commands_list.join("\n"), username, colors_list.black, colors_list.white, '', usergroup);
 }
 
@@ -933,12 +1005,12 @@ if(is_debug) {
 }
 else if(i18n[lang].lbl_not_applicable === cb.settings[i18n[lang].tip_menu_shown_to]) {
 	cb.setTimeout(function () {
-		alert_error('tip_menu_shown_to', 'app is stopped');
+		alert_error('tip_menu_shown_to', i18n[lang].errmsg_app_disabled);
 	}, 1000 * 2);
 }
 else if (!check_template_format('menu_item_display_format', ['AMOUNT', 'LABEL'])) {
 	cb.setTimeout(function () {
-		alert_error('menu_item_display_format', 'has errors: app is stopped');
+		alert_error('menu_item_display_format', i18n[lang].errmsg_app_errors);
 	}, 1000 * 2);
 }
 else {
@@ -948,7 +1020,7 @@ else {
 	}
 	else {
 		cb.setTimeout(function () {
-			alert_error('menu_repeat_minutes', 'the menu will not be shown again in the chat');
+			alert_error('menu_repeat_minutes', i18n[lang].errmsg_tipmenu_once);
 			show_menu();
 		}, 1000 * 2);
 	}
@@ -967,17 +1039,17 @@ else {
 	}
 	else if(i18n[lang].lbl_not_applicable === cb.settings[i18n[lang].thank_tippers]) {
 		cb.setTimeout(function () {
-			alert_error('thank_tippers', 'disabled thanking module', colors_list.black, colors_list.white);
+			alert_error('thank_tippers', i18n[lang].errmsg_thanks_module_disabled, colors_list.black, colors_list.white);
 		}, 1000 * 2);
 	}
 	else if(!check_template_format('thank_tippers_publicly_format', ['TIPPER'])) {
 		cb.setTimeout(function () {
-			alert_error('thank_tippers_publicly_format', 'has errors, so the thanking module is disabled', colors_list['pastel red'], colors_list.black);
+			alert_error('thank_tippers_publicly_format', i18n[lang].errmsg_thanks_module_errors, colors_list['pastel red'], colors_list.black);
 		}, 1000 * 2);
 	}
 	else if(!check_template_format('thank_tippers_privately_format', ['TIPPER'])) {
 		cb.setTimeout(function () {
-			alert_error('thank_tippers_privately_format', 'has errors, so the thanking module is disabled', colors_list['pastel red'], colors_list.black);
+			alert_error('thank_tippers_privately_format', i18n[lang].errmsg_thanks_module_errors, colors_list['pastel red'], colors_list.black);
 		}, 1000 * 2);
 	}
 	else {
