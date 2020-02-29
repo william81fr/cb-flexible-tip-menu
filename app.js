@@ -56,19 +56,23 @@ let shown_errors = []; // Used to show error messages only once
 //
 // CB has this feature where a setting name is transposed directly as a label in the admin UI
 //		for example, a setting called "app_name" is shown as "App name" in the UI
+//
 // Apparently, the first letter is capitalized and all underscores are changed into spaces
 //		but most other characters are kept, including punctuation
 //		NB: accentuated letters are stripped
+//
 //	All variable names are also converted to CSS class names (unless next to punctuation or as the last word); here are a few examples:
 //		- avoid "banner" in your variable name because it breaks the page layout (2020-02-29)
 //		- use "subject" in your variable name to hide the setting name in the admin panel (but still display the user input)
-//		- placing "message" in your variable name makes a big box with a tame yellow in the background
+//		- placing "message" or "top_alert" in your variable name makes a big box with a tame yellow in the background
 //		- placing "importantmessage" in your variable name sets a reddish color as the background
 //		- placing "successmessage" in your variable name sets a green color as the background
 //		- placing "debugmessage" in your variable name sets a purple color as the background
 //		- placing "cambouncernotes" in your variable name sets a bright yellow color as the background
 //		- placing "creat" in your variable name makes a big button with orange background and white text, but also with a white arrow
-// Therefore, so as to keep our code readable, here is a map of variables and their labels:
+//		- placing "code" in your variable name will use a fixed-size font
+//
+// In order to keep our code readable, here is a map of variables and their labels:
 //
 const i18n = {
 	en: {
