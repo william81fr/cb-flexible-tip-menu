@@ -1,25 +1,59 @@
 <h1>Flexible tip menu usage &amp; configuration details</h1>
 
-<p>This is a tip menu app for Chaturbate. Fill in your prices and their description, and the app will repeat them in the chat as notices for your viewers to see.</p>
-<p>There are two levels of configuration: the settings in the standard Chaturbate admin panel to make the menu look how you want it to, and inside the source code to adjust the admin panel itself. All the options are described below.</p>
-<p>Why not configure everything in the Chaturbate interface? One example is the number of items: if 99 menu items are too many for you, feel free to reduce that value in the code of the app: the admin panel will be shorter as a result.</p>
-<p>One great feature is the ability to fill in the tip menu items as you think them up, and not worry about the order in which you write them or the specifics of what you write. Just put the amount first in the box, and the display format will be handled globally by the app. It's configurable too. Any empty menu item box will be ignored. Menu items that don't start with a number are ignored as well.</p>
-
-<p>All text boxes can display graphics (if you choose to do so). There are two kinds of graphics: </p>
-
-<p>Please feel free to <a href="https://github.com/william81fr/cb-flexible-tip-menu" target="_blank" rel="noreferer noopener">discuss improvements and issues on GitHub</a> (or to read a proper changelog).</p>
-
-<h2>Variables in the source code</h2>
 <dl>
+	<dt><span style="font-weight:bold">English</span>:</dt>
+	<dd>&middot; This is a tip menu app for Chaturbate.</dd>
+	<dd>&middot; Fill in your prices and their description, and the bot will repeat them in the chat as notices for your viewers to see.</dd>
+
+	<dt><span style="font-weight:bold">Español</span>:</dt>
+	<dd>&middot; Esto es un bot de tip menu para Chaturbate.</dd>
+	<dd>&middot; Rellenas tus precios y su descripcion, y el bot los repetirá en el chat con noticias a los usuarios.</dd>
+	<dd>&middot; El admin panel "Launch Bot" mismo se puede cambiar al español.</dd>
+
+	<dt><span style="font-weight:bold">Français</span>:</dt>
+	<dd>&middot; Ceci est un bot de tip menu pour Chaturbate.</dd>
+	<dd>&middot; Remplissez vos prix et leur description, et le bot se chargera de les rappeler dans le chat.</dd>
+	<dd>&middot; Le panneau de configuration "Launch Bot" peut lui-même être affiché en français.</dd>
+</dl>
+
+<p>One great feature of this bot is the ability to fill in the tip menu items as you think them up, and not worry about the order in which you write them or the specifics of what you write. Just put the amount first in the box, and the display format will be handled globally by the app. It's configurable too. Any empty menu item box will be ignored. Menu items that don't start with a number are ignored as well.</p>
+<p>There are two levels of configuration: the settings in the "Launch Bot" admin panel to make the menu look how you want it to, and inside the source code to adjust the admin panel itself. All the options are described below.</p>
+<p>Why not configure everything in the "Launch Bot" page? One example is to translate the admin panel itself; another is the number of items: if 99 menu items are too many for you, feel free to reduce that value in the code of the app: the admin panel will be shorter as a result.</p>
+<p class="message">Please feel free to <a href="https://github.com/william81fr/cb-flexible-tip-menu" target="_blank" rel="noreferer noopener">discuss improvements and issues on GitHub</a> (or to read a proper changelog).</p>
+
+
+<h2>A. Adding visuals to your notices</h2>
+<p>All text boxes in the admin panel can display graphics (if you choose to do so). There are two kinds of graphics:</p>
+<dl>
+	<dt><span style="font-weight:bold">Emoji &amp; the like</span>:</dt>
+	<dd>&middot; those can be emoji or plain text that just happens to look like an image, for example the snowman: &#9731;</dd>
+	<dd>&middot; they can be copy/pasted directly</dd>
+	<dd>&middot; the way to look them up is either by "emoji" or "unicode" searches</dd>
+
+	<dt><span style="font-weight:bold">Emoticons</span>:</dt>
+	<dd>&middot; they can be animated or not</dd>
+	<dd>&middot; they can't be copy/pasted without using their code</dd>
+	<dd>&middot; they are entered as text, with a colon followed by the name of the GIF</dd>
+	<dd>&middot; as an example, <span class="code">:heart2</span> displays <img src="https://public.chaturbate.com/uploads/avatar/2012/04/21/tIdqu5wjkWIDF.jpg" alt="static heart img"/>, while <span class="code">:heart7</span> translates to <img src="https://public.chaturbate.com/uploads/avatar/2014/01/03/Xc1F3sxBShvtN.jpg" alt="animated heart img"/> and <span class="code">:crownsilver</span> shows as <img src="https://public.chaturbate.com/uploads/avatar/2016/09/03/22/08/9bb827cc2580febd2f99326e661583e9136e560b.jpg" alt="silver crown img"/></dd>
+	<dd>&middot; one way to look them up is by hovering the mouse cursor over such an image in the chat, and after a few seconds you will see its code in a tooltip</dd>
+	<dd>&middot; another way is to start typing a colon in the chat followed by a letter and the chat will suggest emote codes for you: click one and you will get a preview of the image</dd>
+	<dd>&middot; any user on CB can upload an image of their choice and thus create a new <span class="code">:code</span> for the chat and for apps to use</dd>
+</dl>
+
+<h2>B. Variables in the source code</h2>
+<dl>
+	<dt><span style="font-weight:bold">lang</span>:</dt>
+	<dd>&middot; the language of the admin panel: it can be one of <span class="code">en</span>, <span class="code">es</span> or <span class="code">fr</span></dd>
+
 	<dt><span style="font-weight:bold">nb_of_menu_items</span>:</dt>
 	<dd>&middot; the number of configurable menu items from the admin panel</dd>
 
 	<dt><span style="font-weight:bold">enable_thank_tippers</span>:</dt>
 	<dd>&middot; enable/disable the "Thank Tippers" module of the app (its options will or will not be present in the admin panel depending on this)</dd>
-	<dd>&middot; true to enable, or false to disable</dd>
+	<dd>&middot; <span class="code">true</span> to enable, or <span class="code">false</span> to disable</dd>
 </dl>
 
-<h2>Global settings in the admin panel</h2>
+<h2>C. Global settings in the admin panel</h2>
 <dl>
 	<dt><span style="font-weight:bold">App name</span>:</dt>
 	<dd>&middot; if set, this will be displayed in the chat at the top of the tip menu</dd>
@@ -32,7 +66,7 @@
 	<dd>&middot; otherwise, tippers are thanked either publicly or privately</dd>
 </dl>
 
-<h2>Thank Tippers module settings in the admin panel</h2>
+<h2>D. Thank Tippers module settings in the admin panel</h2>
 <dl>
 	<dt><span style="font-weight:bold">Thank tippers above tokens</span>:</dt>
 	<dd>&middot; allows to avoid thanking every single low tip</dd>
@@ -52,7 +86,7 @@
 
 	<dt><span style="font-weight:bold">Thank tippers publicly format</span>:</dt>
 	<dd>&middot; template to format the public notice</dd>
-	<dd>&middot; available variables are: {AMOUNT} for the tip amount, {TIPPER} for the tipper's nickname, {SERVICE} for the label of the item corresponding to the tip amount</dd>
+	<dd>&middot; available variables are: <span class="code">{AMOUNT}</span> for the tip amount, <span class="code">{TIPPER}</span> for the tipper's nickname, <span class="code">{SERVICE}</span> for the label of the item corresponding to the tip amount</dd>
 
 	<dt><span style="font-weight:bold">Thank tippers privately background color</span>:</dt>
 	<dd>&middot; color of the text for the private notice</dd>
@@ -68,15 +102,15 @@
 
 	<dt><span style="font-weight:bold">Thank tippers privately format</span>:</dt>
 	<dd>&middot; template to format the private notice</dd>
-	<dd>&middot; available variables are: {AMOUNT} for the tip amount, {TIPPER} for the tipper's nickname, {SERVICE} for the label of the item corresponding to the tip amount</dd>
+	<dd>&middot; available variables are: <span class="code">{AMOUNT}</span> for the tip amount, <span class="code">{TIPPER}</span> for the tipper's nickname, <span class="code">{SERVICE}</span> for the label of the item corresponding to the tip amount</dd>
 
 	<dt><span style="font-weight:bold">Thank tippers remind tip note format</span>:</dt>
 	<dd>&middot; template to format the personal reminder of the tip message (to its author, not in public chat)</dd>
 	<dd>&middot; same format options as the private thanks</dd>
-	<dd>&middot; available variables are: {MESSAGE}</dd>
+	<dd>&middot; available variables are: <span class="code">{MESSAGE}</span></dd>
 </dl>
 
-<h2>Tip Menu settings in the admin panel</h2>
+<h2>E. Tip Menu settings in the admin panel</h2>
 <dl>
 	<dt><span style="font-weight:bold">Tip menu shown to</span>:</dt>
 	<dd>&middot; whether to enable the tip menu at all, show it to everyone or to a subset of users</dd>
@@ -112,18 +146,18 @@
 
 	<dt><span style="font-weight:bold">Menu item prefix</span>:</dt>
 	<dd>&middot; text that is prepended to all menu items</dd>
-	<dd>&middot; should allow for <code>:emoticons</code></dd>
+	<dd>&middot; allows the use of <span class="code">:emoticons</span></dd>
 
 	<dt><span style="font-weight:bold">Menu item suffix</span>:</dt>
 	<dd>&middot; text that is appended to all menu items</dd>
-	<dd>&middot; should allow for <code>:emoticons</code></dd>
+	<dd>&middot; allows the use of <span class="code">:emoticons</span></dd>
 
 	<dt><span style="font-weight:bold">Menu item display format</span>:</dt>
 	<dd>&middot; all subsequent menu items will be reformatted to this pattern</dd>
-	<dd>&middot; remember to include both <code>{AMOUNT}</code> and <code>{LABEL}</code></dd>
-	<dd>&middot; available variables are: {AMOUNT}, {LABEL}</dd>
+	<dd>&middot; remember to include both <span class="code">{AMOUNT}</span> and <span class="code">{LABEL}</span></dd>
+	<dd>&middot; available variables are: <span class="code">{AMOUNT}</span>, <span class="code">{LABEL}</span></dd>
 	<dd>&middot; see examples below</dd>
-	<dd>&middot; should allow for <code>:emoticons</code></dd>
+	<dd>&middot; allows the use of <span class="code">:emoticons</span></dd>
 
 	<dt><span style="font-weight:bold">Sort order</span>:</dt>
 	<dd>&middot; in which order to sort the items (can be disabled too)</dd>
@@ -131,7 +165,7 @@
 	<dt><span style="font-weight:bold">Menu item XYZ</span>:</dt>
 	<dd>&middot; must start with a number followed by a text label</dd>
 	<dd>&middot; anything else will be ignored by the app (handy to disable an item temporarily)</dd>
-	<dd>&middot; should allow for <code>:emoticons</code></dd>
+	<dd>&middot; allows the use of <span class="code">:emoticons</span></dd>
 </dl>
 
 <p><span style="font-weight:bold">[1]</span> Feel free to use <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool" target="_blank" rel="noreferer noopener">a tool like this one</a> to pick your colors (focus on the "HEXA" label that changes as you click on different colors). This app accepts both lowercase and uppercase color codes, and the # symbol is not required at the start.</p>
