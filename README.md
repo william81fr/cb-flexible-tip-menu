@@ -1,18 +1,19 @@
 # Flexible tip menu usage & configuration details
 
 
-This is a [tip menu app](https://chaturbate.com/apps/app_details/flexible-tip-menu/) for Chaturbate. Fill in your prices and their description, and the app will repeat them in the chat as notices for your viewers to see.
+This is a [tip menu bot](https://chaturbate.com/apps/app_details/flexible-tip-menu/) for [Chaturbate](https://chaturbate.com). Fill in your prices and their description, and the bot will repeat them in the chat as notices for your viewers to see.
 
-There are two levels of configuration: the settings in the standard Chaturbate admin panel to make the menu look how you want it to, and inside the source code to adjust the admin panel itself. All the options are described below.
+One great feature of this bot is the ability to fill in the tip menu items as you think them up, and not worry about the order in which you write them or the specifics of what you write. Just put the amount first in the box, and the display format will be handled globally by the app. It's configurable too. Any empty menu item box will be ignored. Menu items that don't start with a number are ignored as well.
 
-Why not configure everything in the Chaturbate interface? One example is the number of items: if 99 menu items are too many for you, feel free to reduce that value in the code of the app: the admin panel will be shorter as a result.
+There are two levels of configuration: the settings in the "Launch Bot" admin panel to make the menu look how you want it to, and inside the source code to adjust the admin panel itself. All the options are described below.
 
-One great feature is the ability to fill in the tip menu items as you think them up, and not worry about the order in which you write them or the specifics of what you write. Just put the amount first in the box, and the display format will be handled globally by the app. It's configurable too. Any empty menu item box will be ignored. Menu items that don't start with a number are ignored as well.
+Why not configure everything in the "Launch Bot" page? One example is to translate the admin panel itself; another is the number of items: if 99 menu items are too many for you, feel free to reduce that value in the code of the app: the admin panel will be shorter as a result.
 
 Please feel free to [discuss improvements and issues on GitHub](https://github.com/william81fr/cb-flexible-tip-menu)  (or to read a proper changelog).
 
 ## Variables in the source code
 
+- **lang**: the language of the admin panel
 - **nb_of_menu_items**: the number of configurable menu items from the admin panel
 - **enable_thank_tippers**: enable/disable the "Thank Tippers" module of the app in the admin panel (its options will or will not be present in the admin panel depending on this); true to enable, or false to disable
 
