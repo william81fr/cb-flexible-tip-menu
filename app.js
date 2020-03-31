@@ -52,6 +52,8 @@ const weight_bolder = 'bolder';
 
 let shown_errors = []; // Used to show error messages only once
 
+// ([\u{0000}-\u{024F}]+|[\u{1F600}-\u{1F64F}]+)
+
 
 //
 // CB has this feature where a setting name is transposed directly as a label in the admin UI
@@ -593,10 +595,11 @@ function clean_str(str) {
 function alert_error(cfg_name, error_lbl, bg_color=null, txt_color=null) {
 	bg_color = bg_color ? bg_color : colors_list['bright red'];
 	txt_color = txt_color ? txt_color : colors_list.white;
-	const app_name = cb.settings[settings_list.app_name] ? cb.settings[settings_list.app_name] : i18n[lang].default_app_name;
+	const app_name = cb.settings[settings_list.app_name] ? cb.settings[settings_list.app_name] : default_app_name;
 	const setting_name = ('undefined' === typeof i18n[lang][cfg_name]) ? cfg_name : i18n[lang][cfg_name];
-	const setting_value = ('undefined' === typeof i18n[lang][cfg_name]) ? cb.settings[cfg_name] : cb.settings[i18n[lang][cfg_name]];
-	const msg = i18n[lang].errmsg_format.replace(/{BROADCASTER}/, cb.room_slug).replace(/{SETTING}/, setting_name).replace(/{APP}/, app_name).replace(/{LABEL}/, error_lbl).replace(/{VALUE}/, setting_value);
+	const setting_value = cb.settings[settings_list[cfg_name]];
+	const errmsg_format = i18n[lang].errmsg_format;
+	const msg = errmsg_format.replace(/{BROADCASTER}/, cb.room_slug).replace(/{APP}/, app_name).replace(/{LABEL}/, error_lbl).replace(/{VALUE}/, setting_value).replace(/{SETTING}/, setting_name);
 	if(cbjs.arrayContains(shown_errors, msg)) {
 		return;
 	}
@@ -622,8 +625,8 @@ function alert_error(cfg_name, error_lbl, bg_color=null, txt_color=null) {
  * Gets the hex value of a color from a settings value
  */
 function get_color_code(cfg_color, default_value) {
-	const cfg_varname = i18n[lang][cfg_color];
-	const color_match = cb.settings[cfg_varname].match(/^#?([0-9a-f]{6})$/i);
+	const cfg_value = cb.settings[settings_list[cfg_color]];
+	const color_match = cfg_value.match(/^#?([0-9a-f]{6})$/i);
 	if(!color_match) {
 		alert_error(cfg_color, i18n[lang].errmsg_color_format);
 		return default_value;
@@ -919,7 +922,7 @@ function thank_tipper_handler(tip) {
  */
 function check_template_format(cfg_setting, expected_options) {
 	const cfg_varname = i18n[lang][cfg_setting];
-	const notice_tpl = cb.settings[cfg_varname];
+	const notice_tpl = cb.settings[settings_list[cfg_setting]];
 	if(!notice_tpl) {
 		alert_error(cfg_setting, i18n[lang].errmsg_empty);
 		return false;
@@ -1002,7 +1005,7 @@ function basic_log(obj, lbl) {
  * Displays the app's list of commands
  */
 function show_commands_help(username, usergroup = null) {
-	const app_name = cb.settings[settings_list.app_name] ? cb.settings[settings_list.app_name] : i18n[lang].default_app_name;
+	const app_name = cb.settings[settings_list.app_name] ? cb.settings[settings_list.app_name] : default_app_name;
 	let commands_list = [];
 	commands_list.push(i18n[lang].expl_commands_available_recommend_english.replace(/{LABEL}/, app_name));
 	commands_list.push(i18n[lang].expl_commands_tipmenu_recommend_english);
