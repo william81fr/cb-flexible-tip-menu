@@ -1,4 +1,4 @@
-/*
+/**
  * Made by william81fr
  *
  * Please discuss improvements and issues at:
@@ -412,28 +412,28 @@ const i18n = {
 // Custom functions
 //
 
-class FlexibleTipMenu {
-	/*
-	 * Removes remaining {VAR} syntax from a string
-	 */
-	static clean_str(str) {
-		if(!str) {
+const FlexibleTipMenu = {
+	/**
+	* Removes remaining {VAR} syntax from a string
+	*/
+	clean_str: function(str) {
+		if(!str.trim()) {
 			return '';
 		}
 
 		return str.replace(allvarnames_pattern, ' ').trim();
-	}
+	},
 
-	/*
-	 * Display errors in the chat
-	 */
-	static alert_error(cfg_name, error_lbl, bg_color=null, txt_color=null) {
+	/**
+	* Display errors in the chat
+	*/
+	alert_error: function(cfg_name, error_lbl, bg_color=null, txt_color=null) {
 		bg_color = bg_color ? bg_color : colors_list['bright red'];
 		txt_color = txt_color ? txt_color : colors_list.white;
-		const app_name = ftm.val('app_name') ? ftm.val('app_name') : default_app_name;
-		const setting_name = ftm.i18n(cfg_name) === null ? cfg_name : ftm.i18n(cfg_name);
-		const setting_value = ftm.val(cfg_name);
-		const errmsg_format = ftm.i18n('errmsg_format');
+		const app_name = FlexibleTipMenu.val('app_name') ? FlexibleTipMenu.val('app_name') : default_app_name;
+		const setting_name = (null === FlexibleTipMenu.i18n(cfg_name)) ? cfg_name : FlexibleTipMenu.i18n(cfg_name);
+		const setting_value = FlexibleTipMenu.val(cfg_name);
+		const errmsg_format = FlexibleTipMenu.i18n('errmsg_format');
 		const msg = errmsg_format
 			.replace(generic_patterns.broadcaster_name, cb.room_slug)
 			.replace(generic_patterns.app_name, app_name)
@@ -444,12 +444,12 @@ class FlexibleTipMenu {
 			return;
 		}
 
-		switch(ftm.val('errors_flag')) {
-			case ftm.i18n('lbl_errors_host'):
+		switch(FlexibleTipMenu.val('errors_flag')) {
+			case FlexibleTipMenu.i18n('lbl_errors_host'):
 				cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
 			break;
 
-			case ftm.i18n('lbl_errors_hostmods'):
+			case FlexibleTipMenu.i18n('lbl_errors_hostmods'):
 				cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
 				cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder, group_mods);
 			break;
@@ -459,37 +459,37 @@ class FlexibleTipMenu {
 		}
 
 		shown_errors.push(msg);
-	}
+	},
 
-	/*
-	 * Gets the hex value of a color from a settings value
-	 */
-	static get_color_code(cfg_color, default_value) {
-		const cfg_value = ftm.val(cfg_color);
+	/**
+	* Gets the hex value of a color from a settings value
+	*/
+	get_color_code: function(cfg_color, default_value) {
+		const cfg_value = FlexibleTipMenu.val(cfg_color);
 		const color_match = hexcolor_pattern.exec(cfg_value);
 		if(null === color_match) {
-			ftm.alert_error(cfg_color, ftm.i18n('errmsg_color_format'));
+			FlexibleTipMenu.alert_error(cfg_color, FlexibleTipMenu.i18n('errmsg_color_format'));
 			return default_value;
 		}
 
 		return '#'+(color_match[1].toUpperCase());
-	}
+	},
 
-	/*
-	 * Gets the menu items separator, whether multi- or single-line and according to spacing setting
-	 */
-	static get_items_separator(cfg_spacing, cfg_separator) {
+	/**
+	* Gets the menu items separator, whether multi- or single-line and according to spacing setting
+	*/
+	get_items_separator: function(cfg_spacing, cfg_separator) {
 		let items_separator;
 		if('' === cfg_separator) {
 			items_separator = "\n";
 		}
-		else if(ftm.i18n('lbl_inline_spacing_before') === cfg_spacing) {
+		else if(FlexibleTipMenu.i18n('lbl_inline_spacing_before') === cfg_spacing) {
 			items_separator = ' '+cfg_separator;
 		}
-		else if(ftm.i18n('lbl_inline_spacing_after') === cfg_spacing) {
+		else if(FlexibleTipMenu.i18n('lbl_inline_spacing_after') === cfg_spacing) {
 			items_separator = cfg_separator+' ';
 		}
-		else if(ftm.i18n('lbl_inline_spacing_both') === cfg_spacing) {
+		else if(FlexibleTipMenu.i18n('lbl_inline_spacing_both') === cfg_spacing) {
 			items_separator = ' '+cfg_separator+' ';
 		}
 		else {
@@ -497,12 +497,12 @@ class FlexibleTipMenu {
 		}
 
 		return items_separator;
-	}
+	},
 
-	/*
-	 * Gets the sorted list of menu items from the app settings
-	 */
-	static get_menu_options() {
+	/**
+	* Gets the sorted list of menu items from the app settings
+	*/
+	get_menu_options: function() {
 		let options_list = [];
 		for(const setting_name in cb.settings) {
 			if(!setting_name.startsWith(settings_list.menu_item_lbl)) continue;
@@ -513,7 +513,7 @@ class FlexibleTipMenu {
 
 			const menu_item = menuitem_pattern.exec(setting_value);
 			if(null === menu_item) {
-				ftm.alert_error(setting_name, ftm.i18n('errmsg_tipmenu_item_format'), colors_list['pastel red'], colors_list.black);
+				FlexibleTipMenu.alert_error(setting_name, FlexibleTipMenu.i18n('errmsg_tipmenu_item_format'), colors_list['pastel red'], colors_list.black);
 				continue;
 			}
 
@@ -522,14 +522,14 @@ class FlexibleTipMenu {
 		};
 
 		if(0 === options_list.length) {
-			ftm.alert_error(ftm.i18n('errmsg_tipmenu_entire'), ftm.i18n('errmsg_tipmenu_noitems'));
+			FlexibleTipMenu.alert_error(FlexibleTipMenu.i18n('errmsg_tipmenu_entire'), FlexibleTipMenu.i18n('errmsg_tipmenu_noitems'));
 			return [];
 		}
 
-		if(!ftm.is_disabled('sort_order')) {
+		if(!FlexibleTipMenu.is_disabled('sort_order')) {
 			options_list.sort(function(a, b) {
 				let res;
-				if(ftm.i18n('lbl_sort_amount_asc') === ftm.val('sort_order')) {
+				if(FlexibleTipMenu.i18n('lbl_sort_amount_asc') === FlexibleTipMenu.val('sort_order')) {
 					res = a.amount - b.amount;
 				}
 				else {
@@ -541,34 +541,32 @@ class FlexibleTipMenu {
 		}
 
 		return options_list;
-	}
+	},
 
-	/*
-	 * Gets the parametrized tip menu lines according to format setting
-	 */
-	static get_tip_menu(options_list) {
-		const inline_spacing = ftm.val('inline_spacing');
-		const menu_item_prefix = ftm.val('menu_item_prefix');
-		const menu_item_suffix = ftm.val('menu_item_suffix');
-		const menu_item_display_format = ftm.val('menu_item_display_format');
+	/**
+	* Gets the parametrized tip menu lines according to format setting
+	*/
+	get_tip_menu: function(options_list) {
+		const has_inline_spacing = (FlexibleTipMenu.i18n('lbl_not_applicable') !== FlexibleTipMenu.val('inline_spacing'));
+		const menu_item_prefix = FlexibleTipMenu.val('menu_item_prefix');
+		const menu_item_suffix = FlexibleTipMenu.val('menu_item_suffix');
+		const menu_item_display_format = FlexibleTipMenu.val('menu_item_display_format');
 
 		let tip_menu_items = [];
-		if('' !== ftm.val('app_name')) {
-			tip_menu_items.push(ftm.val('app_name'));
+		if('' !== FlexibleTipMenu.val('app_name')) {
+			tip_menu_items.push(FlexibleTipMenu.val('app_name'));
 		}
 
-		if('' !== ftm.val('tip_menu_header')) {
-			tip_menu_items.push(ftm.val('tip_menu_header'));
+		if('' !== FlexibleTipMenu.val('tip_menu_header')) {
+			tip_menu_items.push(FlexibleTipMenu.val('tip_menu_header'));
 		}
 
 		for(const menu_option of options_list) {
 			let msg = '';
 			if(menu_item_prefix) {
-				if(lbl_not_applicable !== inline_spacing) {
-					msg += menu_item_prefix+' ';
-				}
-				else {
-					msg += menu_item_prefix;
+				msg += menu_item_prefix;
+				if(has_inline_spacing) {
+					msg += ' ';
 				}
 			}
 
@@ -578,88 +576,86 @@ class FlexibleTipMenu {
 			msg = msg.replace(generic_patterns.broadcaster_name, cb.room_slug);
 
 			if(menu_item_suffix) {
-				if(lbl_not_applicable !== inline_spacing) {
-					msg += ' '+menu_item_suffix;
-				}
-				else {
-					msg += menu_item_suffix;
+				msg += menu_item_suffix;
+				if(has_inline_spacing) {
+					msg += ' ';
 				}
 			}
 
 			tip_menu_items.push(msg);
 		}
 
-		if('' !== ftm.val('tip_menu_footer')) {
-			tip_menu_items.push(ftm.val('tip_menu_footer'));
+		if('' !== FlexibleTipMenu.val('tip_menu_footer')) {
+			tip_menu_items.push(FlexibleTipMenu.val('tip_menu_footer'));
 		}
 
 		return tip_menu_items;
-	}
+	},
 
-	/*
-	 * Display the tip menu
-	 */
-	static show_menu(tip_menu_flag = null, username = null) {
-		const menu_boldness = ftm.val('menu_boldness');
-		const background_color = ftm.get_color_code('menu_background_color', colors_list.black);
-		const text_color = ftm.get_color_code('menu_text_color', colors_list.white);
-		const options_list = ftm.get_menu_options();
-		const menu_items_separator = ftm.get_items_separator(ftm.val('inline_spacing'), ftm.val('inline_separator'));
-		const tip_menu = ftm.get_tip_menu(options_list).join(menu_items_separator);
+	/**
+	* Display the tip menu
+	*/
+	show_menu: function(tip_menu_flag = null, username = null) {
+		const menu_boldness = FlexibleTipMenu.val('menu_boldness');
+		const background_color = FlexibleTipMenu.get_color_code('menu_background_color', colors_list.black);
+		const text_color = FlexibleTipMenu.get_color_code('menu_text_color', colors_list.white);
+		const options_list = FlexibleTipMenu.get_menu_options();
+		const menu_items_separator = FlexibleTipMenu.get_items_separator(FlexibleTipMenu.val('inline_spacing'), FlexibleTipMenu.val('inline_separator'));
+		const tip_menu = FlexibleTipMenu.get_tip_menu(options_list).join(menu_items_separator);
 
 		if(tip_menu_flag === null) {
-			tip_menu_flag = ftm.val('tip_menu_flag');
+			tip_menu_flag = FlexibleTipMenu.val('tip_menu_flag');
 		}
 
 		switch(tip_menu_flag) {
-			case ftm.i18n('lbl_tip_menu_testing'):
-				cb.sendNotice(ftm.clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // only to the broadcaster
+			case FlexibleTipMenu.i18n('lbl_tip_menu_testing'):
+				cb.sendNotice(FlexibleTipMenu.clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // only to the broadcaster
 			break;
 
-			case ftm.i18n('lbl_tip_menu_all'):
-				cb.sendNotice(ftm.clean_str(tip_menu), '', background_color, text_color, menu_boldness);
+			case FlexibleTipMenu.i18n('lbl_tip_menu_all'):
+				cb.sendNotice(FlexibleTipMenu.clean_str(tip_menu), '', background_color, text_color, menu_boldness);
 			break;
 
-			case ftm.i18n('lbl_tip_menu_fans'):
-				cb.sendNotice(ftm.clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_fans); // send notice only to group
-				cb.sendNotice(ftm.clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
+			case FlexibleTipMenu.i18n('lbl_tip_menu_fans'):
+				cb.sendNotice(FlexibleTipMenu.clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_fans); // send notice only to group
+				cb.sendNotice(FlexibleTipMenu.clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
 			break;
 
-			case ftm.i18n('lbl_tip_menu_havetk'):
-				cb.sendNotice(ftm.clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_havetk); // send notice only to group
-				cb.sendNotice(ftm.clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
+			case FlexibleTipMenu.i18n('lbl_tip_menu_havetk'):
+				cb.sendNotice(FlexibleTipMenu.clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_havetk); // send notice only to group
+				cb.sendNotice(FlexibleTipMenu.clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
 			break;
 
-			case ftm.i18n('lbl_tip_menu_user'):
-				cb.sendNotice(ftm.clean_str(tip_menu), username, background_color, text_color, menu_boldness); // send notice only to username who asked for it
+			case FlexibleTipMenu.i18n('lbl_tip_menu_user'):
+				cb.sendNotice(FlexibleTipMenu.clean_str(tip_menu), username, background_color, text_color, menu_boldness); // send notice only to username who asked for it
 			break;
 
 			default:
 				// never mind
 		}
-	}
+	},
 
-	/*
-	 * Start the tip menu with a repeating timer
-	 */
-	static show_menu_handler() {
-		ftm.show_menu();
+	/**
+	* Start the tip menu with a repeating timer
+	*/
+	show_menu_handler: function() {
+		FlexibleTipMenu.show_menu();
 
-		const nb_minutes = ftm.val('menu_repeat_minutes');
+		const nb_minutes = FlexibleTipMenu.val('menu_repeat_minutes');
 		if(isNaN(nb_minutes) || !parseInt(nb_minutes)) {
 			// never mind
 		}
 		else {
-			cb.setTimeout(ftm.show_menu_handler, 1000 * 60 * parseInt(nb_minutes));
+			cb.setTimeout(FlexibleTipMenu.show_menu_handler, 1000 * 60 * parseInt(nb_minutes));
 		}
-	}
+	},
 
-	/*
-	 * Look up a service from the tip menu by its amount
-	 */
-	static find_service(tip_amount) {
-		const options_list = ftm.get_menu_options();
-		if(0 === options_list.length) {
+	/**
+	* Look up a service from the tip menu by its amount
+	*/
+	find_service: function(tip_amount) {
+		const options_list = FlexibleTipMenu.get_menu_options();
+		if(!options_list || !options_list.length) {
 			return false;
 		}
 
@@ -670,34 +666,34 @@ class FlexibleTipMenu {
 		}
 
 		return false;
-	}
+	},
 
-	/*
-	 * Whether the thanks module displays public or private notices
-	 */
-	static is_public_thanks() {
-		return ftm.i18n('lbl_publicly') === ftm.val('autothank_flag');
-	}
+	/**
+	* Whether the thanks module displays public or private notices
+	*/
+	is_public_thanks: function() {
+		return FlexibleTipMenu.i18n('lbl_publicly') === FlexibleTipMenu.val('autothank_flag');
+	},
 
-	/*
-	 * Gets the formatted message to display in the chat for a tip
-	 */
-	static get_thanks_notice(tip_amount, from_user) {
-		if(tip_amount <= ftm.val('autothank_above_tokens')) {
+	/**
+	* Gets the formatted message to display in the chat for a tip
+	*/
+	get_thanks_notice: function(tip_amount, from_user) {
+		if(tip_amount <= FlexibleTipMenu.val('autothank_above_tokens')) {
 			return false;
 		}
 
 		let notice_tpl;
-		if(ftm.is_public_thanks()) {
-			notice_tpl = ftm.val('autothank_publicly_format');
+		if(is_public_thanks()) {
+			notice_tpl = FlexibleTipMenu.val('autothank_publicly_format');
 		}
 		else {
-			notice_tpl = ftm.val('autothank_privately_format');
+			notice_tpl = FlexibleTipMenu.val('autothank_privately_format');
 		}
 
 		let notice = notice_tpl;
 		if(generic_patterns.service_name.test(notice)) {
-			const service_lbl = ftm.find_service(tip_amount);
+			const service_lbl = FlexibleTipMenu.find_service(tip_amount);
 			if(!service_lbl) {
 				return false;
 			}
@@ -709,105 +705,105 @@ class FlexibleTipMenu {
 		notice = notice.replace(generic_patterns.tipper_handle, from_user);
 		notice = notice.replace(generic_patterns.broadcaster_name, cb.room_slug);
 		return notice;
-	}
+	},
 
-	/*
-	 * Gets the formatted message to display as a private notice to remind the tipper of their tip note
-	 */
-	static get_autothank_remind_tip_note_notice(tip_note){
+	/**
+	* Gets the formatted message to display as a private notice to remind the tipper of their tip note
+	*/
+	get_autothank_remind_tip_note_notice: function(tip_note){
 		let res;
 		if('' === tip_note) {
 			res = false;
 		}
-		else if (!ftm.val('autothank_remind_tip_note_format')) {
+		else if (!FlexibleTipMenu.val('autothank_remind_tip_note_format')) {
 			res = false;
 		}
-		else if(!ftm.val('autothank_remind_tip_note_format').match(generic_patterns.message)) {
+		else if(!FlexibleTipMenu.val('autothank_remind_tip_note_format').match(generic_patterns.message)) {
 			res = false;
 		}
 		else {
-			res = ftm.val('autothank_remind_tip_note_format')
+			res = FlexibleTipMenu.val('autothank_remind_tip_note_format')
 				.replace(generic_patterns.message, tip_note)
 				.replace(generic_patterns.broadcaster_name, cb.room_slug);
 		}
 
 		return res;
-	}
+	},
 
-	/*
-	 * Displays a notice to thank the tipper
-	 */
-	static thank_tipper(tip_amount, from_user, tip_note) {
+	/**
+	* Displays a notice to thank the tipper
+	*/
+	thank_tipper: function(tip_amount, from_user, tip_note) {
 		let background_color;
 		let text_color;
 
-		const notice = ftm.get_thanks_notice(tip_amount, from_user);
+		const notice = FlexibleTipMenu.get_thanks_notice(tip_amount, from_user);
 
 		if(!notice) {
 			// never mind
 		}
-		else if(ftm.is_public_thanks()) {
-			background_color = ftm.get_color_code('autothank_publicly_background_color', colors_list.white);
-			text_color = ftm.get_color_code('autothank_publicly_text_color', colors_list.black);
-			cb.sendNotice(ftm.clean_str(notice), '', background_color, text_color, ftm.val('autothank_publicly_boldness'));
+		else if(FlexibleTipMenu.is_public_thanks()) {
+			background_color = FlexibleTipMenu.get_color_code('autothank_publicly_background_color', colors_list.white);
+			text_color = FlexibleTipMenu.get_color_code('autothank_publicly_text_color', colors_list.black);
+			cb.sendNotice(FlexibleTipMenu.clean_str(notice), '', background_color, text_color, FlexibleTipMenu.val('autothank_publicly_boldness'));
 		}
 		else {
-			background_color = ftm.get_color_code('autothank_privately_background_color', colors_list.white);
-			text_color = ftm.get_color_code('autothank_privately_text_color', colors_list.black);
-			cb.sendNotice(ftm.clean_str(notice), from_user, background_color, text_color, ftm.val('autothank_privately_boldness'));
+			background_color = FlexibleTipMenu.get_color_code('autothank_privately_background_color', colors_list.white);
+			text_color = FlexibleTipMenu.get_color_code('autothank_privately_text_color', colors_list.black);
+			cb.sendNotice(FlexibleTipMenu.clean_str(notice), from_user, background_color, text_color, FlexibleTipMenu.val('autothank_privately_boldness'));
 		}
 
-		const private_notice = ftm.get_autothank_remind_tip_note_notice(tip_note);
+		const private_notice = FlexibleTipMenu.get_autothank_remind_tip_note_notice(tip_note);
 		if(private_notice) {
-			background_color = ftm.get_color_code('autothank_privately_background_color', colors_list.white);
-			text_color = ftm.get_color_code('autothank_privately_text_color', colors_list.black);
-			cb.sendNotice(ftm.clean_str(private_notice), from_user, background_color, text_color, ftm.val('autothank_privately_boldness'));
+			background_color = FlexibleTipMenu.get_color_code('autothank_privately_background_color', colors_list.white);
+			text_color = FlexibleTipMenu.get_color_code('autothank_privately_text_color', colors_list.black);
+			cb.sendNotice(FlexibleTipMenu.clean_str(private_notice), from_user, background_color, text_color, FlexibleTipMenu.val('autothank_privately_boldness'));
 		}
-	}
+	},
 
-	/*
-	 * Callback for when a tip is sent
-	 */
-	static thank_tipper_handler(tip) {
+	/**
+	* Callback for when a tip is sent
+	*/
+	thank_tipper_handler: function(tip) {
 		if(tip.is_anon_tip)
 			return true;
 
-		ftm.thank_tipper(tip.amount, tip.from_user, tip.message);
-	}
+		FlexibleTipMenu.thank_tipper(tip.amount, tip.from_user, tip.message);
+	},
 
-	/*
-	 * Whether a template string matches its expected format
-	 */
-	static check_template_format(cfg_setting, expected_options) {
+	/**
+	* Whether a template string matches its expected format
+	*/
+	check_template_format: function(cfg_setting, expected_options) {
 		//const cfg_varname = i18n[lang][cfg_setting];
-		const notice_tpl = ftm.val(cfg_setting);
+		const notice_tpl = FlexibleTipMenu.val(cfg_setting);
 		if(!notice_tpl) {
-			ftm.alert_error(cfg_setting, ftm.i18n('errmsg_empty'));
+			FlexibleTipMenu.alert_error(cfg_setting, FlexibleTipMenu.i18n('errmsg_empty'));
 			return false;
 		}
 
-		const errmsg_missing_tpl = ftm.i18n('errmsg_missing');
+		const errmsg_missing_tpl = FlexibleTipMenu.i18n('errmsg_missing');
 		for(const i in expected_options) {
 			const varname = '{'+expected_options[i]+'}';
 			const regexp = new RegExp(varname, 'i');
 			if(!regexp.test(notice_tpl)) {
 				const lbl = errmsg_missing_tpl.replace(generic_patterns.varname, varname);
-				ftm.alert_error(cfg_setting, lbl);
+				FlexibleTipMenu.alert_error(cfg_setting, lbl);
 				return false;
 			}
 		}
 
 		return true;
-	}
+	},
 
-	/*
-	 * Replacement for the official cb.log() function, which does not appear to work
-	 */
-	static basic_log(obj, lbl) {
+	/**
+	* Replacement for the official cb.log() function, which does not appear to work
+	*/
+	basic_log: function(obj, lbl) {
 		let dbg_rows = [];
 
 		const dbg_start = new Date(Date.now());
-		const dbg_lbl_start = ftm.i18n('errmsg_dbg_start')
+		const dbg_lbl_start = FlexibleTipMenu.i18n('errmsg_dbg_start')
 			.replace(generic_patterns.label, lbl)
 			.replace(generic_patterns.time, dbg_start.toTimeString());
 		dbg_rows.push(dbg_lbl_start);
@@ -859,77 +855,77 @@ class FlexibleTipMenu {
 		}
 
 		const dbg_end = new Date(Date.now());
-		const dbg_lbl_end = ftm.i18n('errmsg_dbg_end')
+		const dbg_lbl_end = FlexibleTipMenu.i18n('errmsg_dbg_end')
 			.replace(generic_patterns.label, lbl)
 			.replace(generic_patterns.time, dbg_end.toTimeString());
 		dbg_rows.push(dbg_lbl_end);
 
 		return dbg_rows;
-	}
+	},
 
-	/*
-	 * Displays the app's list of commands
-	 */
-	static show_commands_help(username, usergroup = null) {
-		const app_name = ftm.val('app_name') ? ftm.val('app_name') : default_app_name;
+	/**
+	* Displays the app's list of commands
+	*/
+	show_commands_help: function(username, usergroup = null) {
+		const app_name = FlexibleTipMenu.val('app_name') ? FlexibleTipMenu.val('app_name') : default_app_name;
 
-		const tmp_label = ftm.i18n('expl_commands_available_recommend_english')
+		const tmp_label = FlexibleTipMenu.i18n('expl_commands_available_recommend_english')
 			.replace(generic_patterns.label, app_name)
 
 		let commands_list = [];
 		commands_list.push(tmp_label);
-		commands_list.push(ftm.i18n('expl_commands_tipmenu_recommend_english'));
-		commands_list.push(ftm.i18n('expl_commands_colorslist_recommend_english'));
+		commands_list.push(FlexibleTipMenu.i18n('expl_commands_tipmenu_recommend_english'));
+		commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist_recommend_english'));
 		cb.sendNotice(commands_list.join("\n"), username, colors_list.black, colors_list.white, '', usergroup);
-	}
+	},
 
-	/*
-	 * Recommended way to hide message in public chat, but still echoed back to the user
-	 */
-	static hide_message(msg) {
+	/**
+	* Recommended way to hide message in public chat, but still echoed back to the user
+	*/
+	hide_message: function(msg) {
 		msg['X-Spam'] = true;
 		return msg;
-	}
+	},
 
-	/*
-	 * Handle generic messages from users
-	 */
-	static message_handler(orig_msg) {
+	/**
+	* Handle generic messages from users
+	*/
+	message_handler: function(orig_msg) {
 		let alt_msg = null;
 		const txt_msg = orig_msg.m.trim();
 		if(command_prefixes_allow_list.includes(txt_msg.substring(0, 1))) {
-			alt_msg = ftm.commands_handler(orig_msg); // that's a command, not a plain message
+			alt_msg = FlexibleTipMenu.commands_handler(orig_msg); // that's a command, not a plain message
 		}
 		else {
-			alt_msg = ftm.plaintext_handler(orig_msg); // not a command
+			alt_msg = FlexibleTipMenu.plaintext_handler(orig_msg); // not a command
 		}
 
 		return alt_msg;
-	}
+	},
 
-	/*
-	 * Handle plain messages from users
-	 */
-	static plaintext_handler(orig_msg) {
+	/**
+	* Handle plain messages from users
+	*/
+	plaintext_handler: function(orig_msg) {
 		let alt_msg = null;
 		const txt_msg = orig_msg.m.trim();
 
-		if(!ftm.is_disabled('automod_chars_flag') && !automod_charlist.test(txt_msg)) {
-			alt_msg = ftm.hide_message(orig_msg);
+		if(!FlexibleTipMenu.is_disabled('automod_chars_flag') && !automod_charlist.test(txt_msg)) {
+			alt_msg = FlexibleTipMenu.hide_message(orig_msg);
 			cb.setTimeout(function() {
-				const lbl = ftm.i18n('errmsg_automod_hidden')
-					.replace(generic_patterns.label, ftm.i18n('errmsg_automod_chars'))
+				const lbl = FlexibleTipMenu.i18n('errmsg_automod_hidden')
+					.replace(generic_patterns.label, FlexibleTipMenu.i18n('errmsg_automod_chars'))
 					.replace(generic_patterns.username, orig_msg.user)
 					.replace(generic_patterns.message, txt_msg);
 				cb.sendNotice(lbl, cb.room_slug);
 			}, 1000);
 		}
 
-		if(!ftm.is_disabled('automod_links_flag') && automod_url.test(txt_msg.replace(' ', ''))) {
-			alt_msg = ftm.hide_message(orig_msg);
+		if(!FlexibleTipMenu.is_disabled('automod_links_flag') && automod_url.test(txt_msg.replace(' ', ''))) {
+			alt_msg = FlexibleTipMenu.hide_message(orig_msg);
 			cb.setTimeout(function() {
-				const lbl = ftm.i18n('errmsg_automod_hidden')
-					.replace(generic_patterns.label, ftm.i18n('errmsg_automod_link'))
+				const lbl = FlexibleTipMenu.i18n('errmsg_automod_hidden')
+					.replace(generic_patterns.label, FlexibleTipMenu.i18n('errmsg_automod_link'))
 					.replace(generic_patterns.username, orig_msg.user)
 					.replace(generic_patterns.message, txt_msg);
 				cb.sendNotice(lbl, cb.room_slug);
@@ -948,74 +944,96 @@ class FlexibleTipMenu {
 		// ⚥⚥ U+26A5 Bisexuality
 
 		return alt_msg;
-	}
+	},
 
-	/*
-	 * Handle commands from users
-	 */
-	static commands_handler(msg) {
-		const txtMsg = msg.m.trim();
+	/**
+	* Handle commands from users
+	*/
+	commands_handler: function(orig_msg) {
+		let alt_msg = null;
+		const txt_msg = orig_msg.m.trim();
+		const txt_command = txt_msg.substring(1).trim();
 
-		const command = txtMsg.substring(1).trim();
-		if(command_patterns.help.test(command)) {
-			msg = ftm.hide_message(msg);
-			ftm.show_commands_help(msg.user);
+		if(command_patterns.help.test(txt_command)) {
+			alt_msg = FlexibleTipMenu.hide_message(orig_msg);
+			FlexibleTipMenu.show_commands_help(orig_msg.user);
 		}
-		else if(command_patterns.tip_menu.test(command)) {
-			msg = ftm.hide_message(msg);
-			if(msg.user === cb.room_slug || msg.is_mod) {
-				ftm.show_menu(ftm.i18n('lbl_tip_menu_all'));
+
+		else if(command_patterns.tip_menu.test(txt_command)) {
+			alt_msg = FlexibleTipMenu.hide_message(orig_msg);
+			if(orig_msg.user === cb.room_slug || orig_msg.is_mod) {
+				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_tip_menu_all'));
 			}
 			else {
-				ftm.show_menu(ftm.i18n('lbl_tip_menu_user'), msg.user);
+				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_tip_menu_user'), orig_msg.user);
 			}
 		}
-		else if(command_patterns.colors_list.test(command)) {
-			msg = ftm.hide_message(msg);
+
+		else if(command_patterns.colors_list.test(txt_command)) {
+			alt_msg = FlexibleTipMenu.hide_message(orig_msg);
 			let i = 0; // timer offset
 
 			cb.setTimeout(function() {
-				cb.sendNotice(ftm.i18n('colorslist_header'), msg.user);
+				cb.sendNotice(FlexibleTipMenu.i18n('colorslist_header'), orig_msg.user);
 			}, 1000 * ++i);
 
 			// use two different background colors to ensure all colored labels are shown
 			for(const bgcolor of [colors_list.black, colors_list.white]) {
 				// set a timer to try and group the notices by their background
 				cb.setTimeout(function() {
-					for(lbl in colors_list) {
-						if(bgcolor === colors_list[lbl]) {
+					for(const color_lbl in colors_list) {
+						const color_code = colors_list[color_lbl];
+						if(bgcolor === color_code) {
 							continue;
 						}
 
 						// the notices can't be single line because the text color needs to change with each time
-						cb.sendNotice(lbl+': '+colors_list[lbl], msg.user, bgcolor, colors_list[lbl]);
+						cb.sendNotice(color_lbl+': '+color_code, orig_msg.user, bgcolor, color_code);
 					}
 				}, 1000 * ++i);
 			}
 		}
+
 		else {
 			// never mind
 		}
 
-		return msg;
-	}
+		return alt_msg;
+	},
 
-	static val(name) {
+	/**
+	* Gets a value from the app settings (storage)
+	*/
+	val: function(name) {
+		if('undefined' === typeof settings_list[name]) {
+			return null;
+		}
+
 		return cb.settings[settings_list[name]];
-	}
+	},
 
-	static i18n(label) {
+	/**
+	* Gets a localized label
+	*/
+	i18n: function(label) {
 		if('undefined' === typeof i18n[lang][label]) {
 			return null;
 		}
 
 		return i18n[lang][label];
-	}
+	},
 
-	static is_disabled(setting_name) {
-		return ftm.i18n('lbl_not_applicable') === ftm.val(setting_name);
-	}
-}
+	/**
+	* Whether a specific setting is disabled (= has the "not applicable" value)
+	*/
+	is_disabled: function(setting_name) {
+		if(!setting_name) {
+			return true;
+		}
+
+		return FlexibleTipMenu.i18n('lbl_not_applicable') === FlexibleTipMenu.val(setting_name);
+	},
+};
 
 const ftm = FlexibleTipMenu;
 
@@ -1382,7 +1400,7 @@ else {
 
 if(ftm.is_disabled('autothank_flag')) {
 	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
-	/*
+	/**
 	cb.setTimeout(function () {
 		ftm.alert_error('autothank_flag', ftm.i18n('errmsg_thanks_module_disabled'), colors_list.black, colors_list.white);
 	}, 1000 * 2);
