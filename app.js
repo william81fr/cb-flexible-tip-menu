@@ -21,9 +21,6 @@ const nb_of_menu_items = 40;
 // please leave at 1 for now
 const nb_of_individual_menus = 1;
 
-// whether the Thank Tippers module appears in the admin panel at all
-const enable_thank_tippers = true;
-
 // messages starting with these characters will be interpreted as commands
 const command_prefixes_allow_list = ['/', '!'];
 
@@ -61,7 +58,63 @@ const weight_bolder = 'bolder';
 
 let shown_errors = []; // Used to show error messages only once
 
-// ([\u{0000}-\u{024F}]+|[\u{1F600}-\u{1F64F}]+)
+
+// cf. https://en.wikipedia.org/wiki/List_of_Unicode_characters
+const ascii_allowlist = [
+	'\u{20}-\u{2F}', // ASCII Punctuation & Symbols
+	'\u{30}-\u{39}', // ASCII Digits
+	'\u{3A}-\u{40}', // ASCII Punctuation & Symbols
+	'\u{41}-\u{5A}', // Latin Alphabet: Uppercase
+	'\u{5B}-\u{60}', // ASCII Punctuation & Symbols
+	'\u{61}-\u{7A}', // Latin Alphabet: Lowercase
+	'\u{7B}-\u{7E}', // ASCII Punctuation & Symbols
+];
+
+
+// cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
+// cf. https://en.wikipedia.org/wiki/Emoji#Unicode_blocks
+
+const misc_allowlist = [
+	'\u{2600}-\u{26D4}',
+	'\u{2700}-\u{27BF}',
+	//'\u{1F300}-\u{1F64F}', // not recognized at the moment
+	//'\u{1F680}-\u{1F6FF}', // not recognized at the moment
+	//'\u{1F7E0}-\u{1F7EF}', // not recognized at the moment
+	//'\u{1F900}-\u{1FADF}', // not recognized at the moment
+];
+
+const chars_allowlist = ascii_allowlist.join(' ') + ' ' + misc_allowlist.join(' ');
+const automod_charlist = new RegExp('^['+chars_allowlist+']+$');
+const automod_url = /[0-9a-z]+:\/\/[0-9a-z._-]+/i;
+
+const hexcolor_pattern = /^#?([0-9a-f]{6})$/i;
+const menuitem_pattern = /^([0-9]+)(.+)$/;
+const allvarnames_pattern = /\s*\{[0-9A-Z_ -]+\}\s*/g;
+
+const generic_patterns = {
+	amount: /\{AMOUNT\}/gi,
+	app_name: /\{APP\}/gi,
+	broadcaster_name: /\{BCASTER\}/gi,
+	item_idx: /\{ITEMIDX\}/gi,
+	label: /\{LABEL\}/gi,
+	message: /\{MESSAGE\}/gi,
+	menu: /\{MENU\}/gi,
+	menu_idx: /\{MENUIDX\}/gi,
+	service_name: /\{SERVICE\}/gi,
+	setting_name: /\{SETTING\}/gi,
+	time: /\{TIME\}/gi,
+	tipper_handle: /\{TIPPER\}/gi,
+	username: /\{USER\}/gi,
+	setting_value: /\{VALUE\}/gi,
+	varname: /\{VARNAME\}/gi,
+	visibility: /\{VISIBILITY\}/gi,
+};
+
+const command_patterns = {
+	help: /^he?lp$/i,
+	tip_menu: /^(?:tip)?_?menu$/i,
+	colors_list: /^colou?rs_?(?:list)?$/i,
+}
 
 
 //
@@ -71,7 +124,7 @@ let shown_errors = []; // Used to show error messages only once
 //
 // All variable names are reused as:
 //		- CSS class names (unless next to punctuation or as the last word)
-//			- only in the testbed, currently not working on the Live website (2021-04)
+//			- this is currently not working on the Live website (2021-04)
 //		- HTML IDs (unless next to puncutation or as the first word)
 //
 // Here are a few examples:
@@ -89,19 +142,21 @@ let shown_errors = []; // Used to show error messages only once
 //
 const settings_list = {
 	app_name: 'debugmessage appName',
-	errors_shown_to: 'importantmessage showErrorsTo',
-	thank_tippers: 'debugmessage thankTippersModuleFlag',
-	thank_tippers_above_tokens: 'thankTippersAboveTokens',
-	thank_tippers_publicly_background_color: 'thankTippersPubliclyBackgroundColor',
-	thank_tippers_publicly_text_color: 'thankTippersPubliclyTextColor',
-	thank_tippers_publicly_boldness: 'thankTippersPubliclyBoldness',
-	thank_tippers_publicly_format: 'successmessage thankTippersPubliclyFormat',
-	thank_tippers_privately_background_color: 'thankTippersPrivatelyBackgroundColor',
-	thank_tippers_privately_text_color: 'thankTippersPrivatelyTextColor',
-	thank_tippers_privately_boldness: 'thankTippersPrivatelyBoldness',
-	thank_tippers_privately_format: 'successmessage thankTippersPrivatelyFormat',
-	thank_tippers_remind_tip_note_format: 'successmessage thankTippersRemindTipNoteFormat',
-	tip_menu_shown_to: 'debugmessage tipMenuShownTo',
+	errors_flag: 'importantmessage errorsFlag',
+	automod_chars_flag: 'debugmessage automodCharsFlag',
+	automod_links_flag: 'debugmessage automodLinksFlag',
+	autothank_flag: 'debugmessage autothankFlag',
+	autothank_above_tokens: 'autothankAboveTokens',
+	autothank_publicly_background_color: 'autothankPubliclyBackgroundColor',
+	autothank_publicly_text_color: 'autothankPubliclyTextColor',
+	autothank_publicly_boldness: 'autothankPubliclyBoldness',
+	autothank_publicly_format: 'successmessage autothankPubliclyFormat',
+	autothank_privately_background_color: 'autothankPrivatelyBackgroundColor',
+	autothank_privately_text_color: 'autothankPrivatelyTextColor',
+	autothank_privately_boldness: 'autothankPrivatelyBoldness',
+	autothank_privately_format: 'successmessage autothankPrivatelyFormat',
+	autothank_remind_tip_note_format: 'successmessage autothankRemindTipNoteFormat',
+	tip_menu_flag: 'debugmessage tipMenuShownTo',
 	tip_menu_header: 'tipMenuHeader',
 	tip_menu_footer: 'tipMenuFooter',
 	inline_separator: 'inlineSeparator',
@@ -121,19 +176,21 @@ const settings_list = {
 const i18n = {
 	en: {
 		app_name: "GLOBAL SETTINGS ---------------------- App name",
-		errors_shown_to: "Show the errors to...",
-		thank_tippers: "THANK TIPPERS MODULE ---------------------- show to...",
-		thank_tippers_above_tokens: "Only tips above this limit will get a thank you",
-		thank_tippers_publicly_background_color: "Background color for the public thanks (hexa code)",
-		thank_tippers_publicly_text_color: "Text color for the public thanks (hexa code)",
-		thank_tippers_publicly_boldness: "Text thickness for the public thanks",
-		thank_tippers_publicly_format: "Template for the public thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE}) - english recommended",
-		thank_tippers_privately_background_color: "Background color for the private thanks (hexa code)",
-		thank_tippers_privately_text_color: "Text color for the private thanks (hexa code)",
-		thank_tippers_privately_boldness: "Text thickness for the private thanks",
-		thank_tippers_privately_format: "Template for the private thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE}) - english recommended",
-		thank_tippers_remind_tip_note_format: "Template for the tip note reminder (variables are: {MESSAGE}) - english recommended",
-		tip_menu_shown_to: "TIP MENU {MENU} ---------------------- show to...",
+		errors_flag: "Show the errors to...",
+		automod_chars_flag: 'AUTOMOD NONLATIN TEXT ----------------------',
+		automod_links_flag: 'AUTOMOD LINKS ----------------------',
+		autothank_flag: "AUTOMATICALLY THANK TIPPERS ----------------------",
+		autothank_above_tokens: "Only tips above this limit will get a thank you",
+		autothank_publicly_background_color: "Background color for the public thanks (hexa code)",
+		autothank_publicly_text_color: "Text color for the public thanks (hexa code)",
+		autothank_publicly_boldness: "Text thickness for the public thanks",
+		autothank_publicly_format: "Template for the public thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE}) - english recommended",
+		autothank_privately_background_color: "Background color for the private thanks (hexa code)",
+		autothank_privately_text_color: "Text color for the private thanks (hexa code)",
+		autothank_privately_boldness: "Text thickness for the private thanks",
+		autothank_privately_format: "Template for the private thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE}) - english recommended",
+		autothank_remind_tip_note_format: "Template for the tip note reminder (variables are: {MESSAGE}) - english recommended",
+		tip_menu_flag: "TIP MENU {MENU} ----------------------",
 		tip_menu_header: "Line before the tip menu {MENU}",
 		tip_menu_footer: "Line at the end of the tip menu {MENU}",
 		inline_separator: "Separator for a one-line tip menu {MENU} (leave empty for multi-line)",
@@ -145,36 +202,37 @@ const i18n = {
 		menu_item_prefix: "Text prefix for the menu {MENU} items (prepend)",
 		menu_item_suffix: "Text suffix for the menu {MENU} items (append)",
 		menu_item_display_format: "Template for the tip menu {MENU} items (variables are: {LABEL}, {AMOUNT}) - english recommended",
+		colorslist_header: 'This is a sample list of colors to help you configure the bot:',
 		sort_order: "Sort the menu {MENU} items before display, regardless of their order below",
-		menu_item_lbl: "menu item #{MENU}{ITEM}",
+		menu_item_lbl: "menu item #{MENUIDX}{ITEMIDX}",
 		lbl_not_applicable: "n/a (disabled)",
-		lbl_tip_menu_shown_to_testing: "broadcaster only (for testing)",
-		lbl_tip_menu_shown_to_all: "everybody",
-		lbl_tip_menu_shown_to_fans: "fans",
-		//lbl_tip_menu_shown_to_50tk: "Dark Blue (Tipped 50 recently)",
-		//lbl_tip_menu_shown_to_250tk: "Light Purple (Tipped 250 recently)",
-		//lbl_tip_menu_shown_to_1000tk: "Dark Purple (Tipped 1000 recently)",
-		//lbl_tip_menu_shown_to_havetk: "Light Blue (Own or purchased tokens)",
-		lbl_tip_menu_shown_to_havetk: "own or purchased tokens",
-		lbl_tip_menu_shown_to_user: "the user who sent the command",
-		lbl_thank_tippers_testing: "broadcaster only (for testing)",
-		lbl_thank_tippers_publicly: "publicly",
-		lbl_thank_tippers_privately: "privately",
+		lbl_tip_menu_testing: "broadcaster only (for testing)",
+		lbl_tip_menu_all: "everybody",
+		lbl_tip_menu_fans: "fans",
+		//lbl_tip_menu_50tk: "Dark Blue (Tipped 50 recently)",
+		//lbl_tip_menu_250tk: "Light Purple (Tipped 250 recently)",
+		//lbl_tip_menu_1000tk: "Dark Purple (Tipped 1000 recently)",
+		//lbl_tip_menu_havetk: "Light Blue (Own or purchased tokens)",
+		lbl_tip_menu_havetk: "own or purchased tokens",
+		lbl_tip_menu_user: "the user who sent the command",
+		lbl_testing: "broadcaster only (for testing)",
+		lbl_publicly: "publicly",
+		lbl_privately: "privately",
 		lbl_inline_spacing_before: "before",
 		lbl_inline_spacing_after: "after",
 		lbl_inline_spacing_both: "before + after",
-		lbl_errors_shown_to_host: "broadcaster",
-		lbl_errors_shown_to_hostmods: "broadcaster + moderators",
+		lbl_errors_host: "broadcaster",
+		lbl_errors_hostmods: "broadcaster + moderators",
 		lbl_sort_amount_asc: "lowest to highest price",
 		lbl_sort_amount_desc: "highest to lowest price",
-		expl_thank_tippers_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
-		expl_thank_tippers_privately_format_recommend_english: "Thank you {TIPPER} for your {AMOUNT}tk tip",
-		expl_thank_tippers_remind_tip_note_format_recommend_english: "Your tip note was: {MESSAGE}",
+		expl_autothank_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
+		expl_autothank_privately_format_recommend_english: "Thank you {TIPPER} for your {AMOUNT}tk tip",
+		expl_autothank_remind_tip_note_format_recommend_english: "Your tip note was: {MESSAGE}",
 		expl_menu_item_display_format_recommend_english: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' in {APP} {LABEL} (currently valued at '{VALUE}')",
 		errmsg_app_disabled: "app is disabled",
 		errmsg_app_errors: "has errors: app is stopped",
-		errmsg_missing: "requires {LABEL} value",
+		errmsg_missing: "requires {VARNAME} value",
 		errmsg_empty: "should not be empty",
 		errmsg_color_format: "should start with # followed by 6 numbers and letters (0 to 9 numbers and A through F letters)",
 		errmsg_tipmenu_once: "the menu will not be shown again in the chat",
@@ -185,25 +243,31 @@ const i18n = {
 		errmsg_thanks_module_errors: "has errors, so the thanking module is disabled",
 		errmsg_dbg_start: "dbg start for '{LABEL}' object at {TIME}",
 		errmsg_dbg_end: "dbg end for '{LABEL}' object at {TIME}",
+		errmsg_starting_app: "Starting '{APP}' shown to: {VISIBILITY}",
+		errmsg_automod_hidden: "The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
+		errmsg_automod_chars: 'disallowed text',
+		errmsg_automod_link: 'link attempt',
 		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
 		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
 		expl_commands_colorslist_recommend_english: "/colors or /colorslist -- Display a list of color codes",
 	},
 	es: {
 		app_name: "OPCIONES GLOBALES ---------------------- Nombre de la aplicacion",
-		errors_shown_to: "Quien puede ver los errores...",
-		thank_tippers: "MODULO AGRADECIMIENTOS ---------------------- quien puede ver...",
-		thank_tippers_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
-		thank_tippers_publicly_background_color: "Color de fondo para las gracias en publico (codigo hexa)",
-		thank_tippers_publicly_text_color: "Color del texto para las gracias en publico (codigo hexa)",
-		thank_tippers_publicly_boldness: "Grosor de la letra para las gracias en publico",
-		thank_tippers_publicly_format: "Modelo del mensaje para las gracias en publico (variables son: {TIPPER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
-		thank_tippers_privately_background_color: "Color de fondo para las gracias en privado (codigo hexa)",
-		thank_tippers_privately_text_color: "Color del texto para las gracias en privado (codigo hexa)",
-		thank_tippers_privately_boldness: "Grosor de la letra para las gracias en privado",
-		thank_tippers_privately_format: "Modelo del mensaje para las gracias en privado (variables son: {TIPPER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
-		thank_tippers_remind_tip_note_format: "Modelo del mensaje para el recordatorio de tip note (variables son: {MESSAGE}) - Ingles recommendado",
-		tip_menu_shown_to: "MENU DE TIPS {MENU} ---------------------- quien puede ver...",
+		errors_flag: "Quien puede ver los errores...",
+		automod_chars_flag: 'AUTOMOD NONLATIN TEXT ----------------------',
+		automod_links_flag: 'AUTOMOD LINKS ----------------------',
+		autothank_flag: "MODULO AGRADECIMIENTOS ----------------------",
+		autothank_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
+		autothank_publicly_background_color: "Color de fondo para las gracias en publico (codigo hexa)",
+		autothank_publicly_text_color: "Color del texto para las gracias en publico (codigo hexa)",
+		autothank_publicly_boldness: "Grosor de la letra para las gracias en publico",
+		autothank_publicly_format: "Modelo del mensaje para las gracias en publico (variables son: {TIPPER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
+		autothank_privately_background_color: "Color de fondo para las gracias en privado (codigo hexa)",
+		autothank_privately_text_color: "Color del texto para las gracias en privado (codigo hexa)",
+		autothank_privately_boldness: "Grosor de la letra para las gracias en privado",
+		autothank_privately_format: "Modelo del mensaje para las gracias en privado (variables son: {TIPPER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
+		autothank_remind_tip_note_format: "Modelo del mensaje para el recordatorio de tip note (variables son: {MESSAGE}) - Ingles recommendado",
+		tip_menu_flag: "MENU DE TIPS {MENU} ----------------------",
 		tip_menu_header: "Linea antes del menu de tips {MENU}",
 		tip_menu_footer: "Linea despues del menu de tips {MENU}",
 		inline_separator: "Separacion para un menu monolinea (dejar vacio para multi linea)",
@@ -215,36 +279,37 @@ const i18n = {
 		menu_item_prefix: "Prefijo para cada elemento del menu {MENU}",
 		menu_item_suffix: "Sufijo para cada elemento del menu {MENU}",
 		menu_item_display_format: "Modelo del mensaje para el menu de tips {MENU} (variables son: {LABEL}, {AMOUNT}) - Ingles recommendado",
+		colorslist_header: 'A continuacion un listado de colores para ayudarle a configurar el bot:',
 		sort_order: "Ordenar el menu {MENU}, sin tener cuenta de la orden aqui abajo",
-		menu_item_lbl: "elemento del menu #{MENU}{ITEM}",
+		menu_item_lbl: "elemento del menu #{MENUIDX}{ITEMIDX}",
 		lbl_not_applicable: "n/a (desactivar)",
-		lbl_tip_menu_shown_to_testing: "streamer (para testear)",
-		lbl_tip_menu_shown_to_all: "todo el mundo",
-		lbl_tip_menu_shown_to_fans: "fans",
-		//lbl_tip_menu_shown_to_50tk: "Azul Oscuro (Ha Tippeado 50 recientemente)",
-		//lbl_tip_menu_shown_to_250tk: "Violeta Clarito (Ha Tippeado 250 recientemente)",
-		//lbl_tip_menu_shown_to_1000tk: "Violeta Oscuro (Ha Tippeado 1000 recientemente)",
-		//lbl_tip_menu_shown_to_havetk: "Azul Clarito (Tiene tokens)",
-		lbl_tip_menu_shown_to_havetk: "teniendo tokens",
-		lbl_tip_menu_shown_to_user: "el usuario que envio el comando",
-		lbl_thank_tippers_testing: "streamer (para testear)",
-		lbl_thank_tippers_publicly: "publicamente",
-		lbl_thank_tippers_privately: "en privado",
+		lbl_tip_menu_testing: "streamer (para testear)",
+		lbl_tip_menu_all: "todo el mundo",
+		lbl_tip_menu_fans: "fans",
+		//lbl_tip_menu_50tk: "Azul Oscuro (Ha Tippeado 50 recientemente)",
+		//lbl_tip_menu_250tk: "Violeta Clarito (Ha Tippeado 250 recientemente)",
+		//lbl_tip_menu_1000tk: "Violeta Oscuro (Ha Tippeado 1000 recientemente)",
+		//lbl_tip_menu_havetk: "Azul Clarito (Tiene tokens)",
+		lbl_tip_menu_havetk: "teniendo tokens",
+		lbl_tip_menu_user: "el usuario que envio el comando",
+		lbl_testing: "streamer (para testear)",
+		lbl_publicly: "publicamente",
+		lbl_privately: "en privado",
 		lbl_inline_spacing_before: "antes",
 		lbl_inline_spacing_after: "despues",
 		lbl_inline_spacing_both: "antes + despues",
-		lbl_errors_shown_to_host: "streamer",
-		lbl_errors_shown_to_hostmods: "streamer + moderador",
+		lbl_errors_host: "streamer",
+		lbl_errors_hostmods: "streamer + moderador",
 		lbl_sort_amount_asc: "del precio mas bajo al mas alto",
 		lbl_sort_amount_desc: "del precio mas alto al mas bajo",
-		expl_thank_tippers_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
-		expl_thank_tippers_privately_format_recommend_english: "Thank you {TIPPER} for your {AMOUNT}tk tip",
-		expl_thank_tippers_remind_tip_note_format_recommend_english: "Your tip note was: {MESSAGE}",
+		expl_autothank_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
+		expl_autothank_privately_format_recommend_english: "Thank you {TIPPER} for your {AMOUNT}tk tip",
+		expl_autothank_remind_tip_note_format_recommend_english: "Your tip note was: {MESSAGE}",
 		expl_menu_item_display_format_recommend_english: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' en {APP} {LABEL} (actualmente vale '{VALUE}')",
 		errmsg_app_disabled: "el bot esta desactivado",
 		errmsg_app_errors: "hay errores: el bot esta parado",
-		errmsg_missing: "necesita el valor {LABEL}",
+		errmsg_missing: "necesita el valor {VARNAME}",
 		errmsg_empty: "no puede estar vacio",
 		errmsg_color_format: "debe empezar con # seguido por 6 cifras y letras (cifras de 0 hasta 9 y letras de A hasta F)",
 		errmsg_tipmenu_once: "el menu no se ensenara mas en el chat",
@@ -253,27 +318,33 @@ const i18n = {
 		errmsg_tipmenu_item_format: "debe empezar por un numero seguido por una descripcion: desactivado de momento",
 		errmsg_thanks_module_disabled: "MODULO de agradecimientos esta desactivado",
 		errmsg_thanks_module_errors: "hay errores, asi que el MODULO de agradecimientos esta desactivado",
-		errmsg_dbg_start: "dbg start for '{LABEL}' object at {TIME}",
-		errmsg_dbg_end: "dbg end for '{LABEL}' object at {TIME}",
+		errmsg_dbg_start: "dbg empieza para objeto '{LABEL}': {TIME}",
+		errmsg_dbg_end: "dbg fin para objeto '{LABEL}': {TIME}",
+		errmsg_starting_app: "Starting '{APP}' shown to: {VISIBILITY}",
+		errmsg_automod_hidden: "The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
+		errmsg_automod_chars: 'disallowed text',
+		errmsg_automod_link: 'link attempt',
 		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
 		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
 		expl_commands_colorslist_recommend_english: "/colors or /colorslist -- Display a list of color codes",
 	},
 	fr: {
 		app_name: "PARAMETRES GENERAUX ---------------------- Nom de l'aplication",
-		errors_shown_to: "A qui montrer les erreurs...",
-		thank_tippers: "MODULE REMERCIEMENTS ---------------------- montrer a...",
-		thank_tippers_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
-		thank_tippers_publicly_background_color: "Couleur de fond pour les remerciements en public (code hexa)",
-		thank_tippers_publicly_text_color: "Couleur du texte pour les remerciements en public (code hexa)",
-		thank_tippers_publicly_boldness: "Epaisseur du texte pour les remerciements en public",
-		thank_tippers_publicly_format: "Modele du message pour les remerciements en public (variables sont : {TIPPER}, {AMOUNT}, {SERVICE}) - anglais recommande",
-		thank_tippers_privately_background_color: "Couleur de fond pour les remerciements prives (code hexa)",
-		thank_tippers_privately_text_color: "Couleur du texte pour les remerciements prives (code hexa)",
-		thank_tippers_privately_boldness: "Epaisseur du texte pour les remerciements prives",
-		thank_tippers_privately_format: "Modele du message pour les remerciements prives (variables sont : {TIPPER}, {AMOUNT}, {SERVICE}) - anglais recommande",
-		thank_tippers_remind_tip_note_format: "Modele du message pour le rappel de tip note (variables sont : {MESSAGE}) - anglais recommande",
-		tip_menu_shown_to: "MENU DE TIPS {MENU} ---------------------- montrer a...",
+		errors_flag: "A qui montrer les erreurs...",
+		automod_chars_flag: 'AUTOMOD NONLATIN TEXT ----------------------',
+		automod_links_flag: 'AUTOMOD LINKS ----------------------',
+		autothank_flag: "MODULE REMERCIEMENTS ----------------------",
+		autothank_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
+		autothank_publicly_background_color: "Couleur de fond pour les remerciements en public (code hexa)",
+		autothank_publicly_text_color: "Couleur du texte pour les remerciements en public (code hexa)",
+		autothank_publicly_boldness: "Epaisseur du texte pour les remerciements en public",
+		autothank_publicly_format: "Modele du message pour les remerciements en public (variables sont : {TIPPER}, {AMOUNT}, {SERVICE}) - anglais recommande",
+		autothank_privately_background_color: "Couleur de fond pour les remerciements prives (code hexa)",
+		autothank_privately_text_color: "Couleur du texte pour les remerciements prives (code hexa)",
+		autothank_privately_boldness: "Epaisseur du texte pour les remerciements prives",
+		autothank_privately_format: "Modele du message pour les remerciements prives (variables sont : {TIPPER}, {AMOUNT}, {SERVICE}) - anglais recommande",
+		autothank_remind_tip_note_format: "Modele du message pour le rappel de tip note (variables sont : {MESSAGE}) - anglais recommande",
+		tip_menu_flag: "MENU DE TIPS {MENU} ----------------------",
 		tip_menu_header: "Ligne avant le menu de tips {MENU}",
 		tip_menu_footer: "Ligne apres le menu de tips {MENU}",
 		inline_separator: "Separateur pour un menu monoligne (laisser vide pour multi ligne)",
@@ -285,36 +356,37 @@ const i18n = {
 		menu_item_prefix: "Prefixe pour chaque element du menu {MENU}",
 		menu_item_suffix: "Suffixe pour chaque element du menu {MENU}",
 		menu_item_display_format: "Modele du message pour le menu de tips {MENU} (variables sont : {LABEL}, {AMOUNT}) - anglais recommande",
+		colorslist_header: 'Voici une liste de couleurs pour vous aider a parametrer le bot:',
 		sort_order: "Trier le menu {MENU} avant affichage, peu importe l'ordre ci dessous",
-		menu_item_lbl: "element du menu #{MENU}{ITEM}",
+		menu_item_lbl: "element du menu #{MENUIDX}{ITEMIDX}",
 		lbl_not_applicable: "n/a (désactiver)",
-		lbl_tip_menu_shown_to_testing: "streameur seulement (pour tester)",
-		lbl_tip_menu_shown_to_all: "tout le monde",
-		lbl_tip_menu_shown_to_fans: "fans",
-		//lbl_tip_menu_shown_to_50tk: "Bleu Fonce (A Tippe 50 recemment)",
-		//lbl_tip_menu_shown_to_250tk: "Violet Clair (A tippe 250 recemment)",
-		//lbl_tip_menu_shown_to_1000tk: "Violet Fonce (A tippe 1000 recemment)",
-		//lbl_tip_menu_shown_to_havetk: "Bleu Clair (Possede des tokens)",
-		lbl_tip_menu_shown_to_havetk: "possedant des tokens",
-		lbl_tip_menu_shown_to_user: "l'utilisateur qui a envoye la commande",
-		lbl_thank_tippers_testing: "streameur seulement (pour tester)",
-		lbl_thank_tippers_publicly: "en public",
-		lbl_thank_tippers_privately: "en prive",
+		lbl_tip_menu_testing: "streameur seulement (pour tester)",
+		lbl_tip_menu_all: "tout le monde",
+		lbl_tip_menu_fans: "fans",
+		//lbl_tip_menu_50tk: "Bleu Fonce (A Tippe 50 recemment)",
+		//lbl_tip_menu_250tk: "Violet Clair (A tippe 250 recemment)",
+		//lbl_tip_menu_1000tk: "Violet Fonce (A tippe 1000 recemment)",
+		//lbl_tip_menu_havetk: "Bleu Clair (Possede des tokens)",
+		lbl_tip_menu_havetk: "possedant des tokens",
+		lbl_tip_menu_user: "l'utilisateur qui a envoye la commande",
+		lbl_testing: "streameur seulement (pour tester)",
+		lbl_publicly: "en public",
+		lbl_privately: "en prive",
 		lbl_inline_spacing_before: "avant",
 		lbl_inline_spacing_after: "apres",
 		lbl_inline_spacing_both: "avant + apres",
-		lbl_errors_shown_to_host: "streameur",
-		lbl_errors_shown_to_hostmods: "streameur + moderateurs",
+		lbl_errors_host: "streameur",
+		lbl_errors_hostmods: "streameur + moderateurs",
 		lbl_sort_amount_asc: "du prix le plus faible au plus eleve",
 		lbl_sort_amount_desc: "du prix le plus eleve au plus faible",
-		expl_thank_tippers_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
-		expl_thank_tippers_privately_format_recommend_english: "Thank you {TIPPER} for your {AMOUNT}tk tip",
-		expl_thank_tippers_remind_tip_note_format_recommend_english: "Your tip note was: {MESSAGE}",
+		expl_autothank_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
+		expl_autothank_privately_format_recommend_english: "Thank you {TIPPER} for your {AMOUNT}tk tip",
+		expl_autothank_remind_tip_note_format_recommend_english: "Your tip note was: {MESSAGE}",
 		expl_menu_item_display_format_recommend_english: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' dans {APP} {LABEL} (vaut actuellement '{VALUE}')",
 		errmsg_app_disabled: "l'app est desactivee",
 		errmsg_app_errors: "a des erreurs : l'app est arretee",
-		errmsg_missing: "necessite une valeur {LABEL}",
+		errmsg_missing: "necessite une valeur {VARNAME}",
 		errmsg_empty: "ne devrait pas etre vide",
 		errmsg_color_format: "devrait commencer par un # suivi de 6 chiffres et lettres (chiffres de 0 jusque 9 et lettres de A jusque F)",
 		errmsg_tipmenu_once: "le menu ne sera pas repete dans le chat",
@@ -325,11 +397,628 @@ const i18n = {
 		errmsg_thanks_module_errors: "contient des erreurs, ainsi le module de remerciements est inactif",
 		errmsg_dbg_start: "debut dbg pour '{LABEL}' a {TIME}",
 		errmsg_dbg_end: "fin dbg pour '{LABEL}' a {TIME}",
+		errmsg_starting_app: "Starting '{APP}' shown to: {VISIBILITY}",
+		errmsg_automod_hidden: "The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
+		errmsg_automod_chars: 'disallowed text',
+		errmsg_automod_link: 'link attempt',
 		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
 		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
 		expl_commands_colorslist_recommend_english: "/colors or /colorslist -- Display a list of color codes",
 	},
 };
+
+
+//
+// Custom functions
+//
+
+class FlexibleTipMenu {
+	/*
+	 * Removes remaining {VAR} syntax from a string
+	 */
+	static clean_str(str) {
+		if(!str) {
+			return '';
+		}
+
+		return str.replace(allvarnames_pattern, ' ').trim();
+	}
+
+	/*
+	 * Display errors in the chat
+	 */
+	static alert_error(cfg_name, error_lbl, bg_color=null, txt_color=null) {
+		bg_color = bg_color ? bg_color : colors_list['bright red'];
+		txt_color = txt_color ? txt_color : colors_list.white;
+		const app_name = ftm.val('app_name') ? ftm.val('app_name') : default_app_name;
+		const setting_name = ftm.i18n(cfg_name) === null ? cfg_name : ftm.i18n(cfg_name);
+		const setting_value = ftm.val(cfg_name);
+		const errmsg_format = ftm.i18n('errmsg_format');
+		const msg = errmsg_format
+			.replace(generic_patterns.broadcaster_name, cb.room_slug)
+			.replace(generic_patterns.app_name, app_name)
+			.replace(generic_patterns.label, error_lbl)
+			.replace(generic_patterns.setting_value, setting_value)
+			.replace(generic_patterns.setting_name, setting_name);
+		if(cbjs.arrayContains(shown_errors, msg)) {
+			return;
+		}
+
+		switch(ftm.val('errors_flag')) {
+			case ftm.i18n('lbl_errors_host'):
+				cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
+			break;
+
+			case ftm.i18n('lbl_errors_hostmods'):
+				cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
+				cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder, group_mods);
+			break;
+
+			default:
+				// never mind
+		}
+
+		shown_errors.push(msg);
+	}
+
+	/*
+	 * Gets the hex value of a color from a settings value
+	 */
+	static get_color_code(cfg_color, default_value) {
+		const cfg_value = ftm.val(cfg_color);
+		const color_match = hexcolor_pattern.exec(cfg_value);
+		if(null === color_match) {
+			ftm.alert_error(cfg_color, ftm.i18n('errmsg_color_format'));
+			return default_value;
+		}
+
+		return '#'+(color_match[1].toUpperCase());
+	}
+
+	/*
+	 * Gets the menu items separator, whether multi- or single-line and according to spacing setting
+	 */
+	static get_items_separator(cfg_spacing, cfg_separator) {
+		let items_separator;
+		if('' === cfg_separator) {
+			items_separator = "\n";
+		}
+		else if(ftm.i18n('lbl_inline_spacing_before') === cfg_spacing) {
+			items_separator = ' '+cfg_separator;
+		}
+		else if(ftm.i18n('lbl_inline_spacing_after') === cfg_spacing) {
+			items_separator = cfg_separator+' ';
+		}
+		else if(ftm.i18n('lbl_inline_spacing_both') === cfg_spacing) {
+			items_separator = ' '+cfg_separator+' ';
+		}
+		else {
+			items_separator = cfg_separator;
+		}
+
+		return items_separator;
+	}
+
+	/*
+	 * Gets the sorted list of menu items from the app settings
+	 */
+	static get_menu_options() {
+		let options_list = [];
+		for(const setting_name in cb.settings) {
+			if(!setting_name.startsWith(settings_list.menu_item_lbl)) continue;
+			if('string' !== typeof cb.settings[setting_name]) continue;
+
+			const setting_value = cb.settings[setting_name].trim();
+			if('' === setting_value) continue;
+
+			const menu_item = menuitem_pattern.exec(setting_value);
+			if(null === menu_item) {
+				ftm.alert_error(setting_name, ftm.i18n('errmsg_tipmenu_item_format'), colors_list['pastel red'], colors_list.black);
+				continue;
+			}
+
+			const [, item_amount, item_label] = menu_item;
+			options_list.push({amount: parseInt(item_amount), label: item_label.trim()});
+		};
+
+		if(0 === options_list.length) {
+			ftm.alert_error(ftm.i18n('errmsg_tipmenu_entire'), ftm.i18n('errmsg_tipmenu_noitems'));
+			return [];
+		}
+
+		if(!ftm.is_disabled('sort_order')) {
+			options_list.sort(function(a, b) {
+				let res;
+				if(ftm.i18n('lbl_sort_amount_asc') === ftm.val('sort_order')) {
+					res = a.amount - b.amount;
+				}
+				else {
+					res = b.amount - a.amount;
+				}
+
+				return res;
+			});
+		}
+
+		return options_list;
+	}
+
+	/*
+	 * Gets the parametrized tip menu lines according to format setting
+	 */
+	static get_tip_menu(options_list) {
+		const inline_spacing = ftm.val('inline_spacing');
+		const menu_item_prefix = ftm.val('menu_item_prefix');
+		const menu_item_suffix = ftm.val('menu_item_suffix');
+		const menu_item_display_format = ftm.val('menu_item_display_format');
+
+		let tip_menu_items = [];
+		if('' !== ftm.val('app_name')) {
+			tip_menu_items.push(ftm.val('app_name'));
+		}
+
+		if('' !== ftm.val('tip_menu_header')) {
+			tip_menu_items.push(ftm.val('tip_menu_header'));
+		}
+
+		for(const menu_option of options_list) {
+			let msg = '';
+			if(menu_item_prefix) {
+				if(lbl_not_applicable !== inline_spacing) {
+					msg += menu_item_prefix+' ';
+				}
+				else {
+					msg += menu_item_prefix;
+				}
+			}
+
+			msg += menu_item_display_format;
+			msg = msg.replace(generic_patterns.amount, menu_option.amount);
+			msg = msg.replace(generic_patterns.label, menu_option.label);
+			msg = msg.replace(generic_patterns.broadcaster_name, cb.room_slug);
+
+			if(menu_item_suffix) {
+				if(lbl_not_applicable !== inline_spacing) {
+					msg += ' '+menu_item_suffix;
+				}
+				else {
+					msg += menu_item_suffix;
+				}
+			}
+
+			tip_menu_items.push(msg);
+		}
+
+		if('' !== ftm.val('tip_menu_footer')) {
+			tip_menu_items.push(ftm.val('tip_menu_footer'));
+		}
+
+		return tip_menu_items;
+	}
+
+	/*
+	 * Display the tip menu
+	 */
+	static show_menu(tip_menu_flag = null, username = null) {
+		const menu_boldness = ftm.val('menu_boldness');
+		const background_color = ftm.get_color_code('menu_background_color', colors_list.black);
+		const text_color = ftm.get_color_code('menu_text_color', colors_list.white);
+		const options_list = ftm.get_menu_options();
+		const menu_items_separator = ftm.get_items_separator(ftm.val('inline_spacing'), ftm.val('inline_separator'));
+		const tip_menu = ftm.get_tip_menu(options_list).join(menu_items_separator);
+
+		if(tip_menu_flag === null) {
+			tip_menu_flag = ftm.val('tip_menu_flag');
+		}
+
+		switch(tip_menu_flag) {
+			case ftm.i18n('lbl_tip_menu_testing'):
+				cb.sendNotice(ftm.clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // only to the broadcaster
+			break;
+
+			case ftm.i18n('lbl_tip_menu_all'):
+				cb.sendNotice(ftm.clean_str(tip_menu), '', background_color, text_color, menu_boldness);
+			break;
+
+			case ftm.i18n('lbl_tip_menu_fans'):
+				cb.sendNotice(ftm.clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_fans); // send notice only to group
+				cb.sendNotice(ftm.clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
+			break;
+
+			case ftm.i18n('lbl_tip_menu_havetk'):
+				cb.sendNotice(ftm.clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_havetk); // send notice only to group
+				cb.sendNotice(ftm.clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
+			break;
+
+			case ftm.i18n('lbl_tip_menu_user'):
+				cb.sendNotice(ftm.clean_str(tip_menu), username, background_color, text_color, menu_boldness); // send notice only to username who asked for it
+			break;
+
+			default:
+				// never mind
+		}
+	}
+
+	/*
+	 * Start the tip menu with a repeating timer
+	 */
+	static show_menu_handler() {
+		ftm.show_menu();
+
+		const nb_minutes = ftm.val('menu_repeat_minutes');
+		if(isNaN(nb_minutes) || !parseInt(nb_minutes)) {
+			// never mind
+		}
+		else {
+			cb.setTimeout(ftm.show_menu_handler, 1000 * 60 * parseInt(nb_minutes));
+		}
+	}
+
+	/*
+	 * Look up a service from the tip menu by its amount
+	 */
+	static find_service(tip_amount) {
+		const options_list = ftm.get_menu_options();
+		if(0 === options_list.length) {
+			return false;
+		}
+
+		for(const menu_option of options_list) {
+			if(menu_option.amount === tip_amount) {
+				return menu_option.label;
+			}
+		}
+
+		return false;
+	}
+
+	/*
+	 * Whether the thanks module displays public or private notices
+	 */
+	static is_public_thanks() {
+		return ftm.i18n('lbl_publicly') === ftm.val('autothank_flag');
+	}
+
+	/*
+	 * Gets the formatted message to display in the chat for a tip
+	 */
+	static get_thanks_notice(tip_amount, from_user) {
+		if(tip_amount <= ftm.val('autothank_above_tokens')) {
+			return false;
+		}
+
+		let notice_tpl;
+		if(ftm.is_public_thanks()) {
+			notice_tpl = ftm.val('autothank_publicly_format');
+		}
+		else {
+			notice_tpl = ftm.val('autothank_privately_format');
+		}
+
+		let notice = notice_tpl;
+		if(generic_patterns.service_name.test(notice)) {
+			const service_lbl = ftm.find_service(tip_amount);
+			if(!service_lbl) {
+				return false;
+			}
+
+			notice = notice.replace(generic_patterns.service_name, service_lbl);
+		}
+
+		notice = notice.replace(generic_patterns.amount, tip_amount);
+		notice = notice.replace(generic_patterns.tipper_handle, from_user);
+		notice = notice.replace(generic_patterns.broadcaster_name, cb.room_slug);
+		return notice;
+	}
+
+	/*
+	 * Gets the formatted message to display as a private notice to remind the tipper of their tip note
+	 */
+	static get_autothank_remind_tip_note_notice(tip_note){
+		let res;
+		if('' === tip_note) {
+			res = false;
+		}
+		else if (!ftm.val('autothank_remind_tip_note_format')) {
+			res = false;
+		}
+		else if(!ftm.val('autothank_remind_tip_note_format').match(generic_patterns.message)) {
+			res = false;
+		}
+		else {
+			res = ftm.val('autothank_remind_tip_note_format')
+				.replace(generic_patterns.message, tip_note)
+				.replace(generic_patterns.broadcaster_name, cb.room_slug);
+		}
+
+		return res;
+	}
+
+	/*
+	 * Displays a notice to thank the tipper
+	 */
+	static thank_tipper(tip_amount, from_user, tip_note) {
+		let background_color;
+		let text_color;
+
+		const notice = ftm.get_thanks_notice(tip_amount, from_user);
+
+		if(!notice) {
+			// never mind
+		}
+		else if(ftm.is_public_thanks()) {
+			background_color = ftm.get_color_code('autothank_publicly_background_color', colors_list.white);
+			text_color = ftm.get_color_code('autothank_publicly_text_color', colors_list.black);
+			cb.sendNotice(ftm.clean_str(notice), '', background_color, text_color, ftm.val('autothank_publicly_boldness'));
+		}
+		else {
+			background_color = ftm.get_color_code('autothank_privately_background_color', colors_list.white);
+			text_color = ftm.get_color_code('autothank_privately_text_color', colors_list.black);
+			cb.sendNotice(ftm.clean_str(notice), from_user, background_color, text_color, ftm.val('autothank_privately_boldness'));
+		}
+
+		const private_notice = ftm.get_autothank_remind_tip_note_notice(tip_note);
+		if(private_notice) {
+			background_color = ftm.get_color_code('autothank_privately_background_color', colors_list.white);
+			text_color = ftm.get_color_code('autothank_privately_text_color', colors_list.black);
+			cb.sendNotice(ftm.clean_str(private_notice), from_user, background_color, text_color, ftm.val('autothank_privately_boldness'));
+		}
+	}
+
+	/*
+	 * Callback for when a tip is sent
+	 */
+	static thank_tipper_handler(tip) {
+		if(tip.is_anon_tip)
+			return true;
+
+		ftm.thank_tipper(tip.amount, tip.from_user, tip.message);
+	}
+
+	/*
+	 * Whether a template string matches its expected format
+	 */
+	static check_template_format(cfg_setting, expected_options) {
+		//const cfg_varname = i18n[lang][cfg_setting];
+		const notice_tpl = ftm.val(cfg_setting);
+		if(!notice_tpl) {
+			ftm.alert_error(cfg_setting, ftm.i18n('errmsg_empty'));
+			return false;
+		}
+
+		const errmsg_missing_tpl = ftm.i18n('errmsg_missing');
+		for(const i in expected_options) {
+			const varname = '{'+expected_options[i]+'}';
+			const regexp = new RegExp(varname, 'i');
+			if(!regexp.test(notice_tpl)) {
+				const lbl = errmsg_missing_tpl.replace(generic_patterns.varname, varname);
+				ftm.alert_error(cfg_setting, lbl);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/*
+	 * Replacement for the official cb.log() function, which does not appear to work
+	 */
+	static basic_log(obj, lbl) {
+		let dbg_rows = [];
+
+		const dbg_start = new Date(Date.now());
+		const dbg_lbl_start = ftm.i18n('errmsg_dbg_start')
+			.replace(generic_patterns.label, lbl)
+			.replace(generic_patterns.time, dbg_start.toTimeString());
+		dbg_rows.push(dbg_lbl_start);
+
+		for(const idx in obj) {
+			const type = typeof(obj[idx]);
+			let msg = idx+': '+type;
+			switch(type) {
+				case 'string': // pass through
+				case 'number':
+					msg += ' ('+obj[idx]+')';
+				break;
+
+				case 'boolean':
+					msg += ' ('+(obj[idx] ? 'true' : 'false')+')';
+				break;
+
+				case 'function':
+					msg += ' ('+(obj[idx].length)+' params)';
+				break;
+
+				case 'object':
+					let innerObj = [];
+					for(const innerIdx in obj[idx]) {
+						const innerType = obj[idx][innerIdx];
+						innerObj.push(`in ${idx}[${innerIdx}]: ${innerType} (${obj[idx][innerIdx]})`);
+					}
+
+					if(0 === innerObj.length) {
+						dbg_rows.push(msg+' (empty)');
+						continue;
+					}
+
+					if(idx === 'settings' || idx === 'settings_choices') {
+						dbg_rows.push(msg+' ('+innerObj.length+' elements)');
+						continue;
+					}
+
+					dbg_rows.push(msg+' ('+innerObj.length+' elements):');
+					dbg_rows.push(innerObj.join("\n"));
+					continue;
+				break;
+
+				default:
+					// never mind
+			}
+
+			dbg_rows.push(msg);
+		}
+
+		const dbg_end = new Date(Date.now());
+		const dbg_lbl_end = ftm.i18n('errmsg_dbg_end')
+			.replace(generic_patterns.label, lbl)
+			.replace(generic_patterns.time, dbg_end.toTimeString());
+		dbg_rows.push(dbg_lbl_end);
+
+		return dbg_rows;
+	}
+
+	/*
+	 * Displays the app's list of commands
+	 */
+	static show_commands_help(username, usergroup = null) {
+		const app_name = ftm.val('app_name') ? ftm.val('app_name') : default_app_name;
+
+		const tmp_label = ftm.i18n('expl_commands_available_recommend_english')
+			.replace(generic_patterns.label, app_name)
+
+		let commands_list = [];
+		commands_list.push(tmp_label);
+		commands_list.push(ftm.i18n('expl_commands_tipmenu_recommend_english'));
+		commands_list.push(ftm.i18n('expl_commands_colorslist_recommend_english'));
+		cb.sendNotice(commands_list.join("\n"), username, colors_list.black, colors_list.white, '', usergroup);
+	}
+
+	/*
+	 * Recommended way to hide message in public chat, but still echoed back to the user
+	 */
+	static hide_message(msg) {
+		msg['X-Spam'] = true;
+		return msg;
+	}
+
+	/*
+	 * Handle generic messages from users
+	 */
+	static message_handler(orig_msg) {
+		let alt_msg = null;
+		const txt_msg = orig_msg.m.trim();
+		if(command_prefixes_allow_list.includes(txt_msg.substring(0, 1))) {
+			alt_msg = ftm.commands_handler(orig_msg); // that's a command, not a plain message
+		}
+		else {
+			alt_msg = ftm.plaintext_handler(orig_msg); // not a command
+		}
+
+		return alt_msg;
+	}
+
+	/*
+	 * Handle plain messages from users
+	 */
+	static plaintext_handler(orig_msg) {
+		let alt_msg = null;
+		const txt_msg = orig_msg.m.trim();
+
+		if(!ftm.is_disabled('automod_chars_flag') && !automod_charlist.test(txt_msg)) {
+			alt_msg = ftm.hide_message(orig_msg);
+			cb.setTimeout(function() {
+				const lbl = ftm.i18n('errmsg_automod_hidden')
+					.replace(generic_patterns.label, ftm.i18n('errmsg_automod_chars'))
+					.replace(generic_patterns.username, orig_msg.user)
+					.replace(generic_patterns.message, txt_msg);
+				cb.sendNotice(lbl, cb.room_slug);
+			}, 1000);
+		}
+
+		if(!ftm.is_disabled('automod_links_flag') && automod_url.test(txt_msg.replace(' ', ''))) {
+			alt_msg = ftm.hide_message(orig_msg);
+			cb.setTimeout(function() {
+				const lbl = ftm.i18n('errmsg_automod_hidden')
+					.replace(generic_patterns.label, ftm.i18n('errmsg_automod_link'))
+					.replace(generic_patterns.username, orig_msg.user)
+					.replace(generic_patterns.message, txt_msg);
+				cb.sendNotice(lbl, cb.room_slug);
+			}, 1000);
+		}
+
+		// @TODO try https://en.wikipedia.org/wiki/Planet_symbols#Mars
+		// ♀ U+2640 Female sign
+		// ♂ U+2642 Male sign
+		// ⚥ U+26A5 Male and female sign
+		// ⚧ U+26A7 Transsexualism
+		// ⚲ U+26B2 Neutral, genderless
+		// ⚤ U+26A4 Heterosexuality
+		// ⚣ U+26A3 Male homosexuality
+		// ⚢ U+26A2 Lesbianism
+		// ⚥⚥ U+26A5 Bisexuality
+
+		return alt_msg;
+	}
+
+	/*
+	 * Handle commands from users
+	 */
+	static commands_handler(msg) {
+		const txtMsg = msg.m.trim();
+
+		const command = txtMsg.substring(1).trim();
+		if(command_patterns.help.test(command)) {
+			msg = ftm.hide_message(msg);
+			ftm.show_commands_help(msg.user);
+		}
+		else if(command_patterns.tip_menu.test(command)) {
+			msg = ftm.hide_message(msg);
+			if(msg.user === cb.room_slug || msg.is_mod) {
+				ftm.show_menu(ftm.i18n('lbl_tip_menu_all'));
+			}
+			else {
+				ftm.show_menu(ftm.i18n('lbl_tip_menu_user'), msg.user);
+			}
+		}
+		else if(command_patterns.colors_list.test(command)) {
+			msg = ftm.hide_message(msg);
+			let i = 0; // timer offset
+
+			cb.setTimeout(function() {
+				cb.sendNotice(ftm.i18n('colorslist_header'), msg.user);
+			}, 1000 * ++i);
+
+			// use two different background colors to ensure all colored labels are shown
+			for(const bgcolor of [colors_list.black, colors_list.white]) {
+				// set a timer to try and group the notices by their background
+				cb.setTimeout(function() {
+					for(lbl in colors_list) {
+						if(bgcolor === colors_list[lbl]) {
+							continue;
+						}
+
+						// the notices can't be single line because the text color needs to change with each time
+						cb.sendNotice(lbl+': '+colors_list[lbl], msg.user, bgcolor, colors_list[lbl]);
+					}
+				}, 1000 * ++i);
+			}
+		}
+		else {
+			// never mind
+		}
+
+		return msg;
+	}
+
+	static val(name) {
+		return cb.settings[settings_list[name]];
+	}
+
+	static i18n(label) {
+		if('undefined' === typeof i18n[lang][label]) {
+			return null;
+		}
+
+		return i18n[lang][label];
+	}
+
+	static is_disabled(setting_name) {
+		return ftm.i18n('lbl_not_applicable') === ftm.val(setting_name);
+	}
+}
+
+const ftm = FlexibleTipMenu;
+
 
 
 //
@@ -339,7 +1028,7 @@ cb.settings_choices = [];
 
 cb.settings_choices.push({
 	name: settings_list.app_name,
-	label: i18n[lang].app_name,
+	label: ftm.i18n('app_name'),
 	type: 'str',
 	minLength: 1,
 	maxLength: 99,
@@ -347,119 +1036,142 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-	name: settings_list.errors_shown_to,
-	label: i18n[lang].errors_shown_to,
+	name: settings_list.errors_flag,
+	label: ftm.i18n('errors_flag'),
 	type: 'choice',
-	choice1: i18n[lang].lbl_errors_shown_to_host,
-	choice2: i18n[lang].lbl_errors_shown_to_hostmods,
-	choice3: i18n[lang].lbl_not_applicable,
-	defaultValue: i18n[lang].lbl_errors_shown_to_host,
+	choice1: ftm.i18n('lbl_errors_host'),
+	choice2: ftm.i18n('lbl_errors_hostmods'),
+	choice3: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_errors_host'),
 });
 
-if(enable_thank_tippers) {
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers,
-		label: i18n[lang].thank_tippers,
-		type: 'choice',
-		choice1: i18n[lang].lbl_thank_tippers_testing,
-		choice2: i18n[lang].lbl_thank_tippers_publicly,
-		choice3: i18n[lang].lbl_thank_tippers_privately,
-		choice4: i18n[lang].lbl_not_applicable,
-		defaultValue: i18n[lang].lbl_not_applicable,
-	});
+// automod chars module
+cb.settings_choices.push({
+	name: settings_list.automod_chars_flag,
+	label: ftm.i18n('automod_chars_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_testing'),
+	choice2: ftm.i18n('lbl_publicly'),
+	choice3: ftm.i18n('lbl_privately'),
+	choice4: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_above_tokens,
-		label: i18n[lang].thank_tippers_above_tokens,
-		type: 'int',
-		minValue: 1,
-		maxValue: 999999,
-		defaultValue: 24,
-	});
+// automod links module
+cb.settings_choices.push({
+	name: settings_list.automod_links_flag,
+	label: ftm.i18n('automod_links_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_testing'),
+	choice2: ftm.i18n('lbl_publicly'),
+	choice3: ftm.i18n('lbl_privately'),
+	choice4: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_publicly_background_color,
-		label: i18n[lang].thank_tippers_publicly_background_color,
-		type: 'str',
-		minLength: 6,
-		maxLength: 7,
-		defaultValue: colors_list.white,
-	});
+// autothank module
+cb.settings_choices.push({
+	name: settings_list.autothank_flag,
+	label: ftm.i18n('autothank_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_testing'),
+	choice2: ftm.i18n('lbl_publicly'),
+	choice3: ftm.i18n('lbl_privately'),
+	choice4: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_publicly_text_color,
-		label: i18n[lang].thank_tippers_publicly_text_color,
-		type: 'str',
-		minLength: 6,
-		maxLength: 7,
-		defaultValue: colors_list.black,
-	});
+cb.settings_choices.push({
+	name: settings_list.autothank_above_tokens,
+	label: ftm.i18n('autothank_above_tokens'),
+	type: 'int',
+	minValue: 1,
+	maxValue: 999999,
+	defaultValue: 24,
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_publicly_boldness,
-		label: i18n[lang].thank_tippers_publicly_boldness,
-		type: 'choice',
-		choice1: weight_normal,
-		choice2: weight_bold,
-		choice3: weight_bolder,
-		defaultValue: weight_bold,
-	});
+cb.settings_choices.push({
+	name: settings_list.autothank_publicly_background_color,
+	label: ftm.i18n('autothank_publicly_background_color'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_list.white,
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_publicly_format,
-		label: i18n[lang].thank_tippers_publicly_format,
-		type: 'str',
-		minLength: 1,
-		maxLength: 99,
-		defaultValue: i18n[lang].expl_thank_tippers_publicly_format_recommend_english,
-	});
+cb.settings_choices.push({
+	name: settings_list.autothank_publicly_text_color,
+	label: ftm.i18n('autothank_publicly_text_color'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_list.black,
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_privately_background_color,
-		label: i18n[lang].thank_tippers_privately_background_color,
-		type: 'str',
-		minLength: 6,
-		maxLength: 7,
-		defaultValue: colors_list.white,
-	});
+cb.settings_choices.push({
+	name: settings_list.autothank_publicly_boldness,
+	label: ftm.i18n('autothank_publicly_boldness'),
+	type: 'choice',
+	choice1: weight_normal,
+	choice2: weight_bold,
+	choice3: weight_bolder,
+	defaultValue: weight_bold,
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_privately_text_color,
-		label: i18n[lang].thank_tippers_privately_text_color,
-		type: 'str',
-		minLength: 6,
-		maxLength: 7,
-		defaultValue: colors_list.black,
-	});
+cb.settings_choices.push({
+	name: settings_list.autothank_publicly_format,
+	label: ftm.i18n('autothank_publicly_format'),
+	type: 'str',
+	minLength: 1,
+	maxLength: 99,
+	defaultValue: ftm.i18n('expl_autothank_publicly_format_recommend_english'),
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_privately_boldness,
-		label: i18n[lang].thank_tippers_privately_boldness,
-		type: 'choice',
-		choice1: weight_normal,
-		choice2: weight_bold,
-		choice3: weight_bolder,
-		defaultValue: weight_bold,
-	});
+cb.settings_choices.push({
+	name: settings_list.autothank_privately_background_color,
+	label: ftm.i18n('autothank_privately_background_color'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_list.white,
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_privately_format,
-		label: i18n[lang].thank_tippers_privately_format,
-		type: 'str',
-		minLength: 1,
-		maxLength: 99,
-		defaultValue: i18n[lang].expl_thank_tippers_privately_format_recommend_english,
-	});
+cb.settings_choices.push({
+	name: settings_list.autothank_privately_text_color,
+	label: ftm.i18n('autothank_privately_text_color'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_list.black,
+});
 
-	cb.settings_choices.push({
-		name: settings_list.thank_tippers_remind_tip_note_format,
-		label: i18n[lang].thank_tippers_remind_tip_note_format,
-		type: 'str',
-		minLength: 1,
-		maxLength: 99,
-		defaultValue: i18n[lang].expl_thank_tippers_remind_tip_note_format_recommend_english,
-	});
-}
+cb.settings_choices.push({
+	name: settings_list.autothank_privately_boldness,
+	label: ftm.i18n('autothank_privately_boldness'),
+	type: 'choice',
+	choice1: weight_normal,
+	choice2: weight_bold,
+	choice3: weight_bolder,
+	defaultValue: weight_bold,
+});
+
+cb.settings_choices.push({
+	name: settings_list.autothank_privately_format,
+	label: ftm.i18n('autothank_privately_format'),
+	type: 'str',
+	minLength: 1,
+	maxLength: 99,
+	defaultValue: ftm.i18n('expl_autothank_privately_format_recommend_english'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.autothank_remind_tip_note_format,
+	label: ftm.i18n('autothank_remind_tip_note_format'),
+	type: 'str',
+	minLength: 1,
+	maxLength: 99,
+	defaultValue: ftm.i18n('expl_autothank_remind_tip_note_format_recommend_english'),
+});
 
 
 for(let i=0; i<nb_of_individual_menus; ++i) {
@@ -469,20 +1181,20 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 	const settings_idx_offset = (0 === i) ? '' : menu_idx_letter;
 
 	cb.settings_choices.push({
-		name: settings_list.tip_menu_shown_to + settings_idx_offset,
-		label: i18n[lang].tip_menu_shown_to.replace('{MENU}', menu_idx_letter),
+		name: settings_list.tip_menu_flag + settings_idx_offset,
+		label: ftm.i18n('tip_menu_flag').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'choice',
-		choice1: i18n[lang].lbl_tip_menu_shown_to_testing,
-		choice2: i18n[lang].lbl_tip_menu_shown_to_all,
-		choice3: i18n[lang].lbl_tip_menu_shown_to_fans,
-		choice4: i18n[lang].lbl_tip_menu_shown_to_havetk,
-		choice5: i18n[lang].lbl_not_applicable,
-		defaultValue: (0 === i) ? i18n[lang].lbl_tip_menu_shown_to_testing : i18n[lang].lbl_not_applicable,
+		choice1: ftm.i18n('lbl_tip_menu_testing'),
+		choice2: ftm.i18n('lbl_tip_menu_all'),
+		choice3: ftm.i18n('lbl_tip_menu_fans'),
+		choice4: ftm.i18n('lbl_tip_menu_havetk'),
+		choice5: ftm.i18n('lbl_not_applicable'),
+		defaultValue: (0 === i) ? ftm.i18n('lbl_tip_menu_testing') : ftm.i18n('lbl_not_applicable'),
 	});
 
 	cb.settings_choices.push({
 		name: settings_list.tip_menu_header + settings_idx_offset,
-		label: i18n[lang].tip_menu_header.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('tip_menu_header').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 99,
@@ -491,7 +1203,7 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.tip_menu_footer + settings_idx_offset,
-		label: i18n[lang].tip_menu_footer.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('tip_menu_footer').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 99,
@@ -500,7 +1212,7 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.inline_separator + settings_idx_offset,
-		label: i18n[lang].inline_separator.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('inline_separator').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 0,
 		maxLength: 10,
@@ -509,19 +1221,19 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.inline_spacing + settings_idx_offset,
-		label: i18n[lang].inline_spacing.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('inline_spacing').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'choice',
-		choice1: i18n[lang].lbl_inline_spacing_before,
-		choice2: i18n[lang].lbl_inline_spacing_after,
-		choice3: i18n[lang].lbl_inline_spacing_both,
-		choice4: i18n[lang].lbl_not_applicable,
-		defaultValue: i18n[lang].lbl_not_applicable,
+		choice1: ftm.i18n('lbl_inline_spacing_before'),
+		choice2: ftm.i18n('lbl_inline_spacing_after'),
+		choice3: ftm.i18n('lbl_inline_spacing_both'),
+		choice4: ftm.i18n('lbl_not_applicable'),
+		defaultValue: ftm.i18n('lbl_not_applicable'),
 		required: false,
 	});
 
 	cb.settings_choices.push({
 		name: settings_list.menu_background_color + settings_idx_offset,
-		label: i18n[lang].menu_background_color.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('menu_background_color').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 6,
 		maxLength: 7,
@@ -530,7 +1242,7 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_text_color + settings_idx_offset,
-		label: i18n[lang].menu_text_color.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('menu_text_color').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 6,
 		maxLength: 7,
@@ -539,7 +1251,7 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_boldness + settings_idx_offset,
-		label: i18n[lang].menu_boldness.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('menu_boldness').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'choice',
 		choice1: weight_normal,
 		choice2: weight_bold,
@@ -549,7 +1261,7 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_repeat_minutes + settings_idx_offset,
-		label: i18n[lang].menu_repeat_minutes.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('menu_repeat_minutes').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'int',
 		minValue: 0,
 		maxValue: 60,
@@ -558,7 +1270,7 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_item_prefix + settings_idx_offset,
-		label: i18n[lang].menu_item_prefix.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('menu_item_prefix').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 100,
@@ -567,7 +1279,7 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_item_suffix + settings_idx_offset,
-		label: i18n[lang].menu_item_suffix.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('menu_item_suffix').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 100,
@@ -576,27 +1288,32 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_item_display_format + settings_idx_offset,
-		label: i18n[lang].menu_item_display_format.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('menu_item_display_format').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 99,
-		defaultValue: i18n[lang].expl_menu_item_display_format_recommend_english,
+		defaultValue: ftm.i18n('expl_menu_item_display_format_recommend_english'),
 	});
 
 	cb.settings_choices.push({
 		name: settings_list.sort_order + settings_idx_offset,
-		label: i18n[lang].sort_order.replace('{MENU}', menu_idx_letter),
+		label: ftm.i18n('sort_order').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'choice',
-		choice1: i18n[lang].lbl_sort_amount_asc,
-		choice2: i18n[lang].lbl_sort_amount_desc,
-		choice3: i18n[lang].lbl_not_applicable,
-		defaultValue: i18n[lang].lbl_sort_amount_asc,
+		choice1: ftm.i18n('lbl_sort_amount_asc'),
+		choice2: ftm.i18n('lbl_sort_amount_desc'),
+		choice3: ftm.i18n('lbl_not_applicable'),
+		defaultValue: ftm.i18n('lbl_sort_amount_asc'),
 	});
 
+	const item_lbl_tpl = ftm.i18n('menu_item_lbl');
 	for(let j=0; j<nb_of_menu_items; ++j) {
+		const item_lbl = item_lbl_tpl
+			.replace(generic_patterns.menu_idx, menu_idx_letter)
+			.replace(generic_patterns.item_idx, j+1);
+
 		const new_item = {
 			name: settings_list.menu_item_lbl + settings_idx_offset + (j+1),
-			label: i18n[lang].menu_item_lbl.replace('{MENU}', menu_idx_letter).replace('{ITEM}', j+1),
+			label: item_lbl,
 			type: 'str',
 			minLength: 1,
 			maxLength: 99,
@@ -608,581 +1325,82 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 	}
 }
 
-/*
- * Removes remaining {VAR} syntax from a string
- */
-function clean_str(str) {
-	if(!str) {
-		return '';
-	}
 
-	return str.replace(/\s*{[A-Z_ -]+}\s*/g, ' ').trim();
-}
 
-/*
- * Display errors in the chat
- */
-function alert_error(cfg_name, error_lbl, bg_color=null, txt_color=null) {
-	bg_color = bg_color ? bg_color : colors_list['bright red'];
-	txt_color = txt_color ? txt_color : colors_list.white;
-	const app_name = cb.settings[settings_list.app_name] ? cb.settings[settings_list.app_name] : default_app_name;
-	const setting_name = ('undefined' === typeof i18n[lang][cfg_name]) ? cfg_name : i18n[lang][cfg_name];
-	const setting_value = cb.settings[settings_list[cfg_name]];
-	const errmsg_format = i18n[lang].errmsg_format;
-	const msg = errmsg_format.replace(/{BCASTER}/, cb.room_slug).replace(/{APP}/, app_name).replace(/{LABEL}/, error_lbl).replace(/{VALUE}/, setting_value).replace(/{SETTING}/, setting_name);
-	if(cbjs.arrayContains(shown_errors, msg)) {
-		return;
-	}
-
-	switch(cb.settings[settings_list.errors_shown_to]) {
-		case i18n[lang].lbl_errors_shown_to_host:
-			cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
-		break;
-
-		case i18n[lang].lbl_errors_shown_to_hostmods:
-			cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
-			cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder, group_mods);
-		break;
-
-		default:
-			// never mind
-	}
-
-	shown_errors.push(msg);
-}
-
-/*
- * Gets the hex value of a color from a settings value
- */
-function get_color_code(cfg_color, default_value) {
-	const cfg_value = cb.settings[settings_list[cfg_color]];
-	const color_match = cfg_value.match(/^#?([0-9a-f]{6})$/i);
-	if(!color_match) {
-		alert_error(cfg_color, i18n[lang].errmsg_color_format);
-		return default_value;
-	}
-
-	return '#'+(color_match[1].toUpperCase());
-}
-
-/*
- * Gets the menu items separator, whether multi- or single-line and according to spacing setting
- */
-function get_items_separator(cfg_spacing, cfg_separator) {
-	let items_separator;
-	if('' === cfg_separator) {
-		items_separator = "\n";
-	}
-	else if(i18n[lang].lbl_inline_spacing_before === cfg_spacing) {
-		items_separator = ' '+cfg_separator;
-	}
-	else if(i18n[lang].lbl_inline_spacing_after === cfg_spacing) {
-		items_separator = cfg_separator+' ';
-	}
-	else if(i18n[lang].lbl_inline_spacing_both === cfg_spacing) {
-		items_separator = ' '+cfg_separator+' ';
-	}
-	else {
-		items_separator = cfg_separator;
-	}
-
-	return items_separator;
-}
-
-/*
- * Gets the sorted list of menu items from the app settings
- */
-function get_menu_options() {
-	let options_list = [];
-	for(const setting_name in cb.settings) {
-		if(!setting_name.startsWith(settings_list.menu_item_lbl)) continue;
-		if('string' !== typeof cb.settings[setting_name]) continue;
-
-		const setting_value = cb.settings[setting_name].trim();
-		if('' === setting_value) continue;
-
-		const menu_item = setting_value.match(/^([0-9]+)(.+)$/i);
-		if(null === menu_item) {
-			alert_error(setting_name, i18n[lang].errmsg_tipmenu_item_format, colors_list['pastel red'], colors_list.black);
-			continue;
-		}
-
-		const [, item_amount, item_label] = menu_item;
-		options_list.push({amount: parseInt(item_amount), label: item_label.trim()});
-	};
-
-	if(0 === options_list.length) {
-		alert_error(i18n[lang].errmsg_tipmenu_entire, i18n[lang].errmsg_tipmenu_noitems);
-		return [];
-	}
-
-	if(i18n[lang].lbl_not_applicable !== cb.settings[settings_list.sort_order]) {
-		options_list.sort(function(a, b) {
-			let res;
-			if(i18n[lang].lbl_sort_amount_asc === cb.settings[settings_list.sort_order]) {
-				res = a.amount - b.amount;
-			}
-			else {
-				res = b.amount - a.amount;
-			}
-
-			return res;
-		});
-	}
-
-	return options_list;
-}
-
-/*
- * Gets the parametrized tip menu lines according to format setting
- */
-function get_tip_menu(options_list) {
-	const inline_spacing = cb.settings[settings_list.inline_spacing];
-	const menu_item_prefix = cb.settings[settings_list.menu_item_prefix];
-	const menu_item_suffix = cb.settings[settings_list.menu_item_suffix];
-
-	let tip_menu_items = [];
-	if('' !== cb.settings[settings_list.app_name]) {
-		tip_menu_items.push(cb.settings[settings_list.app_name]);
-	}
-
-	if('' !== cb.settings[settings_list.tip_menu_header]) {
-		tip_menu_items.push(cb.settings[settings_list.tip_menu_header]);
-	}
-
-	for(const menu_option of options_list) {
-		let msg = '';
-		if(menu_item_prefix) {
-			if(i18n[lang].lbl_not_applicable !== inline_spacing) {
-				msg += menu_item_prefix+' ';
-			}
-			else {
-				msg += menu_item_prefix;
-			}
-		}
-
-		msg += cb.settings[settings_list.menu_item_display_format];
-		msg = msg.replace(/{AMOUNT}/gi, menu_option.amount);
-		msg = msg.replace(/{LABEL}/gi, menu_option.label);
-		msg = msg.replace(/{BCASTER}/gi, cb.room_slug);
-
-		if(menu_item_suffix) {
-			if(i18n[lang].lbl_not_applicable !== inline_spacing) {
-				msg += ' '+menu_item_suffix;
-			}
-			else {
-				msg += menu_item_suffix;
-			}
-		}
-
-		tip_menu_items.push(msg);
-	}
-
-	if('' !== cb.settings[settings_list.tip_menu_footer]) {
-		tip_menu_items.push(cb.settings[settings_list.tip_menu_footer]);
-	}
-
-	return tip_menu_items;
-}
-
-/*
- * Display the tip menu
- */
-function show_menu(tip_menu_shown_to = null, username = null) {
-	const menu_boldness = cb.settings[settings_list.menu_boldness];
-	const background_color = get_color_code('menu_background_color', colors_list.black);
-	const text_color = get_color_code('menu_text_color', colors_list.white);
-	const options_list = get_menu_options();
-	const menu_items_separator = get_items_separator(cb.settings[settings_list.inline_spacing], cb.settings[settings_list.inline_separator]);
-	const tip_menu = get_tip_menu(options_list).join(menu_items_separator);
-
-	if(tip_menu_shown_to === null) {
-		tip_menu_shown_to = cb.settings[settings_list.tip_menu_shown_to];
-	}
-
-	switch(tip_menu_shown_to) {
-		case i18n[lang].lbl_tip_menu_shown_to_testing:
-			cb.sendNotice(clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // only to the broadcaster
-		break;
-
-		case i18n[lang].lbl_tip_menu_shown_to_all:
-			cb.sendNotice(clean_str(tip_menu), '', background_color, text_color, menu_boldness);
-		break;
-
-		case i18n[lang].lbl_tip_menu_shown_to_fans:
-			cb.sendNotice(clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_fans); // send notice only to group
-			cb.sendNotice(clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
-		break;
-
-		case i18n[lang].lbl_tip_menu_shown_to_havetk:
-			cb.sendNotice(clean_str(tip_menu), '', background_color, text_color, menu_boldness, group_havetk); // send notice only to group
-			cb.sendNotice(clean_str(tip_menu), cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
-		break;
-
-		case i18n[lang].lbl_tip_menu_shown_to_user:
-			cb.sendNotice(clean_str(tip_menu), username, background_color, text_color, menu_boldness); // send notice only to username who asked for it
-		break;
-
-		default:
-			// never mind
-	}
-}
-
-/*
- * Start the tip menu with a repeating timer
- */
-function show_menu_handler() {
-	show_menu();
-
-	if(0 < cb.settings[settings_list.menu_repeat_minutes]) {
-		cb.setTimeout(show_menu_handler, 1000 * 60 * cb.settings[settings_list.menu_repeat_minutes]);
-	}
-}
-
-/*
- * Look up a service from the tip menu by to its amount
- */
-function find_service(tip_amount) {
-	const options_list = get_menu_options();
-	if(0 === options_list.length) {
-		return false;
-	}
-
-	for(const menu_option of options_list) {
-		if(menu_option.amount === tip_amount) {
-			return menu_option.label;
-		}
-	}
-
-	return false;
-}
-
-/*
- * Whether the thanks module displays public or private notices
- */
-function is_public_thanks() {
-	return i18n[lang].lbl_thank_tippers_publicly === cb.settings[settings_list.thank_tippers];
-}
-
-/*
- * Gets the formatted message to display in the chat for a tip
- */
-function get_thanks_notice(tip_amount, from_user) {
-	if(tip_amount <= cb.settings[settings_list.thank_tippers_above_tokens]) {
-		return false;
-	}
-
-	let notice_tpl;
-	if(is_public_thanks()) {
-		notice_tpl = cb.settings[settings_list.thank_tippers_publicly_format];
-	}
-	else {
-		notice_tpl = cb.settings[settings_list.thank_tippers_privately_format];
-	}
-
-	let notice = notice_tpl;
-	if(notice.match(/{SERVICE}/gi)) {
-		const service_lbl = find_service(tip_amount);
-		if(!service_lbl) {
-			return false;
-		}
-
-		notice = notice.replace(/{SERVICE}/gi, service_lbl);
-	}
-
-	notice = notice.replace(/{AMOUNT}/gi, tip_amount);
-	notice = notice.replace(/{TIPPER}/gi, from_user);
-	notice = notice.replace(/{BCASTER}/gi, cb.room_slug);
-	return notice;
-}
-
-/*
- * Gets the formatted message to display as a private notice to remind the tipper of their tip note
- */
-function get_thank_tippers_remind_tip_note_notice(tip_note){
-	let res;
-	if('' === tip_note) {
-		res = false;
-	}
-	else if (!cb.settings[settings_list.thank_tippers_remind_tip_note_format]) {
-		res = false;
-	}
-	else if(!cb.settings[settings_list.thank_tippers_remind_tip_note_format].match(/{MESSAGE}/gi)) {
-		res = false;
-	}
-	else {
-		res = cb.settings[settings_list.thank_tippers_remind_tip_note_format].replace(/{MESSAGE}/gi, tip_note);
-	}
-
-	res = res.replace(/{BCASTER}/gi, cb.room_slug);
-	return res;
-}
-
-/*
- * Displays a notice to thank the tipper
- */
-function thank_tipper(tip_amount, from_user, tip_note) {
-	let background_color;
-	let text_color;
-
-	const notice = get_thanks_notice(tip_amount, from_user);
-
-	if(!notice) {
-		// never mind
-	}
-	else if(is_public_thanks()) {
-		background_color = get_color_code('thank_tippers_publicly_background_color', colors_list.white);
-		text_color = get_color_code('thank_tippers_publicly_text_color', colors_list.black);
-		cb.sendNotice(clean_str(notice), '', background_color, text_color, cb.settings[settings_list.thank_tippers_publicly_boldness]);
-	}
-	else {
-		background_color = get_color_code('thank_tippers_privately_background_color', colors_list.white);
-		text_color = get_color_code('thank_tippers_privately_text_color', colors_list.black);
-		cb.sendNotice(clean_str(notice), from_user, background_color, text_color, cb.settings[settings_list.thank_tippers_privately_boldness]);
-	}
-
-	const private_notice = get_thank_tippers_remind_tip_note_notice(tip_note);
-	if(private_notice) {
-		background_color = get_color_code('thank_tippers_privately_background_color', colors_list.white);
-		text_color = get_color_code('thank_tippers_privately_text_color', colors_list.black);
-		cb.sendNotice(clean_str(private_notice), from_user, background_color, text_color, cb.settings[settings_list.thank_tippers_privately_boldness]);
-	}
-}
-
-/*
- * Callback for when a tip is sent
- */
-function thank_tipper_handler(tip) {
-	thank_tipper(tip.amount, tip.from_user, tip.message);
-}
-
-/*
- * Whether a template string matches its expected format
- */
-function check_template_format(cfg_setting, expected_options) {
-	//const cfg_varname = i18n[lang][cfg_setting];
-	const notice_tpl = cb.settings[settings_list[cfg_setting]];
-	if(!notice_tpl) {
-		alert_error(cfg_setting, i18n[lang].errmsg_empty);
-		return false;
-	}
-
-	for(const i in expected_options) {
-		const varname = '{'+expected_options[i]+'}';
-		const regexp = new RegExp(varname, 'i');
-		if(!regexp.test(notice_tpl)) {
-			alert_error(cfg_setting, i18n[lang].errmsg_missing.replace(/{LABEL}/, varname));
-			return false;
-		}
-	}
-
-	return true;
-}
-
-/*
- * Replacement for the official cb.log() function, which does not appear to work
- */
-function basic_log(obj, lbl) {
-	let dbgRows = [];
-
-	const dbgStart = new Date(Date.now());
-	dbgRows.push(i18n[lang].errmsg_dbg_start.replace(/{LABEL}/, lbl).replace(/{TIME}/, dbgStart.toTimeString()));
-
-	for(const idx in obj) {
-		const type = typeof(obj[idx]);
-		let msg = idx+': '+type;
-		switch(type) {
-			case 'string': // pass through
-			case 'number':
-				msg += ' ('+obj[idx]+')';
-			break;
-
-			case 'boolean':
-				msg += ' ('+(obj[idx] ? 'true' : 'false')+')';
-			break;
-
-			case 'function':
-				msg += ' ('+(obj[idx].length)+' params)';
-			break;
-
-			case 'object':
-				let innerObj = [];
-				for(const innerIdx in obj[idx]) {
-					const innerType = obj[idx][innerIdx];
-					innerObj.push(`in ${idx}[${innerIdx}]: ${innerType} (${obj[idx][innerIdx]})`);
-				}
-
-				if(0 === innerObj.length) {
-					dbgRows.push(msg+' (empty)');
-					continue;
-				}
-
-				if(idx === 'settings' || idx === 'settings_choices') {
-					dbgRows.push(msg+' ('+innerObj.length+' elements)');
-					continue;
-				}
-
-				dbgRows.push(msg+' ('+innerObj.length+' elements):');
-				dbgRows.push(innerObj.join("\n"));
-				continue;
-			break;
-
-			default:
-				// never mind
-		}
-
-		dbgRows.push(msg);
-	}
-
-	const dbgEnd = new Date(Date.now());
-	dbgRows.push(i18n[lang].errmsg_dbg_end.replace(/{LABEL}/, lbl).replace(/{TIME}/, dbgEnd.toTimeString()));
-
-	return dbgRows;
-}
-
-/*
- * Displays the app's list of commands
- */
-function show_commands_help(username, usergroup = null) {
-	const app_name = cb.settings[settings_list.app_name] ? cb.settings[settings_list.app_name] : default_app_name;
-	let commands_list = [];
-	commands_list.push(i18n[lang].expl_commands_available_recommend_english.replace(/{LABEL}/, app_name));
-	commands_list.push(i18n[lang].expl_commands_tipmenu_recommend_english);
-	commands_list.push(i18n[lang].expl_commands_colorslist_recommend_english);
-	cb.sendNotice(commands_list.join("\n"), username, colors_list.black, colors_list.white, '', usergroup);
-}
-
-/*
- * Recommended way to hide message in public chat, but still echoed back to the user
- */
-function hide_message(msg) {
-	msg['X-Spam'] = true;
-	return msg;
-}
-
-/*
- * Handle commands from users
- */
-function commands_handler(msg) {
-	const txtMsg = msg.m.trim();
-	if(!command_prefixes_allow_list.includes(txtMsg.substring(0, 1))) {
-		return msg; // not a command
-	}
-
-	const command = txtMsg.substring(1).trim();
-	if(command.match(/^he?lp$/)) {
-		msg = hide_message(msg);
-		show_commands_help(msg.user);
-	}
-	else if(command.match(/^(?:tip)?_?menu$/)) {
-		msg = hide_message(msg);
-		if(msg.user === cb.room_slug || msg.is_mod) {
-			show_menu(i18n[lang].lbl_tip_menu_shown_to_all);
-		}
-		else {
-			show_menu(i18n[lang].lbl_tip_menu_shown_to_user, msg.user);
-		}
-	}
-	else if(command.match(/^colou?rs_?(?:list)?$/)) {
-		msg = hide_message(msg);
-		let i = 0; // timer offset
-
-		cb.setTimeout(function() {
-			cb.sendNotice('This is a sample list of colors to help you configure the bot:', msg.user);
-		}, 1000 * ++i);
-
-		// use two different background colors to ensure all colored labels are shown
-		for(const bgcolor of [colors_list.black, colors_list.white]) {
-			// set a timer to try and group the notices by their background
-			cb.setTimeout(function() {
-				for(lbl in colors_list) {
-					if(bgcolor === colors_list[lbl]) {
-						continue;
-					}
-
-					// the notices can't be single line because the text color needs to change with each time
-					cb.sendNotice(lbl+': '+colors_list[lbl], msg.user, bgcolor, colors_list[lbl]);
-				}
-			}, 1000 * ++i);
-		}
-	}
-	else {
-		// never mind
-	}
-
-	return msg;
-}
-
+cb.onStart(user => {
 
 //
-// launch the app
+// launch the app components, each with its own self-test
 //
+
+cb.setTimeout(function () {
+	const cfg_app_name = ftm.val('app_name');
+	const starting_lbl = ftm.i18n('errmsg_starting_app')
+		.replace(generic_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name)
+		.replace(generic_patterns.visibility, ftm.val('tip_menu_flag'));
+	cb.sendNotice(starting_lbl, user.user, colors_list.white, colors_list.black);
+	cb.sendNotice(starting_lbl, user.user, colors_list.white, colors_list.black, '', group_mods);
+}, 1000 / 2);
+
+cb.setTimeout(function () {
+	ftm.show_commands_help(user.user);
+	ftm.show_commands_help('', group_mods);
+}, 1000 / 2);
+
+cb.onMessage(ftm.message_handler); // start listening on messages, possible commands
+
 
 if(is_debug) {
-	cb.sendNotice(basic_log(cbjs, 'cbjs').join("\n"), cb.room_slug, colors_list.black, colors_list.white);
-	cb.sendNotice(basic_log(cb, 'cb').join("\n"), cb.room_slug, colors_list.white, colors_list.black);
+	cb.sendNotice(ftm.basic_log(cbjs, 'cbjs').join("\n"), user.user, colors_list.black, colors_list.white);
+	cb.sendNotice(ftm.basic_log(cb, 'cb').join("\n"), user.user, colors_list.white, colors_list.black);
 }
-else if(i18n[lang].lbl_not_applicable === cb.settings[settings_list.tip_menu_shown_to]) {
+else if(ftm.is_disabled('tip_menu_flag')) {
 	cb.setTimeout(function () {
-		alert_error('tip_menu_shown_to', i18n[lang].errmsg_app_disabled);
+		ftm.alert_error('tip_menu_flag', ftm.i18n('errmsg_app_disabled'));
 	}, 1000 * 2);
 }
-else if (!check_template_format('menu_item_display_format', ['LABEL'])) {
+else if (!ftm.check_template_format('menu_item_display_format', ['LABEL'])) {
 	cb.setTimeout(function () {
-		alert_error('menu_item_display_format', i18n[lang].errmsg_app_errors);
+		ftm.alert_error('menu_item_display_format', ftm.i18n('errmsg_app_errors'));
+	}, 1000 * 2);
+}
+else if(!ftm.val('menu_repeat_minutes')) {
+	cb.setTimeout(function () {
+		ftm.alert_error('menu_repeat_minutes', ftm.i18n('errmsg_tipmenu_once'));
+		ftm.show_menu();
 	}, 1000 * 2);
 }
 else {
-	if(cb.settings[settings_list.menu_repeat_minutes] > 0) {
-		// display the menu (it will re-display itself in a timed loop)
-		cb.setTimeout(show_menu_handler, 1000 * 2);
-	}
-	else {
-		cb.setTimeout(function () {
-			alert_error('menu_repeat_minutes', i18n[lang].errmsg_tipmenu_once);
-			show_menu();
-		}, 1000 * 2);
-	}
-
-
-	cb.setTimeout(function () { 
-		const app_name = cb.settings[settings_list.app_name] ? cb.settings[settings_list.app_name] : default_app_name;
-		const startingLbl = 'Starting "{APP}" shown to: {VISIBILITY}'.replace('{APP}', app_name).replace('{VISIBILITY}', cb.settings[settings_list.tip_menu_shown_to]);
-		cb.sendNotice(startingLbl, cb.room_slug, colors_list.white, colors_list.black);
-		cb.sendNotice(startingLbl, cb.room_slug, colors_list.white, colors_list.black, '', group_mods);
-	}, 1000 / 2);
-
-	cb.setTimeout(function () { 
-		show_commands_help(cb.room_slug);
-		show_commands_help('', group_mods);
-	}, 1000 / 2);
-
-	cb.onMessage(commands_handler);
-
-
-	if(!enable_thank_tippers) {
-		// never mind
-	}
-	else if(i18n[lang].lbl_not_applicable === cb.settings[settings_list.thank_tippers]) {
-		// possibly show an alert to the broadcaster, or maybe not
-		/*
-		cb.setTimeout(function () {
-			alert_error('thank_tippers', i18n[lang].errmsg_thanks_module_disabled, colors_list.black, colors_list.white);
-		}, 1000 * 2);
-		*/
-	}
-	else if(!check_template_format('thank_tippers_publicly_format', ['TIPPER'])) {
-		cb.setTimeout(function () {
-			alert_error('thank_tippers_publicly_format', i18n[lang].errmsg_thanks_module_errors, colors_list['pastel red'], colors_list.black);
-		}, 1000 * 2);
-	}
-	else if(!check_template_format('thank_tippers_privately_format', ['TIPPER'])) {
-		cb.setTimeout(function () {
-			alert_error('thank_tippers_privately_format', i18n[lang].errmsg_thanks_module_errors, colors_list['pastel red'], colors_list.black);
-		}, 1000 * 2);
-	}
-	else {
-		// start listening for tips
-		cb.onTip(thank_tipper_handler);
-	}
+	// self-test passes: go on...
+	cb.setTimeout(ftm.show_menu_handler, 1000 * 2); // Repeatedly show the tip menu(s)
 }
+
+
+//
+// Start the autothank module
+//
+
+if(ftm.is_disabled('autothank_flag')) {
+	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
+	/*
+	cb.setTimeout(function () {
+		ftm.alert_error('autothank_flag', ftm.i18n('errmsg_thanks_module_disabled'), colors_list.black, colors_list.white);
+	}, 1000 * 2);
+	*/
+}
+else if(!ftm.check_template_format('autothank_publicly_format', ['TIPPER'])) {
+	cb.setTimeout(function () {
+		ftm.alert_error('autothank_publicly_format', ftm.i18n('errmsg_thanks_module_errors'), colors_list['pastel red'], colors_list.black);
+	}, 1000 * 2);
+}
+else if(!ftm.check_template_format('autothank_privately_format', ['TIPPER'])) {
+	cb.setTimeout(function () {
+		ftm.alert_error('autothank_privately_format', ftm.i18n('errmsg_thanks_module_errors'), colors_list['pastel red'], colors_list.black);
+	}, 1000 * 2);
+}
+else {
+	// self-test passes: go on...
+	cb.onTip(ftm.thank_tipper_handler); // start listening for tips
+}
+
+});
