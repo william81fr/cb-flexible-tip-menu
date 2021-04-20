@@ -31,7 +31,7 @@ const command_prefixes_allow_list = ['/', '!'];
 
 const default_app_name = 'Flexible Tip Menu'; // can be configured in the admin panel
 const is_debug = false; // this prevents the app from running, and instead shows debug info in the chat
-const az = 'abcdefghijklmnopqrstuvwxyz';
+const az = 'abcdefghijklmnopqrstuvwxyz'; // to generate indices for repeatable configurations
 
 const colors_list = {
 	'black': '#000000',
@@ -60,6 +60,7 @@ let shown_errors = []; // Used to show error messages only once
 
 
 // cf. https://en.wikipedia.org/wiki/List_of_Unicode_characters
+/*
 const ascii_allowlist = [
 	'\u{20}-\u{2F}', // ASCII Punctuation & Symbols
 	'\u{30}-\u{39}', // ASCII Digits
@@ -70,10 +71,18 @@ const ascii_allowlist = [
 	'\u{7B}-\u{7E}', // ASCII Punctuation & Symbols
 ];
 
+const latin1_allowlist = [
+	'\u{A0}-\u{BF}', // Latin-1 Punctuation & Symbols
+	'\u{C0}-\u{DE}', // Letters: Uppercase
+	'\u{DF}-\u{FF}', // Letters: Lowercase
+];
+*/
+
 
 // cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
 // cf. https://en.wikipedia.org/wiki/Emoji#Unicode_blocks
 
+/*
 const misc_allowlist = [
 	'\u{2600}-\u{26D4}',
 	'\u{2700}-\u{27BF}',
@@ -82,22 +91,29 @@ const misc_allowlist = [
 	//'\u{1F7E0}-\u{1F7EF}', // not recognized at the moment
 	//'\u{1F900}-\u{1FADF}', // not recognized at the moment
 ];
+*/
 
-const misc_allowranges = [
-	{start: parseInt('1F300', 16), end: parseInt('1F64F', 16)},
-	{start: parseInt('1F680', 16), end: parseInt('1F6FF', 16)},
-	{start: parseInt('1F7E0', 16), end: parseInt('1F7EF', 16)},
-	{start: parseInt('1F900', 16), end: parseInt('1FADF', 16)},
-];
+const automod_chars_allowranges = {
+	text: [
+		'\u{20}-\u{7E}', // most of ASCII 128
+		'\u{A0}-\u{FF}', // some of latin1
+		'\u{2600}-\u{26D4} \u{2700}-\u{27BF}', // early emotes
+	],
+	emoji: [
+		{start: parseInt('1F300', 16), end: parseInt('1F64F', 16)},
+		{start: parseInt('1F680', 16), end: parseInt('1F6FF', 16)},
+		{start: parseInt('1F7E0', 16), end: parseInt('1F7EF', 16)},
+		{start: parseInt('1F900', 16), end: parseInt('1FADF', 16)},
+	],
+}
 
-const chars_allowlist = ascii_allowlist.join(' ') + ' ' + misc_allowlist.join(' ');
-const automod_chars_pattern = new RegExp('^[^'+chars_allowlist+']+$');
-const automod_chars_dblcheck = /([^\u{20}-\u{7E} \u{2600}-\u{26D4} \u{2700}-\u{27BF}])/g;
-const automod_link_pattern = /[0-9a-z]+:\/\/[0-9a-z._-]+/i;
-
-const hexcolor_pattern = /^#?([0-9a-f]{6})$/i;
-const menuitem_pattern = /^([0-9]+)(.+)$/;
-const allvarnames_pattern = /\s*\{[0-9A-Z_ -]+\}\s*/g;
+const specific_patterns = {
+	automod_chars_allowed: new RegExp('^['+automod_chars_allowranges.text.join(' ')+']+$'),
+	automod_link: /[0-9a-z]+:\/\/?[0-9a-z._-]+/i,
+	hex_color: /^#?([0-9a-f]{6})$/i,
+	menu_item: /^([0-9]+)(.+)$/,
+	all_var_names: /\s*\{[0-9A-Z_ -]+\}\s*/g,
+};
 
 const generic_patterns = {
 	amount: /\{AMOUNT\}/gi,
@@ -189,8 +205,8 @@ const i18n = {
 		errors_flag: "Show the start-up errors to...",
 		automod_chars_flag: 'AUTOMOD NONLATIN TEXT ----------------------',
 		automod_links_flag: 'AUTOMOD LINKS ----------------------',
-		automod_record_flag: 'Record automod infractions in chat (all autmods)',
-		automod_nochange: '[{APP}] Automod was set up as TESTING, and the message was not altered',
+		automod_record_flag: 'Record automod infractions in chat (all automods)',
+		automod_noaction: '[{APP}] Automod was set up as TESTING, and the message was not blocked',
 		automod_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
 		autothank_flag: "AUTOMATICALLY THANK TIPPERS ----------------------",
 		autothank_above_tokens: "Only tips above this limit will get a thank you",
@@ -226,8 +242,8 @@ const i18n = {
 		lbl_tip_menu_havetk: "own or purchased tokens",
 		lbl_tip_menu_user: "the user who sent the command",
 		lbl_broadcaster: "broadcaster only",
-		lbl_publicly: "everyone in chat",
-		lbl_privately: "user only in chat",
+		lbl_everyone: "everyone in chat",
+		lbl_single_user: "user only in chat",
 		lbl_not_applicable: "n/a (disabled)",
 		lbl_inline_spacing_before: "before",
 		lbl_inline_spacing_after: "after",
@@ -268,7 +284,7 @@ const i18n = {
 		automod_chars_flag: 'AUTOMOD NONLATIN TEXT ----------------------',
 		automod_links_flag: 'AUTOMOD LINKS ----------------------',
 		automod_record_flag: 'Guardar las infracciones automod en el chat (todos los autmods)',
-		automod_nochange: '[{APP}] Automod esta configurado para TESTING, y el mensaje no ha sido modificado',
+		automod_noaction: '[{APP}] Automod esta configurado para TESTING, y el mensaje no ha sido escondido',
 		automod_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
 		autothank_flag: "MODULO AGRADECIMIENTOS ----------------------",
 		autothank_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
@@ -304,8 +320,8 @@ const i18n = {
 		lbl_tip_menu_havetk: "teniendo tokens",
 		lbl_tip_menu_user: "el usuario que envio el comando",
 		lbl_broadcaster: "streamer",
-		lbl_publicly: "todo el mundo en el chat",
-		lbl_privately: "solo el usuario en el chat",
+		lbl_everyone: "todo el mundo en el chat",
+		lbl_single_user: "solo el usuario en el chat",
 		lbl_not_applicable: "n/a (desactivar)",
 		lbl_inline_spacing_before: "antes",
 		lbl_inline_spacing_after: "despues",
@@ -346,7 +362,7 @@ const i18n = {
 		automod_chars_flag: 'AUTOMOD NONLATIN TEXT ----------------------',
 		automod_links_flag: 'AUTOMOD LINKS ----------------------',
 		automod_record_flag: 'Enregistrer les infractions automod dans le chat (tous les autmods)',
-		automod_nochange: "[{APP}] Automod est configure pour TESTING, et le message n'a pas ete modifie",
+		automod_noaction: "[{APP}] Automod est configure pour TESTING, et le message n'a pas ete masque",
 		automod_user_count: '[{APP}] Automod a enregistre {COUNT} infractions pour {USER}',
 		autothank_flag: "MODULE REMERCIEMENTS ----------------------",
 		autothank_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
@@ -382,8 +398,8 @@ const i18n = {
 		lbl_tip_menu_havetk: "possedant des tokens",
 		lbl_tip_menu_user: "l'utilisateur qui a envoye la commande",
 		lbl_broadcaster: "streameur seulement",
-		lbl_publicly: "tout le monde dans le chat",
-		lbl_privately: "utilisateur uniquement dans le chat",
+		lbl_everyone: "tout le monde dans le chat",
+		lbl_single_user: "utilisateur uniquement dans le chat",
 		lbl_not_applicable: "n/a (desactiver)",
 		lbl_inline_spacing_before: "avant",
 		lbl_inline_spacing_after: "apres",
@@ -436,7 +452,7 @@ const FlexibleTipMenu = {
 			return '';
 		}
 
-		return str.replace(allvarnames_pattern, ' ').trim();
+		return str.replace(specific_patterns.all_var_names, ' ').trim();
 	},
 
 	/**
@@ -483,7 +499,7 @@ const FlexibleTipMenu = {
 	 */
 	get_color_code: function(cfg_color, default_value) {
 		const cfg_value = FlexibleTipMenu.val(cfg_color);
-		const color_match = hexcolor_pattern.exec(cfg_value);
+		const color_match = specific_patterns.hex_color.exec(cfg_value);
 		if(null === color_match) {
 			FlexibleTipMenu.alert_error(cfg_color, FlexibleTipMenu.i18n('errmsg_color_format'));
 			return default_value;
@@ -528,7 +544,7 @@ const FlexibleTipMenu = {
 			const setting_value = cb.settings[setting_name].trim();
 			if('' === setting_value) continue;
 
-			const menu_item = menuitem_pattern.exec(setting_value);
+			const menu_item = specific_patterns.menu_item.exec(setting_value);
 			if(null === menu_item) {
 				FlexibleTipMenu.alert_error(setting_name, FlexibleTipMenu.i18n('errmsg_tipmenu_item_format'), colors_list['pastel red'], colors_list.black);
 				continue;
@@ -630,7 +646,7 @@ const FlexibleTipMenu = {
 				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // only to the broadcaster
 			break;
 
-			case FlexibleTipMenu.i18n('lbl_publicly'):
+			case FlexibleTipMenu.i18n('lbl_everyone'):
 				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness);
 			break;
 
@@ -690,7 +706,7 @@ const FlexibleTipMenu = {
 	 * Whether the thanks module displays public or private notices
 	 */
 	is_public_thanks: function() {
-		return FlexibleTipMenu.i18n('lbl_publicly') === FlexibleTipMenu.val('autothank_flag');
+		return FlexibleTipMenu.i18n('lbl_everyone') === FlexibleTipMenu.val('autothank_flag');
 	},
 
 	/**
@@ -927,20 +943,7 @@ const FlexibleTipMenu = {
 		const txt_msg = message.m.trim();
 		const cfg_app_name = FlexibleTipMenu.val('app_name');
 
-		if(FlexibleTipMenu.i18n('lbl_broadcaster') !== FlexibleTipMenu.val(module_flag)) {
-			// take action
-			message = FlexibleTipMenu.hide_message(message);
-		}
-		else {
-			// only warn the model
-			cb.setTimeout(function() {
-				const lbl = FlexibleTipMenu.i18n('automod_nochange')
-					.replace(generic_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
-
-				cb.sendNotice(lbl, cb.room_slug);
-			}, 1000);
-		}
-
+		// standard warning for the model, so they know that automod did something
 		cb.setTimeout(function() {
 			const lbl = FlexibleTipMenu.i18n(base_errmsg_tpl)
 				.replace(generic_patterns.label, FlexibleTipMenu.i18n(errmsg_lbl))
@@ -950,6 +953,20 @@ const FlexibleTipMenu = {
 
 			cb.sendNotice(lbl, cb.room_slug);
 		}, 1000);
+
+		if(FlexibleTipMenu.i18n('lbl_broadcaster') !== FlexibleTipMenu.val(module_flag)) {
+			// take action
+			message = FlexibleTipMenu.hide_message(message);
+		}
+		else {
+			// don't hide the message, only warn the model
+			cb.setTimeout(function() {
+				const lbl = FlexibleTipMenu.i18n('automod_noaction')
+					.replace(generic_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
+
+				cb.sendNotice(lbl, cb.room_slug);
+			}, 1500);
+		}
 
 		const automod_record_enabled = !FlexibleTipMenu.is_disabled('automod_record_flag');
 		if(automod_record_enabled) {
@@ -971,11 +988,11 @@ const FlexibleTipMenu = {
 						cb.sendNotice(lbl, cb.room_slug);
 					break;
 
-					case FlexibleTipMenu.i18n('lbl_publicly'):
+					case FlexibleTipMenu.i18n('lbl_everyone'):
 						cb.sendNotice(lbl);
 					break;
 
-					case FlexibleTipMenu.i18n('lbl_privately'):
+					case FlexibleTipMenu.i18n('lbl_single_user'):
 					break;
 
 					default:
@@ -987,25 +1004,53 @@ const FlexibleTipMenu = {
 		return message;
 	},
 
-	automod_chars_validator: function(txt_msg) {
-		if(!automod_chars_pattern.test(txt_msg)) {
+	automod_validate_single_char: function(c) {
+		if(specific_patterns.automod_chars_allowed.test(c)) {
 			return true;
 		}
 
-		/*
-		const code_point = parseInt(txt_msg.codePointAt(0)).toString(16);
-		const code_char = parseInt(txt_msg.charCodeAt(0)).toString(16);
-		cb.sendNotice(`code point is ${code_point}; char code is ${code_char}`, message.user);
+		const code_point_int = parseInt(c.codePointAt(0));
+		//const code_point_hex = code_point_int.toString(16);
 
-		txt_msg.matchAll(automod_chars_dblcheck);
-
-		let tmp_res = true;
-		for(code_point of misc_allowranges) {
+		let c_res = false; // assume false at first, and revise later
+		for(const allowed_range of automod_chars_allowranges.emoji) {
+			//const range_start_hex = allowed_range.start.toString(16);
+			//const range_end_hex = allowed_range.end.toString(16);
+			if(code_point_int >= allowed_range.start && code_point_int <= allowed_range.end) {
+				//cb.sendNotice(`code point for ${c} is ${code_point_hex}: more than ${range_end_hex}`, cb.room_slug);
+				c_res = true;
+				break;
+			}
 		}
-		*/
 
-		//misc_allowranges
-		return false;
+		//cb.sendNotice(`code point for ${c} is ${code_point_hex}: ${c_res ? "ok" : "ko"}`, cb.room_slug);
+		return c_res;
+	},
+
+	automod_chars_validator: function(txt_msg) {
+		if(specific_patterns.automod_chars_allowed.test(txt_msg)) {
+			return true; // whole text is ascii-128
+		}
+
+		if(!automod_chars_allowranges.emoji.length) {
+			return true; // we don't have anything more to test against
+		}
+
+		const iterator = txt_msg[Symbol.iterator]();
+		let char = iterator.next();
+
+		let str_res = true;
+		while (!char.done) {
+			const c_res = FlexibleTipMenu.automod_validate_single_char(char.value);
+			if(!c_res) {
+				str_res = false;
+				break; // early fail
+			}
+
+			char = iterator.next();
+		}
+
+		return str_res;
 	},
 
 	/**
@@ -1014,7 +1059,6 @@ const FlexibleTipMenu = {
 	plaintext_handler: function(message) {
 		const txt_msg = message.m.trim();
 
-		/*
 		const automod_chars_enabled = !FlexibleTipMenu.is_disabled('automod_chars_flag');
 		if(automod_chars_enabled && !FlexibleTipMenu.automod_chars_validator(txt_msg)) {
 			message = FlexibleTipMenu.automod_plaintext(
@@ -1024,11 +1068,9 @@ const FlexibleTipMenu = {
 				'errmsg_automod_chars'
 			);
 		}
-		*/
 
-		/*
 		const automod_links_enabled = !FlexibleTipMenu.is_disabled('automod_links_flag');
-		if(automod_links_enabled && automod_link_pattern.test(txt_msg.replace(' ', ''))) {
+		if(automod_links_enabled && specific_patterns.automod_link.test(txt_msg.replace(' ', ''))) {
 			message = FlexibleTipMenu.automod_plaintext(
 				message,
 				'automod_links_flag',
@@ -1036,7 +1078,6 @@ const FlexibleTipMenu = {
 				'errmsg_automod_link'
 			);
 		}
-		*/
 
 		// @TODO try https://en.wikipedia.org/wiki/Planet_symbols#Mars
 		// ♀ U+2640 Female sign
@@ -1065,7 +1106,7 @@ const FlexibleTipMenu = {
 
 		else if(command_patterns.tip_menu.test(txt_command)) {
 			if(message.user === cb.room_slug || message.is_mod) {
-				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_publicly'));
+				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_everyone'));
 			}
 			else {
 				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_tip_menu_user'), message.user);
@@ -1170,47 +1211,41 @@ cb.settings_choices.push({
 	defaultValue: ftm.i18n('lbl_errors_host'),
 });
 
-/*
 // automod chars module
 cb.settings_choices.push({
 	name: settings_list.automod_chars_flag,
 	label: ftm.i18n('automod_chars_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_publicly'),
-	choice3: ftm.i18n('lbl_privately'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_single_user'),
 	choice4: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
-*/
 
-/*
 // automod links module
 cb.settings_choices.push({
 	name: settings_list.automod_links_flag,
 	label: ftm.i18n('automod_links_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_publicly'),
-	choice3: ftm.i18n('lbl_privately'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_single_user'),
 	choice4: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
-*/
 
-/*
 // record automods infractions
 cb.settings_choices.push({
 	name: settings_list.automod_record_flag,
 	label: ftm.i18n('automod_record_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_publicly'),
-	choice3: ftm.i18n('lbl_privately'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_single_user'),
 	choice4: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
-*/
 
 // autothank module
 cb.settings_choices.push({
@@ -1218,8 +1253,8 @@ cb.settings_choices.push({
 	label: ftm.i18n('autothank_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_publicly'),
-	choice3: ftm.i18n('lbl_privately'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_single_user'),
 	choice4: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
@@ -1317,7 +1352,7 @@ cb.settings_choices.push({
 });
 
 
-for(let i=0; i<nb_of_individual_menus; ++i) {
+for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 	const menu_idx_letter = az[i].toUpperCase();
 
 	// the first offset should retain settigns from earlier versions
@@ -1328,7 +1363,7 @@ for(let i=0; i<nb_of_individual_menus; ++i) {
 		label: ftm.i18n('tip_menu_flag').replace(generic_patterns.menu, menu_idx_letter),
 		type: 'choice',
 		choice1: ftm.i18n('lbl_broadcaster'),
-		choice2: ftm.i18n('lbl_publicly'),
+		choice2: ftm.i18n('lbl_everyone'),
 		choice3: ftm.i18n('lbl_tip_menu_fans'),
 		choice4: ftm.i18n('lbl_tip_menu_havetk'),
 		choice5: ftm.i18n('lbl_not_applicable'),
