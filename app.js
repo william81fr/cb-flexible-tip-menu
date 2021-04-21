@@ -315,7 +315,6 @@ const i18n = {
 		errmsg_thanks_module_errors: "has errors, so the thanking module is disabled",
 		errmsg_dbg_start: "dbg start for '{LABEL}' object at {TIME}",
 		errmsg_dbg_end: "dbg end for '{LABEL}' object at {TIME}",
-		errmsg_starting_app: "Starting '{APP}' shown to: {VISIBILITY}",
 		errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
 		errmsg_automod_chars: 'disallowed text',
 		errmsg_automod_link: 'link attempt',
@@ -391,7 +390,6 @@ const i18n = {
 		errmsg_thanks_module_errors: "hay errores, asi que el MODULO de agradecimientos esta desactivado",
 		errmsg_dbg_start: "dbg empieza para objeto '{LABEL}': {TIME}",
 		errmsg_dbg_end: "dbg fin para objeto '{LABEL}': {TIME}",
-		errmsg_starting_app: "Starting '{APP}' shown to: {VISIBILITY}",
 		errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
 		errmsg_automod_chars: 'disallowed text',
 		errmsg_automod_link: 'link attempt',
@@ -467,7 +465,6 @@ const i18n = {
 		errmsg_thanks_module_errors: "contient des erreurs, ainsi le module de remerciements est inactif",
 		errmsg_dbg_start: "debut dbg pour '{LABEL}' a {TIME}",
 		errmsg_dbg_end: "fin dbg pour '{LABEL}' a {TIME}",
-		errmsg_starting_app: "Starting '{APP}' shown to: {VISIBILITY}",
 		errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
 		errmsg_automod_chars: 'disallowed text',
 		errmsg_automod_link: 'link attempt',
@@ -1687,15 +1684,6 @@ cb.onStart(user => {
 //
 // launch the app components, each with its own self-test
 //
-
-cb.setTimeout(function () {
-	const cfg_app_name = ftm.val('app_name');
-	const starting_lbl = ftm.i18n('errmsg_starting_app')
-		.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name)
-		.replace(label_patterns.visibility, ftm.val('tip_menu_flag'));
-	cb.sendNotice(starting_lbl, user.user, colors_sample.white, colors_sample.black);
-	cb.sendNotice(starting_lbl, user.user, colors_sample.white, colors_sample.black, '', user_groups.mods);
-}, 1000 / 2);
 
 cb.setTimeout(function () {
 	ftm.show_commands_help(user.user);
