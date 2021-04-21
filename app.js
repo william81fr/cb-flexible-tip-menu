@@ -215,6 +215,7 @@ const settings_list = {
 	automod_chars_flag: 'debugmessage automodCharsFlag',
 	automod_links_flag: 'debugmessage automodLinksFlag',
 	automod_record_flag: 'debugmessage automodRecordFlag',
+	decorator_gender_flag: 'debugmessage decoratorGenderFlag',
 	autothank_flag: 'debugmessage autothankFlag',
 	autothank_above_tokens: 'autothankAboveTokens',
 	autothank_publicly_background_color: 'autothankPubliclyBackgroundColor',
@@ -254,6 +255,7 @@ const i18n = {
 		automod_record_flag: 'Record automod infractions in chat (all automods)',
 		automod_noaction: '[{APP}] Automod was set up as TESTING, and the message was not blocked',
 		automod_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
+		decorator_gender_flag: "INDICATOR OF USER'S SEX IN CHAT ----------------------",
 		autothank_flag: "AUTOMATICALLY THANK TIPPERS ----------------------",
 		autothank_above_tokens: "Only tips above this limit will get a thank you",
 		autothank_publicly_background_color: "Background color for the public thanks (hexa code)",
@@ -329,6 +331,7 @@ const i18n = {
 		automod_record_flag: 'Guardar las infracciones automod en el chat (todos los autmods)',
 		automod_noaction: '[{APP}] Automod esta configurado para TESTING, y el mensaje no ha sido escondido',
 		automod_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
+		decorator_gender_flag: 'INDICATION DEL SEXO DE LOS USUARIOS EN EL CHAT ----------------------',
 		autothank_flag: "MODULO AGRADECIMIENTOS ----------------------",
 		autothank_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
 		autothank_publicly_background_color: "Color de fondo para las gracias en publico (codigo hexa)",
@@ -404,6 +407,7 @@ const i18n = {
 		automod_record_flag: 'Enregistrer les infractions automod dans le chat (tous les autmods)',
 		automod_noaction: "[{APP}] Automod est configure pour TESTING, et le message n'a pas ete masque",
 		automod_user_count: '[{APP}] Automod a enregistre {COUNT} infractions pour {USER}',
+		decorator_gender_flag: 'INDICATEUR DU SEXE DES UTILISATEURS DU CHAT ----------------------',
 		autothank_flag: "MODULE REMERCIEMENTS ----------------------",
 		autothank_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
 		autothank_publicly_background_color: "Couleur de fond pour les remerciements en public (code hexa)",
@@ -1151,6 +1155,57 @@ const FlexibleTipMenu = {
 	},
 
 	/**
+	 * Decorator to add the gender to messages in chat, according to the app preferences
+	 * @param {message} message The message that came in from the fired event
+	 * @returns {message} The updated message
+	 */
+	decorator_gender: function(message) {
+		const decorator_gender_flag = FlexibleTipMenu.val('decorator_gender_flag');
+
+		const only_broadcaster = (FlexibleTipMenu.i18n('lbl_broadcaster') === decorator_gender_flag);
+		if(only_broadcaster && message.user !== cb.room_slug) {
+			return message; // change nothing
+		}
+
+		const only_mods = (FlexibleTipMenu.i18n('lbl_host_mods') === decorator_gender_flag);
+		if(only_mods && !message.is_mod) {
+			return message; // change nothing
+		}
+
+		const only_fans = (FlexibleTipMenu.i18n('lbl_group_fans') === decorator_gender_flag);
+		if(only_fans && !message.is_fan) {
+			return message; // change nothing
+		}
+
+		const only_havetk = (FlexibleTipMenu.i18n('lbl_group_havetk') === decorator_gender_flag);
+		if(only_havetk && !message.has_tokens) {
+			return message; // change nothing
+		}
+
+		// cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
+		// cf. https://en.wikipedia.org/wiki/Planet_symbols#Mars
+		// ♀ U+2640 Female sign
+		// ♂ U+2642 Male sign
+		// ⚥ U+26A5 Male and female sign
+		// ⚧ U+26A7 Transsexualism
+		// ⚲ U+26B2 Neutral, genderless
+		// ⚤ U+26A4 Heterosexuality
+		// ⚣ U+26A3 Male homosexuality
+		// ⚢ U+26A2 Lesbianism
+		// ⚥⚥ U+26A5 Bisexuality
+
+		let prefix = '';
+		if('m' === message.gender) prefix = '\u2642'; // male
+		else if('f' === message.gender) prefix = '\u2640'; // female
+		else if('s' === message.gender) prefix = '\u26A7'; // trans
+		else if('c' === message.gender) prefix = '\u26A4'; // couple
+		else return message;
+
+		message.m = prefix + ' ' + message.m.trim();
+		return message;
+	},
+
+	/**
 	 * Handle plain messages from users (non-commands); will pass through automods and decorators
 	 * @param {message} message The message that came in from the fired event
 	 * @returns {message} The updated message
@@ -1178,16 +1233,10 @@ const FlexibleTipMenu = {
 			);
 		}
 
-		// @TODO decorators: try https://en.wikipedia.org/wiki/Planet_symbols#Mars
-		// ♀ U+2640 Female sign
-		// ♂ U+2642 Male sign
-		// ⚥ U+26A5 Male and female sign
-		// ⚧ U+26A7 Transsexualism
-		// ⚲ U+26B2 Neutral, genderless
-		// ⚤ U+26A4 Heterosexuality
-		// ⚣ U+26A3 Male homosexuality
-		// ⚢ U+26A2 Lesbianism
-		// ⚥⚥ U+26A5 Bisexuality
+		const decorator_gender_enabled = !FlexibleTipMenu.is_disabled('decorator_gender_flag');
+		if(decorator_gender_enabled) {
+			message = FlexibleTipMenu.decorator_gender(message);
+		}
 
 		return message;
 	},
@@ -1358,6 +1407,20 @@ cb.settings_choices.push({
 	choice2: ftm.i18n('lbl_everyone'),
 	choice3: ftm.i18n('lbl_single_user'),
 	choice4: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+// decorator gender module
+cb.settings_choices.push({
+	name: settings_list.decorator_gender_flag,
+	label: ftm.i18n('decorator_gender_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_host_mods'),
+	choice3: ftm.i18n('lbl_group_fans'),
+	choice4: ftm.i18n('lbl_group_havetk'),
+	choice5: ftm.i18n('lbl_everyone'),
+	choice6: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
