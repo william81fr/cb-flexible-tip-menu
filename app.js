@@ -280,22 +280,19 @@ const i18n = {
 		colorslist_header: 'This is a sample list of colors to help you configure the bot:',
 		sort_order: "Sort the menu {MENU} items before display, regardless of their order below",
 		menu_item_lbl: "menu item #{MENUIDX}{ITEMIDX}",
-		lbl_tip_menu_fans: "fans",
-		//lbl_tip_menu_50tk: "Dark Blue (Tipped 50 recently)",
-		//lbl_tip_menu_250tk: "Light Purple (Tipped 250 recently)",
-		//lbl_tip_menu_1000tk: "Dark Purple (Tipped 1000 recently)",
-		//lbl_tip_menu_havetk: "Light Blue (Own or purchased tokens)",
-		lbl_tip_menu_havetk: "own or purchased tokens",
-		lbl_tip_menu_user: "the user who sent the command",
+		lbl_group_fans: "fans",
+		lbl_group_havetk: "own or purchased tokens (light blue)",
+		//lbl_group_50tk: "Dark Blue (Tipped 50 recently)",
+		//lbl_group_250tk: "Light Purple (Tipped 250 recently)",
+		//lbl_group_1000tk: "Dark Purple (Tipped 1000 recently)",
 		lbl_broadcaster: "broadcaster only",
+		lbl_host_mods: "broadcaster + moderators",
 		lbl_everyone: "everyone in chat",
 		lbl_single_user: "user only in chat",
 		lbl_not_applicable: "n/a (disabled)",
 		lbl_inline_spacing_before: "before",
 		lbl_inline_spacing_after: "after",
 		lbl_inline_spacing_both: "before + after",
-		lbl_errors_host: "broadcaster",
-		lbl_errors_hostmods: "broadcaster + moderators",
 		lbl_sort_amount_asc: "lowest to highest price",
 		lbl_sort_amount_desc: "highest to lowest price",
 		expl_autothank_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
@@ -358,22 +355,19 @@ const i18n = {
 		colorslist_header: 'A continuacion un listado de colores para ayudarle a configurar el bot:',
 		sort_order: "Ordenar el menu {MENU}, sin tener cuenta de la orden aqui abajo",
 		menu_item_lbl: "elemento del menu #{MENUIDX}{ITEMIDX}",
-		lbl_tip_menu_fans: "fans",
-		//lbl_tip_menu_50tk: "Azul Oscuro (Ha Tippeado 50 recientemente)",
-		//lbl_tip_menu_250tk: "Violeta Clarito (Ha Tippeado 250 recientemente)",
-		//lbl_tip_menu_1000tk: "Violeta Oscuro (Ha Tippeado 1000 recientemente)",
-		//lbl_tip_menu_havetk: "Azul Clarito (Tiene tokens)",
-		lbl_tip_menu_havetk: "teniendo tokens",
-		lbl_tip_menu_user: "el usuario que envio el comando",
+		lbl_group_fans: "fans",
+		lbl_group_havetk: "teniendo tokens (azul clarito)",
+		//lbl_group_50tk: "Azul Oscuro (Ha Tippeado 50 recientemente)",
+		//lbl_group_250tk: "Violeta Clarito (Ha Tippeado 250 recientemente)",
+		//lbl_group_1000tk: "Violeta Oscuro (Ha Tippeado 1000 recientemente)",
 		lbl_broadcaster: "streamer",
+		lbl_host_mods: "streamer + moderador",
 		lbl_everyone: "todo el mundo en el chat",
 		lbl_single_user: "solo el usuario en el chat",
 		lbl_not_applicable: "n/a (desactivar)",
 		lbl_inline_spacing_before: "antes",
 		lbl_inline_spacing_after: "despues",
 		lbl_inline_spacing_both: "antes + despues",
-		lbl_errors_host: "streamer",
-		lbl_errors_hostmods: "streamer + moderador",
 		lbl_sort_amount_asc: "del precio mas bajo al mas alto",
 		lbl_sort_amount_desc: "del precio mas alto al mas bajo",
 		expl_autothank_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
@@ -436,22 +430,19 @@ const i18n = {
 		colorslist_header: 'Voici une liste de couleurs pour vous aider a parametrer le bot:',
 		sort_order: "Trier le menu {MENU} avant affichage, peu importe l'ordre ci dessous",
 		menu_item_lbl: "element du menu #{MENUIDX}{ITEMIDX}",
-		lbl_tip_menu_fans: "fans",
-		//lbl_tip_menu_50tk: "Bleu Fonce (A Tippe 50 recemment)",
-		//lbl_tip_menu_250tk: "Violet Clair (A tippe 250 recemment)",
-		//lbl_tip_menu_1000tk: "Violet Fonce (A tippe 1000 recemment)",
-		//lbl_tip_menu_havetk: "Bleu Clair (Possede des tokens)",
-		lbl_tip_menu_havetk: "possedant des tokens",
-		lbl_tip_menu_user: "l'utilisateur qui a envoye la commande",
+		lbl_group_fans: "fans",
+		lbl_group_havetk: "possedant des tokens (bleu clair)",
+		//lbl_group_50tk: "Bleu Fonce (A Tippe 50 recemment)",
+		//lbl_group_250tk: "Violet Clair (A tippe 250 recemment)",
+		//lbl_group_1000tk: "Violet Fonce (A tippe 1000 recemment)",
 		lbl_broadcaster: "streameur seulement",
+		lbl_host_mods: "streameur + moderateurs",
 		lbl_everyone: "tout le monde dans le chat",
 		lbl_single_user: "utilisateur uniquement dans le chat",
 		lbl_not_applicable: "n/a (desactiver)",
 		lbl_inline_spacing_before: "avant",
 		lbl_inline_spacing_after: "apres",
 		lbl_inline_spacing_both: "avant + apres",
-		lbl_errors_host: "streameur",
-		lbl_errors_hostmods: "streameur + moderateurs",
 		lbl_sort_amount_asc: "du prix le plus faible au plus eleve",
 		lbl_sort_amount_desc: "du prix le plus eleve au plus faible",
 		expl_autothank_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
@@ -505,7 +496,13 @@ const FlexibleTipMenu = {
 			return '';
 		}
 
-		return notice_tpl.replace(specific_patterns.all_var_names, ' ').trim();
+		const cfg_app_name = FlexibleTipMenu.val('app_name');
+
+		return notice_tpl
+			.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name)
+			.replace(label_patterns.broadcaster_name, cb.room_slug)
+			.replace(specific_patterns.all_var_names, ' ')
+			.trim();
 	},
 
 	/**
@@ -522,21 +519,20 @@ const FlexibleTipMenu = {
 		const cfg_setting_name = FlexibleTipMenu.i18n(cfg_name);
 		const setting_name = (null === cfg_setting_name) ? cfg_name : cfg_setting_name;
 		const setting_value = FlexibleTipMenu.val(cfg_name);
-		const errmsg_format = FlexibleTipMenu.i18n('errmsg_format');
-		const msg = errmsg_format
-			.replace(label_patterns.broadcaster_name, cb.room_slug)
+		const msg = FlexibleTipMenu.i18n('errmsg_format')
 			.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name)
+			.replace(label_patterns.broadcaster_name, cb.room_slug)
 			.replace(label_patterns.label, error_lbl)
 			.replace(label_patterns.setting_value, setting_value)
 			.replace(label_patterns.setting_name, setting_name);
 
-		if(!cbjs.arrayContains(shown_errors, msg)) {
+		if(!shown_errors.includes(msg)) {
 			switch(FlexibleTipMenu.val('errors_flag')) {
-				case FlexibleTipMenu.i18n('lbl_errors_host'):
+				case FlexibleTipMenu.i18n('lbl_broadcaster'):
 					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder);
 				break;
 
-				case FlexibleTipMenu.i18n('lbl_errors_hostmods'):
+				case FlexibleTipMenu.i18n('lbl_host_mods'):
 					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder);
 					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder, user_groups.mods);
 				break;
@@ -716,17 +712,17 @@ const FlexibleTipMenu = {
 				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness);
 			break;
 
-			case FlexibleTipMenu.i18n('lbl_tip_menu_fans'):
+			case FlexibleTipMenu.i18n('lbl_group_fans'):
 				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.fans); // send notice only to group
 				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
 			break;
 
-			case FlexibleTipMenu.i18n('lbl_tip_menu_havetk'):
+			case FlexibleTipMenu.i18n('lbl_group_havetk'):
 				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.have_tk); // send notice only to group
 				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
 			break;
 
-			case FlexibleTipMenu.i18n('lbl_tip_menu_user'):
+			case FlexibleTipMenu.i18n('lbl_single_user'):
 				cb.sendNotice(tip_menu_str, username, background_color, text_color, menu_boldness); // send notice only to username who asked for it
 			break;
 
@@ -993,16 +989,13 @@ const FlexibleTipMenu = {
 	 * @param {string} usergroup Who should see the menu in chat
 	 */
 	show_commands_help: function(username, usergroup = null) {
-		const cfg_app_name = FlexibleTipMenu.val('app_name');
-
-		const tmp_label = FlexibleTipMenu.i18n('expl_commands_available_recommend_english')
-			.replace(label_patterns.label, cfg_app_name ? cfg_app_name : default_app_name)
-
 		let commands_list = [];
-		commands_list.push(tmp_label);
+		commands_list.push(FlexibleTipMenu.i18n('expl_commands_available_recommend_english'));
 		commands_list.push(FlexibleTipMenu.i18n('expl_commands_tipmenu_recommend_english'));
 		commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist_recommend_english'));
-		cb.sendNotice(commands_list.join("\n"), username, colors_sample.black, colors_sample.white, '', usergroup);
+
+		const notice = FlexibleTipMenu.clean_str(commands_list.join("\n"));
+		cb.sendNotice(notice, username, colors_sample.black, colors_sample.white, '', usergroup);
 	},
 
 	/**
@@ -1042,17 +1035,15 @@ const FlexibleTipMenu = {
 	 */
 	 automod_plaintext: function(message, module_flag, notice_tpl, module_lbl) {
 		const txt_msg = message.m.trim();
-		const cfg_app_name = FlexibleTipMenu.val('app_name');
 
 		// standard warning for the model, so they know that automod did something
 		cb.setTimeout(function() {
-			const lbl = FlexibleTipMenu.i18n(notice_tpl)
+			const notice = FlexibleTipMenu.i18n(notice_tpl)
 				.replace(label_patterns.label, FlexibleTipMenu.i18n(module_lbl))
 				.replace(label_patterns.username, message.user)
-				.replace(label_patterns.message, txt_msg)
-				.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
+				.replace(label_patterns.message, txt_msg);
 
-			cb.sendNotice(lbl, cb.room_slug);
+			cb.sendNotice(FlexibleTipMenu.clean_str(notice), cb.room_slug);
 		}, 1000);
 
 		if(FlexibleTipMenu.i18n('lbl_broadcaster') !== FlexibleTipMenu.val(module_flag)) {
@@ -1062,10 +1053,8 @@ const FlexibleTipMenu = {
 		else {
 			// don't hide the message, only warn the model
 			cb.setTimeout(function() {
-				const lbl = FlexibleTipMenu.i18n('automod_noaction')
-					.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
-
-				cb.sendNotice(lbl, cb.room_slug);
+				const notice = FlexibleTipMenu.i18n('automod_noaction');
+				cb.sendNotice(FlexibleTipMenu.clean_str(notice), cb.room_slug);
 			}, 1500);
 		}
 
@@ -1081,20 +1070,21 @@ const FlexibleTipMenu = {
 			cb.setTimeout(function() {
 				const lbl = FlexibleTipMenu.i18n('automod_user_count')
 					.replace(label_patterns.username, message.user)
-					.replace(label_patterns.count, FlexibleTipMenu.automod_infractions[message.user])
-					.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
+					.replace(label_patterns.count, FlexibleTipMenu.automod_infractions[message.user]);
+
+				const notice = FlexibleTipMenu.clean_str(lbl);
 
 				switch(automod_record_flag) {
 					case FlexibleTipMenu.i18n('lbl_broadcaster'):
-						cb.sendNotice(lbl, cb.room_slug);
+						cb.sendNotice(notice, cb.room_slug);
 					break;
 
 					case FlexibleTipMenu.i18n('lbl_everyone'):
-						cb.sendNotice(lbl);
+						cb.sendNotice(notice);
 					break;
 
 					case FlexibleTipMenu.i18n('lbl_single_user'):
-						cb.sendNotice(lbl, '', '', '', '', message.user);
+						cb.sendNotice(notice, '', '', '', '', message.user);
 					break;
 
 					default:
@@ -1210,7 +1200,8 @@ const FlexibleTipMenu = {
 		let i = 0; // timer offset
 
 		cb.setTimeout(function() {
-			cb.sendNotice(FlexibleTipMenu.i18n('colorslist_header'), username);
+			const notice = FlexibleTipMenu.clean_str(FlexibleTipMenu.i18n('colorslist_header'));
+			cb.sendNotice(notice, username);
 		}, 1000 * ++i);
 
 		// use two different background colors to ensure all colored labels are shown
@@ -1248,7 +1239,7 @@ const FlexibleTipMenu = {
 				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_everyone'));
 			}
 			else {
-				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_tip_menu_user'), message.user);
+				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_single_user'), message.user);
 			}
 		}
 		else if(command_patterns.colors_sample.test(txt_command)) {
@@ -1328,10 +1319,10 @@ cb.settings_choices.push({
 	name: settings_list.errors_flag,
 	label: ftm.i18n('errors_flag'),
 	type: 'choice',
-	choice1: ftm.i18n('lbl_errors_host'),
-	choice2: ftm.i18n('lbl_errors_hostmods'),
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_host_mods'),
 	choice3: ftm.i18n('lbl_not_applicable'),
-	defaultValue: ftm.i18n('lbl_errors_host'),
+	defaultValue: ftm.i18n('lbl_broadcaster'),
 });
 
 // automod chars module
@@ -1487,8 +1478,8 @@ for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 		type: 'choice',
 		choice1: ftm.i18n('lbl_broadcaster'),
 		choice2: ftm.i18n('lbl_everyone'),
-		choice3: ftm.i18n('lbl_tip_menu_fans'),
-		choice4: ftm.i18n('lbl_tip_menu_havetk'),
+		choice3: ftm.i18n('lbl_group_fans'),
+		choice4: ftm.i18n('lbl_group_havetk'),
 		choice5: ftm.i18n('lbl_not_applicable'),
 		defaultValue: (0 === i) ? ftm.i18n('lbl_broadcaster') : ftm.i18n('lbl_not_applicable'),
 	});
