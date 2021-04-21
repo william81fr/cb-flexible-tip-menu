@@ -10,30 +10,52 @@
 // modify the next few lines to adjust the admin panel itself
 //
 
-// language of the admin panel; values are 'en' or 'fr'
-// (save and come back to the admin panel to see the changes)
+/**
+ * Language of the admin panel; values are 'en' or 'fr'
+ *   (save and come back to the admin panel to see the changes)
+ */
 const lang = 'en';
 
-// max number of configurable menu items
+/**
+ * Max number of configurable menu items
+ */
 const nb_of_menu_items = 40;
 
-// number of configurable menus, not more than 26
-// please leave at 1 for now
-const nb_of_individual_menus = 1;
-
-// messages starting with these characters will be interpreted as commands
-const command_prefixes_allow_list = ['/', '!'];
+/**
+ * Number of configurable menus, not more than 26
+ * Please leave at 1 for now
+ */
+const nb_of_distinct_menus = 1;
 
 
 //
 // don't modify anything from here on
 //
 
-const default_app_name = 'Flexible Tip Menu'; // can be configured in the admin panel
-const is_debug = false; // this prevents the app from running, and instead shows debug info in the chat
-const az = 'abcdefghijklmnopqrstuvwxyz'; // to generate indices for repeatable configurations
+/**
+ * This prevents the app from running, and instead shows debug info in the chat
+ */
+ const is_debug = false;
 
-const colors_list = {
+/**
+ * The app name can also be changed in the admin panel
+ */
+const default_app_name = 'Flexible Tip Menu';
+
+/**
+ * To generate indices for repeatable configurations
+ */
+const az = 'abcdefghijklmnopqrstuvwxyz';
+
+/**
+ * Messages starting with these characters will be interpreted as commands
+ */
+const command_prefixes_allow_list = ['/', '!'];
+
+/**
+ * Sample list of hexadecimal color codes
+ */
+const colors_sample = {
 	'black': '#000000',
 	'white': '#FFFFFF',
 	'bright red': '#FF0000',
@@ -45,16 +67,26 @@ const colors_list = {
 	'purple': '#bf3fbf',
 };
 
-const group_mods = 'red';
-const group_fans = 'green';
-const group_50tk = 'darkblue';
-const group_250tk = 'lightpurple';
-const group_1000tk = 'darkpurple';
-const group_havetk = 'lightblue';
+/**
+ * Identifiers to be used with cb.sendNotice()
+ */
+const user_groups = {
+	mods: 'red',
+	fans: 'green',
+	tk_50: 'darkblue',
+	tk_250: 'lightpurple',
+	tk_1000: 'darkpurple',
+	have_tk: 'lightblue',
+};
 
-const weight_normal = 'normal';
-const weight_bold = 'bold';
-const weight_bolder = 'bolder';
+/**
+ * Can be used with cb.sendNotice()
+ */
+const font_weights = {
+	normal: 'normal',
+	bold: 'bold',
+	bolder: 'bolder',
+};
 
 let shown_errors = []; // Used to show error messages only once
 
@@ -93,6 +125,9 @@ const misc_allowlist = [
 ];
 */
 
+/**
+ * Used by automod "chars" to identify ranges of Unicode characters to test for
+ */
 const automod_chars_allowranges = {
 	text: [
 		'\u{20}-\u{7E}', // most of ASCII 128
@@ -105,17 +140,21 @@ const automod_chars_allowranges = {
 		{start: parseInt('1F7E0', 16), end: parseInt('1F7EF', 16)},
 		{start: parseInt('1F900', 16), end: parseInt('1FADF', 16)},
 	],
-}
-
-const specific_patterns = {
-	automod_chars_allowed: new RegExp('^['+automod_chars_allowranges.text.join(' ')+']+$'),
-	automod_link: /[0-9a-z]+:\/\/?[0-9a-z._-]+/i,
-	hex_color: /^#?([0-9a-f]{6})$/i,
-	menu_item: /^([0-9]+)(.+)$/,
-	all_var_names: /\s*\{[0-9A-Z_ -]+\}\s*/g,
 };
 
-const generic_patterns = {
+/**
+ * RegExp patterns used for commands (in chat)
+ */
+const command_patterns = {
+	help: /^he?lp$/i,
+	tip_menu: /^(?:tip)?_?menu$/i,
+	colors_sample: /^colou?rs_?(?:list)?$/i,
+};
+
+/**
+ * RegExp patterns used for label replacements before calling cb.sendNotice()
+ */
+const label_patterns = {
 	amount: /\{AMOUNT\}/gi,
 	app_name: /\{APP\}/gi,
 	broadcaster_name: /\{BCASTER\}/gi,
@@ -127,44 +166,49 @@ const generic_patterns = {
 	menu_idx: /\{MENUIDX\}/gi,
 	service_name: /\{SERVICE\}/gi,
 	setting_name: /\{SETTING\}/gi,
+	setting_value: /\{VALUE\}/gi,
 	time: /\{TIME\}/gi,
 	tipper_handle: /\{TIPPER\}/gi,
 	username: /\{USER\}/gi,
-	setting_value: /\{VALUE\}/gi,
 	varname: /\{VARNAME\}/gi,
 	visibility: /\{VISIBILITY\}/gi,
 };
 
-const command_patterns = {
-	help: /^he?lp$/i,
-	tip_menu: /^(?:tip)?_?menu$/i,
-	colors_list: /^colou?rs_?(?:list)?$/i,
-}
+/**
+ * RegExp patterns used in specific contexts (except commands and mere labels)
+ */
+ const specific_patterns = {
+	automod_chars_allowed: new RegExp('^['+automod_chars_allowranges.text.join(' ')+']+$'),
+	automod_link: /[0-9a-z]+:\/\/?[0-9a-z._-]+/i,
+	hex_color: /^#?([0-9a-f]{6})$/i,
+	menu_item: /^([0-9]+)(.+)$/,
+	all_var_names: /\s*\{[0-9A-Z_ -]+\}\s*/g,
+};
 
 
-//
-// CB has this feature where a setting name is transposed directly as a label in the admin UI
-//		for example, a setting called "app_name" is shown as "App name" in the UI
-//		except if you specify a "label", which is what we do in this app
-//
-// All variable names are reused as:
-//		- CSS class names (unless next to punctuation or as the last word)
-//			- this is currently not working on the Live website (2021-04)
-//		- HTML IDs (unless next to puncutation or as the first word)
-//
-// Here are a few examples:
-//		- avoid "banner" in your variable name because it breaks the page layout (2020-02-29)
-//		- use "subject" in your variable name to hide the setting name in the admin panel (but still display the user input)
-//		- placing "message" or "top_alert" in your variable name makes a big box with a tame yellow in the background
-//		- placing "importantmessage" in your variable name sets a reddish color as the background
-//		- placing "successmessage" in your variable name sets a green color as the background
-//		- placing "debugmessage" in your variable name sets a purple color as the background
-//		- placing "cambouncernotes" in your variable name sets a bright yellow color as the background
-//		- placing "creat" in your variable name makes a big button with orange background and white text, but also with a white arrow
-//		- placing "code" in your variable name will use a fixed-size font
-//
-// In order to keep our code readable, here is a map of variables internal to our app's workings VS in the Chaturbate UI:
-//
+/**
+ * CB has this feature where a setting name is transposed directly as a label in the admin UI
+ *   for example, a setting called "app_name" is shown as "App name" in the UI
+ *   except if you specify a "label", which is what we do in this app
+
+ * All variable names are reused as:
+ *   - CSS class names (unless next to punctuation or as the last word)
+ *   	- this is currently not working on the Live website (2021-04)
+ *   - HTML IDs (unless next to puncutation or as the first word)
+
+ * Here are a few examples:
+ *   - avoid "banner" in your variable name because it breaks the page layout (2020-02-29)
+ *   - use "subject" in your variable name to hide the setting name in the admin panel (but still display the user input)
+ *   - placing "message" or "top_alert" in your variable name makes a big box with a tame yellow in the background
+ *   - placing "importantmessage" in your variable name sets a reddish color as the background
+ *   - placing "successmessage" in your variable name sets a green color as the background
+ *   - placing "debugmessage" in your variable name sets a purple color as the background
+ *   - placing "cambouncernotes" in your variable name sets a bright yellow color as the background
+ *   - placing "creat" in your variable name makes a big button with orange background and white text, but also with a white arrow
+ *   - placing "code" in your variable name will use a fixed-size font
+
+ * In order to keep our code readable, here is a map of variables internal to our app's workings VS in the Chaturbate UI:
+ */
 const settings_list = {
 	app_name: 'debugmessage appName',
 	errors_flag: 'importantmessage errorsFlag',
@@ -198,7 +242,9 @@ const settings_list = {
 	menu_item_lbl: 'menuItemLbl',
 };
 
-
+/**
+ * Localized labels for the admin UI & localized message templates for the chat
+ */
 const i18n = {
 	en: {
 		app_name: "GLOBAL SETTINGS ---------------------- App name",
@@ -437,65 +483,77 @@ const i18n = {
 };
 
 
-//
-// Custom functions
-//
 
+/**
+ * Main object for the app, grouping all the custom methods
+ */
 const FlexibleTipMenu = {
+	/**
+	 * Archive of automod infractions, recorded while the bot is running
+	 */
 	automod_infractions: {},
 
 	/**
-	 * Removes remaining {VAR} syntax from a string
+	 * Removes remaining {VAR} syntax from a notice template;
+	 * This is expected to run at the last moment before cb.sendNotice()
+	 * After all variables were reasonably replaced
+	 * @param {string} notice_tpl The notice template meant for cb.sendNotice()
+	 * @returns The updated message
 	 */
-	clean_str: function(str) {
-		if(!str.trim()) {
+	clean_str: function(notice_tpl) {
+		if(!notice_tpl.trim()) {
 			return '';
 		}
 
-		return str.replace(specific_patterns.all_var_names, ' ').trim();
+		return notice_tpl.replace(specific_patterns.all_var_names, ' ').trim();
 	},
 
 	/**
-	 * Display errors in the chat
+	 * Display app errors in the chat, according to app settings
+	 * @param {string} cfg_name The name of the app setting that failed
+	 * @param {string} error_lbl A short label to insert in the notice
+	 * @param {string} bg_color Color code for the background
+	 * @param {string} txt_color Color code for the text
 	 */
 	alert_error: function(cfg_name, error_lbl, bg_color=null, txt_color=null) {
-		bg_color = bg_color ? bg_color : colors_list['bright red'];
-		txt_color = txt_color ? txt_color : colors_list.white;
+		bg_color = bg_color ? bg_color : colors_sample['bright red'];
+		txt_color = txt_color ? txt_color : colors_sample.white;
 		const cfg_app_name = FlexibleTipMenu.val('app_name');
 		const cfg_setting_name = FlexibleTipMenu.i18n(cfg_name);
 		const setting_name = (null === cfg_setting_name) ? cfg_name : cfg_setting_name;
 		const setting_value = FlexibleTipMenu.val(cfg_name);
 		const errmsg_format = FlexibleTipMenu.i18n('errmsg_format');
 		const msg = errmsg_format
-			.replace(generic_patterns.broadcaster_name, cb.room_slug)
-			.replace(generic_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name)
-			.replace(generic_patterns.label, error_lbl)
-			.replace(generic_patterns.setting_value, setting_value)
-			.replace(generic_patterns.setting_name, setting_name);
+			.replace(label_patterns.broadcaster_name, cb.room_slug)
+			.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name)
+			.replace(label_patterns.label, error_lbl)
+			.replace(label_patterns.setting_value, setting_value)
+			.replace(label_patterns.setting_name, setting_name);
 
-		if(cbjs.arrayContains(shown_errors, msg)) {
-			return;
+		if(!cbjs.arrayContains(shown_errors, msg)) {
+			switch(FlexibleTipMenu.val('errors_flag')) {
+				case FlexibleTipMenu.i18n('lbl_errors_host'):
+					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder);
+				break;
+
+				case FlexibleTipMenu.i18n('lbl_errors_hostmods'):
+					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder);
+					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder, user_groups.mods);
+				break;
+
+				default:
+					// never mind
+			}
+
+			shown_errors.push(msg);
 		}
-
-		switch(FlexibleTipMenu.val('errors_flag')) {
-			case FlexibleTipMenu.i18n('lbl_errors_host'):
-				cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
-			break;
-
-			case FlexibleTipMenu.i18n('lbl_errors_hostmods'):
-				cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder);
-				cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, weight_bolder, group_mods);
-			break;
-
-			default:
-				// never mind
-		}
-
-		shown_errors.push(msg);
 	},
 
 	/**
 	 * Gets the hex value of a color from a settings value
+	 * @param {string} cfg_color The name of the app setting
+	 * @param {string} default_value Default color code in case the app setting is misspelled by the user
+	 * @returns The uppercased hex code prefixed with a #
 	 */
 	get_color_code: function(cfg_color, default_value) {
 		const cfg_value = FlexibleTipMenu.val(cfg_color);
@@ -510,6 +568,9 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Gets the menu items separator, whether multi- or single-line and according to spacing setting
+	 * @param {string} cfg_spacing The app setting name for spacing option
+	 * @param {string} cfg_separator The app setting name for separator option
+	 * @returns {string} The value
 	 */
 	get_items_separator: function(cfg_spacing, cfg_separator) {
 		let items_separator;
@@ -533,7 +594,8 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Gets the sorted list of menu items from the app settings
+	 * Gets the localized list of menu items from the app settings, potentially sorted
+	 * @returns {array} The list
 	 */
 	get_menu_options: function() {
 		let options_list = [];
@@ -546,7 +608,7 @@ const FlexibleTipMenu = {
 
 			const menu_item = specific_patterns.menu_item.exec(setting_value);
 			if(null === menu_item) {
-				FlexibleTipMenu.alert_error(setting_name, FlexibleTipMenu.i18n('errmsg_tipmenu_item_format'), colors_list['pastel red'], colors_list.black);
+				FlexibleTipMenu.alert_error(setting_name, FlexibleTipMenu.i18n('errmsg_tipmenu_item_format'), colors_sample['pastel red'], colors_sample.black);
 				continue;
 			}
 
@@ -578,6 +640,8 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Gets the parametrized tip menu lines according to format setting
+	 * @param {array} options_list Typically from FlexibleTipMenu.get_menu_options()
+	 * @returns {array} The list of lines suitable for cb.sendNotice()
 	 */
 	get_tip_menu: function(options_list) {
 		const has_inline_spacing = (FlexibleTipMenu.i18n('lbl_not_applicable') !== FlexibleTipMenu.val('inline_spacing'));
@@ -604,9 +668,9 @@ const FlexibleTipMenu = {
 			}
 
 			msg += menu_item_display_format;
-			msg = msg.replace(generic_patterns.amount, menu_option.amount);
-			msg = msg.replace(generic_patterns.label, menu_option.label);
-			msg = msg.replace(generic_patterns.broadcaster_name, cb.room_slug);
+			msg = msg.replace(label_patterns.amount, menu_option.amount);
+			msg = msg.replace(label_patterns.label, menu_option.label);
+			msg = msg.replace(label_patterns.broadcaster_name, cb.room_slug);
 
 			if(menu_item_suffix) {
 				msg += menu_item_suffix;
@@ -626,12 +690,14 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Display the tip menu
+	 * Display the tip menu, potentially to a specific user or group
+	 * @param {string} tip_menu_flag Name of the app setting to know who to display to (if anyone)
+	 * @param {string} username Specific user who may have asked for the menu
 	 */
 	show_menu: function(tip_menu_flag = null, username = null) {
 		const menu_boldness = FlexibleTipMenu.val('menu_boldness');
-		const background_color = FlexibleTipMenu.get_color_code('menu_background_color', colors_list.black);
-		const text_color = FlexibleTipMenu.get_color_code('menu_text_color', colors_list.white);
+		const background_color = FlexibleTipMenu.get_color_code('menu_background_color', colors_sample.black);
+		const text_color = FlexibleTipMenu.get_color_code('menu_text_color', colors_sample.white);
 		const options_list = FlexibleTipMenu.get_menu_options();
 		const menu_items_separator = FlexibleTipMenu.get_items_separator(FlexibleTipMenu.val('inline_spacing'), FlexibleTipMenu.val('inline_separator'));
 		const tip_menu = FlexibleTipMenu.get_tip_menu(options_list).join(menu_items_separator);
@@ -651,12 +717,12 @@ const FlexibleTipMenu = {
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_tip_menu_fans'):
-				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, group_fans); // send notice only to group
+				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.fans); // send notice only to group
 				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_tip_menu_havetk'):
-				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, group_havetk); // send notice only to group
+				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.have_tk); // send notice only to group
 				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
 			break;
 
@@ -670,7 +736,8 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Start the tip menu with a repeating timer
+	 * Start the tip menu with a repeating timer;
+	 * This is meant to be called on app startup
 	 */
 	show_menu_handler: function() {
 		FlexibleTipMenu.show_menu();
@@ -685,7 +752,9 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Look up a service from the tip menu by its amount
+	 * Look up a service name from the tip menu(s) by its amount
+	 * @param {integer} tip_amount
+	 * @returns {boolean|string} The name of the corresponding service in a tip menu, or false
 	 */
 	find_service: function(tip_amount) {
 		const options_list = FlexibleTipMenu.get_menu_options();
@@ -703,14 +772,18 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Whether the thanks module displays public or private notices
+	 * Whether the thanks module displays public or user-specific notices
+	 * @returns {boolean} bool
 	 */
 	is_public_thanks: function() {
 		return FlexibleTipMenu.i18n('lbl_everyone') === FlexibleTipMenu.val('autothank_flag');
 	},
 
 	/**
-	 * Gets the formatted message to display in the chat for a tip
+	 * Gets the formatted notice to display in the chat for a tip
+	 * @param {integer} tip_amount
+	 * @param {string} from_user
+	 * @returns {string} The message suitable for cb.sendNotice()
 	 */
 	get_thanks_notice: function(tip_amount, from_user) {
 		if(tip_amount <= FlexibleTipMenu.val('autothank_above_tokens')) {
@@ -726,25 +799,26 @@ const FlexibleTipMenu = {
 		}
 
 		let notice = notice_tpl;
-		if(generic_patterns.service_name.test(notice)) {
+		if(label_patterns.service_name.test(notice)) {
 			const service_lbl = FlexibleTipMenu.find_service(tip_amount);
 			if(!service_lbl) {
 				return false;
 			}
 
-			notice = notice.replace(generic_patterns.service_name, service_lbl);
+			notice = notice.replace(label_patterns.service_name, service_lbl);
 		}
 
-		notice = notice.replace(generic_patterns.amount, tip_amount);
-		notice = notice.replace(generic_patterns.tipper_handle, from_user);
-		notice = notice.replace(generic_patterns.broadcaster_name, cb.room_slug);
+		notice = notice.replace(label_patterns.amount, tip_amount);
+		notice = notice.replace(label_patterns.tipper_handle, from_user);
+		notice = notice.replace(label_patterns.broadcaster_name, cb.room_slug);
 		return notice;
 	},
 
 	/**
-	 * Gets the formatted message to display as a private notice to remind the tipper of their tip note
+	 * Gets the formatted message to display as a user-specific notice to remind the tipper of their tip note
+	 * @param {string} tip_note
 	 */
-	get_autothank_remind_tip_note_notice: function(tip_note){
+	get_autothank_remind_tip_note_notice: function(tip_note) {
 		let res;
 		if('' === tip_note) {
 			res = false;
@@ -752,13 +826,13 @@ const FlexibleTipMenu = {
 		else if (!FlexibleTipMenu.val('autothank_remind_tip_note_format')) {
 			res = false;
 		}
-		else if(!FlexibleTipMenu.val('autothank_remind_tip_note_format').match(generic_patterns.message)) {
+		else if(!FlexibleTipMenu.val('autothank_remind_tip_note_format').match(label_patterns.message)) {
 			res = false;
 		}
 		else {
 			res = FlexibleTipMenu.val('autothank_remind_tip_note_format')
-				.replace(generic_patterns.message, tip_note)
-				.replace(generic_patterns.broadcaster_name, cb.room_slug);
+				.replace(label_patterns.message, tip_note)
+				.replace(label_patterns.broadcaster_name, cb.room_slug);
 		}
 
 		return res;
@@ -766,47 +840,59 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Displays a notice to thank the tipper
+	 * @param {integer} tip_amount
+	 * @param {string} from_user
+	 * @param {string} tip_note
 	 */
 	thank_tipper: function(tip_amount, from_user, tip_note) {
 		let background_color;
 		let text_color;
 
 		const notice = FlexibleTipMenu.get_thanks_notice(tip_amount, from_user);
+		const msg = FlexibleTipMenu.clean_str(notice);
 
-		if(!notice) {
+		if(!msg) {
 			// never mind
 		}
 		else if(FlexibleTipMenu.is_public_thanks()) {
-			background_color = FlexibleTipMenu.get_color_code('autothank_publicly_background_color', colors_list.white);
-			text_color = FlexibleTipMenu.get_color_code('autothank_publicly_text_color', colors_list.black);
-			cb.sendNotice(FlexibleTipMenu.clean_str(notice), '', background_color, text_color, FlexibleTipMenu.val('autothank_publicly_boldness'));
+			background_color = FlexibleTipMenu.get_color_code('autothank_publicly_background_color', colors_sample.white);
+			text_color = FlexibleTipMenu.get_color_code('autothank_publicly_text_color', colors_sample.black);
+			cb.sendNotice(msg, '', background_color, text_color, FlexibleTipMenu.val('autothank_publicly_boldness'));
 		}
 		else {
-			background_color = FlexibleTipMenu.get_color_code('autothank_privately_background_color', colors_list.white);
-			text_color = FlexibleTipMenu.get_color_code('autothank_privately_text_color', colors_list.black);
-			cb.sendNotice(FlexibleTipMenu.clean_str(notice), from_user, background_color, text_color, FlexibleTipMenu.val('autothank_privately_boldness'));
+			background_color = FlexibleTipMenu.get_color_code('autothank_privately_background_color', colors_sample.white);
+			text_color = FlexibleTipMenu.get_color_code('autothank_privately_text_color', colors_sample.black);
+			cb.sendNotice(msg, from_user, background_color, text_color, FlexibleTipMenu.val('autothank_privately_boldness'));
 		}
 
 		const private_notice = FlexibleTipMenu.get_autothank_remind_tip_note_notice(tip_note);
-		if(private_notice) {
-			background_color = FlexibleTipMenu.get_color_code('autothank_privately_background_color', colors_list.white);
-			text_color = FlexibleTipMenu.get_color_code('autothank_privately_text_color', colors_list.black);
-			cb.sendNotice(FlexibleTipMenu.clean_str(private_notice), from_user, background_color, text_color, FlexibleTipMenu.val('autothank_privately_boldness'));
+		const private_msg = FlexibleTipMenu.clean_str(private_notice);
+		if(private_msg) {
+			background_color = FlexibleTipMenu.get_color_code('autothank_privately_background_color', colors_sample.white);
+			text_color = FlexibleTipMenu.get_color_code('autothank_privately_text_color', colors_sample.black);
+			cb.sendNotice(private_msg, from_user, background_color, text_color, FlexibleTipMenu.val('autothank_privately_boldness'));
 		}
 	},
 
 	/**
 	 * Callback for when a tip is sent
+	 * @param {tip} tip The tip object that was fired with the event
 	 */
 	thank_tipper_handler: function(tip) {
-		if(tip.is_anon_tip)
-			return true;
-
-		FlexibleTipMenu.thank_tipper(tip.amount, tip.from_user, tip.message);
+		if(tip.is_anon_tip) {
+			// nothing here
+		}
+		else {
+			FlexibleTipMenu.thank_tipper(parseInt(tip.amount), tip.from_user, tip.message.trim());
+		}
 	},
 
 	/**
-	 * Whether a template string matches its expected format
+	 * Whether a template string matches its expected format;
+	 * This will run at bot startup, as a kind of autotest to guide the user in case of misconfiguration
+	 * @param {string} cfg_setting The name of an app setting, which should refer to a notice template string
+	 * @param {array} expected_options A list of mandatory labels this template is expected to have
+	 * @returns
 	 */
 	check_template_format: function(cfg_setting, expected_options) {
 		//const cfg_varname = i18n[lang][cfg_setting];
@@ -821,7 +907,7 @@ const FlexibleTipMenu = {
 			const varname = '{'+expected_options[i]+'}';
 			const regexp = new RegExp(varname, 'i');
 			if(!regexp.test(notice_tpl)) {
-				const lbl = errmsg_missing_tpl.replace(generic_patterns.varname, varname);
+				const lbl = errmsg_missing_tpl.replace(label_patterns.varname, varname);
 				FlexibleTipMenu.alert_error(cfg_setting, lbl);
 				return false;
 			}
@@ -831,15 +917,19 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Replacement for the official cb.log() function, which does not appear to work
+	 * Replacement for the official cb.log() function, which does not appear to work;
+	 * This is meant for debugging and NOT for production
+	 * @param {*} obj The object to debug in chat
+	 * @param {*} lbl To identify the object in chat
+	 * @returns {array} Debug lines to display in chat
 	 */
 	basic_log: function(obj, lbl) {
 		let dbg_rows = [];
 
 		const dbg_start = new Date(Date.now());
 		const dbg_lbl_start = FlexibleTipMenu.i18n('errmsg_dbg_start')
-			.replace(generic_patterns.label, lbl)
-			.replace(generic_patterns.time, dbg_start.toTimeString());
+			.replace(label_patterns.label, lbl)
+			.replace(label_patterns.time, dbg_start.toTimeString());
 		dbg_rows.push(dbg_lbl_start);
 
 		for(const idx in obj) {
@@ -890,8 +980,8 @@ const FlexibleTipMenu = {
 
 		const dbg_end = new Date(Date.now());
 		const dbg_lbl_end = FlexibleTipMenu.i18n('errmsg_dbg_end')
-			.replace(generic_patterns.label, lbl)
-			.replace(generic_patterns.time, dbg_end.toTimeString());
+			.replace(label_patterns.label, lbl)
+			.replace(label_patterns.time, dbg_end.toTimeString());
 		dbg_rows.push(dbg_lbl_end);
 
 		return dbg_rows;
@@ -899,22 +989,26 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Displays the app's list of commands
+	 * @param {string} username The user who called the command in chat
+	 * @param {string} usergroup Who should see the menu in chat
 	 */
 	show_commands_help: function(username, usergroup = null) {
 		const cfg_app_name = FlexibleTipMenu.val('app_name');
 
 		const tmp_label = FlexibleTipMenu.i18n('expl_commands_available_recommend_english')
-			.replace(generic_patterns.label, cfg_app_name ? cfg_app_name : default_app_name)
+			.replace(label_patterns.label, cfg_app_name ? cfg_app_name : default_app_name)
 
 		let commands_list = [];
 		commands_list.push(tmp_label);
 		commands_list.push(FlexibleTipMenu.i18n('expl_commands_tipmenu_recommend_english'));
 		commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist_recommend_english'));
-		cb.sendNotice(commands_list.join("\n"), username, colors_list.black, colors_list.white, '', usergroup);
+		cb.sendNotice(commands_list.join("\n"), username, colors_sample.black, colors_sample.white, '', usergroup);
 	},
 
 	/**
 	 * Recommended way to hide message in public chat, but still echoed back to the user
+	 * @param {message} message The message that came in from the fired event
+	 * @returns {message} The updated message
 	 */
 	hide_message: function(msg) {
 		msg['X-Spam'] = true;
@@ -923,6 +1017,8 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Handle generic messages from users
+	 * @param {message} message The message that came in from the fired event
+	 * @returns {message} The updated message
 	 */
 	message_handler: function(message) {
 		const txt_msg = message.m.trim();
@@ -938,18 +1034,23 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Modify a message according to an automod module's settings
+	 * @param {message} message The message that came in from the fired event
+	 * @param {string} module_flag The main setting to determine how this automod should run
+	 * @param {string} notice_tpl The main notice template
+	 * @param {string} module_lbl A small label to identify the automod in chat (in the main notice)
+	 * @returns {message} The updated message
 	 */
-	 automod_plaintext: function(message, module_flag, base_errmsg_tpl, errmsg_lbl) {
+	 automod_plaintext: function(message, module_flag, notice_tpl, module_lbl) {
 		const txt_msg = message.m.trim();
 		const cfg_app_name = FlexibleTipMenu.val('app_name');
 
 		// standard warning for the model, so they know that automod did something
 		cb.setTimeout(function() {
-			const lbl = FlexibleTipMenu.i18n(base_errmsg_tpl)
-				.replace(generic_patterns.label, FlexibleTipMenu.i18n(errmsg_lbl))
-				.replace(generic_patterns.username, message.user)
-				.replace(generic_patterns.message, txt_msg)
-				.replace(generic_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
+			const lbl = FlexibleTipMenu.i18n(notice_tpl)
+				.replace(label_patterns.label, FlexibleTipMenu.i18n(module_lbl))
+				.replace(label_patterns.username, message.user)
+				.replace(label_patterns.message, txt_msg)
+				.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
 
 			cb.sendNotice(lbl, cb.room_slug);
 		}, 1000);
@@ -962,7 +1063,7 @@ const FlexibleTipMenu = {
 			// don't hide the message, only warn the model
 			cb.setTimeout(function() {
 				const lbl = FlexibleTipMenu.i18n('automod_noaction')
-					.replace(generic_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
+					.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
 
 				cb.sendNotice(lbl, cb.room_slug);
 			}, 1500);
@@ -979,9 +1080,9 @@ const FlexibleTipMenu = {
 
 			cb.setTimeout(function() {
 				const lbl = FlexibleTipMenu.i18n('automod_user_count')
-					.replace(generic_patterns.username, message.user)
-					.replace(generic_patterns.count, FlexibleTipMenu.automod_infractions[message.user])
-					.replace(generic_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
+					.replace(label_patterns.username, message.user)
+					.replace(label_patterns.count, FlexibleTipMenu.automod_infractions[message.user])
+					.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name);
 
 				switch(automod_record_flag) {
 					case FlexibleTipMenu.i18n('lbl_broadcaster'):
@@ -993,6 +1094,7 @@ const FlexibleTipMenu = {
 					break;
 
 					case FlexibleTipMenu.i18n('lbl_single_user'):
+						cb.sendNotice(lbl, '', '', '', '', message.user);
 					break;
 
 					default:
@@ -1004,6 +1106,11 @@ const FlexibleTipMenu = {
 		return message;
 	},
 
+	/**
+	 * Whether a single character is allowed for display in chat
+	 * @param {string} c Single character to test (against Unicode ranges etc)
+	 * @returns {boolean} bool
+	 */
 	automod_validate_single_char: function(c) {
 		if(specific_patterns.automod_chars_allowed.test(c)) {
 			return true;
@@ -1012,7 +1119,7 @@ const FlexibleTipMenu = {
 		const code_point_int = parseInt(c.codePointAt(0));
 		//const code_point_hex = code_point_int.toString(16);
 
-		let c_res = false; // assume false at first, and revise later
+		let c_res = false; // assume false at first, and revise as soon as a match is found
 		for(const allowed_range of automod_chars_allowranges.emoji) {
 			//const range_start_hex = allowed_range.start.toString(16);
 			//const range_end_hex = allowed_range.end.toString(16);
@@ -1027,6 +1134,11 @@ const FlexibleTipMenu = {
 		return c_res;
 	},
 
+	/**
+	 * Whether a complete message is allowed for display in chat
+	 * @param {string} txt_msg A copy of the message that came in from the fired event
+	 * @returns {boolean} bool
+	 */
 	automod_chars_validator: function(txt_msg) {
 		if(specific_patterns.automod_chars_allowed.test(txt_msg)) {
 			return true; // whole text is ascii-128
@@ -1040,13 +1152,8 @@ const FlexibleTipMenu = {
 		let char = iterator.next();
 
 		let str_res = true;
-		while (!char.done) {
-			const c_res = FlexibleTipMenu.automod_validate_single_char(char.value);
-			if(!c_res) {
-				str_res = false;
-				break; // early fail
-			}
-
+		while(!char.done && str_res) {
+			str_res = FlexibleTipMenu.automod_validate_single_char(char.value);
 			char = iterator.next();
 		}
 
@@ -1054,7 +1161,9 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Handle plain messages from users
+	 * Handle plain messages from users (non-commands); will pass through automods and decorators
+	 * @param {message} message The message that came in from the fired event
+	 * @returns {message} The updated message
 	 */
 	plaintext_handler: function(message) {
 		const txt_msg = message.m.trim();
@@ -1079,7 +1188,7 @@ const FlexibleTipMenu = {
 			);
 		}
 
-		// @TODO try https://en.wikipedia.org/wiki/Planet_symbols#Mars
+		// @TODO decorators: try https://en.wikipedia.org/wiki/Planet_symbols#Mars
 		// ♀ U+2640 Female sign
 		// ♂ U+2642 Male sign
 		// ⚥ U+26A5 Male and female sign
@@ -1094,7 +1203,38 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Handle commands from users
+	 * Show a sample of colors to the user who asked for them
+	 * @param {string} username
+	 */
+	show_colors_sample: function(username) {
+		let i = 0; // timer offset
+
+		cb.setTimeout(function() {
+			cb.sendNotice(FlexibleTipMenu.i18n('colorslist_header'), username);
+		}, 1000 * ++i);
+
+		// use two different background colors to ensure all colored labels are shown
+		for(const bgcolor of [colors_sample.black, colors_sample.white]) {
+			// set a timer to try and group the notices by their background
+			cb.setTimeout(function() {
+				for(const color_lbl in colors_sample) {
+					const color_code = colors_sample[color_lbl];
+					if(bgcolor === color_code) {
+						continue;
+					}
+
+					// the notices can't be single line because the text color needs to change with each time
+					cb.sendNotice(color_lbl+': '+color_code, username, bgcolor, color_code);
+				}
+			}, 1000 * ++i);
+		}
+	},
+
+	/**
+	 * Handle commands from users;
+	 * This will hide the command itself in chat
+	 * @param {message} message The message that came in from the fired event
+	 * @returns {message} The updated message
 	 */
 	commands_handler: function(message) {
 		const txt_msg = message.m.trim();
@@ -1103,7 +1243,6 @@ const FlexibleTipMenu = {
 		if(command_patterns.help.test(txt_command)) {
 			FlexibleTipMenu.show_commands_help(message.user);
 		}
-
 		else if(command_patterns.tip_menu.test(txt_command)) {
 			if(message.user === cb.room_slug || message.is_mod) {
 				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_everyone'));
@@ -1112,31 +1251,9 @@ const FlexibleTipMenu = {
 				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_tip_menu_user'), message.user);
 			}
 		}
-
-		else if(command_patterns.colors_list.test(txt_command)) {
-			let i = 0; // timer offset
-
-			cb.setTimeout(function() {
-				cb.sendNotice(FlexibleTipMenu.i18n('colorslist_header'), message.user);
-			}, 1000 * ++i);
-
-			// use two different background colors to ensure all colored labels are shown
-			for(const bgcolor of [colors_list.black, colors_list.white]) {
-				// set a timer to try and group the notices by their background
-				cb.setTimeout(function() {
-					for(const color_lbl in colors_list) {
-						const color_code = colors_list[color_lbl];
-						if(bgcolor === color_code) {
-							continue;
-						}
-
-						// the notices can't be single line because the text color needs to change with each time
-						cb.sendNotice(color_lbl+': '+color_code, message.user, bgcolor, color_code);
-					}
-				}, 1000 * ++i);
-			}
+		else if(command_patterns.colors_sample.test(txt_command)) {
+			FlexibleTipMenu.show_colors_sample(message.user);
 		}
-
 		else {
 			// never mind
 		}
@@ -1146,6 +1263,8 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Gets a value from the app settings (storage)
+	 * @param {string} name The name of the setting to get a value for
+	 * @returns {string} The value
 	 */
 	val: function(name) {
 		if('undefined' === typeof settings_list[name]) {
@@ -1161,18 +1280,22 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Gets a localized label
+	 * Gets a localized label or template
+	 * @param {string} idx The identifier of the label or template to localize
+	 * @returns {string} The value
 	 */
-	i18n: function(label) {
-		if('undefined' === typeof i18n[lang][label]) {
+	i18n: function(idx) {
+		if('undefined' === typeof i18n[lang][idx]) {
 			return null;
 		}
 
-		return i18n[lang][label].trim();
+		return i18n[lang][idx].trim();
 	},
 
 	/**
-	 * Whether a specific setting is disabled
+	 * Whether a specific setting is disabled in the current configuration
+	 * @param {string} setting_name
+	 * @returns {boolean} bool
 	 */
 	is_disabled: function(setting_name) {
 		if(!setting_name) {
@@ -1183,7 +1306,7 @@ const FlexibleTipMenu = {
 	},
 };
 
-const ftm = FlexibleTipMenu;
+const ftm = FlexibleTipMenu; // shorthand
 
 
 
@@ -1274,7 +1397,7 @@ cb.settings_choices.push({
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
-	defaultValue: colors_list.white,
+	defaultValue: colors_sample.white,
 });
 
 cb.settings_choices.push({
@@ -1283,17 +1406,17 @@ cb.settings_choices.push({
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
-	defaultValue: colors_list.black,
+	defaultValue: colors_sample.black,
 });
 
 cb.settings_choices.push({
 	name: settings_list.autothank_publicly_boldness,
 	label: ftm.i18n('autothank_publicly_boldness'),
 	type: 'choice',
-	choice1: weight_normal,
-	choice2: weight_bold,
-	choice3: weight_bolder,
-	defaultValue: weight_bold,
+	choice1: font_weights.normal,
+	choice2: font_weights.bold,
+	choice3: font_weights.bolder,
+	defaultValue: font_weights.bold,
 });
 
 cb.settings_choices.push({
@@ -1311,7 +1434,7 @@ cb.settings_choices.push({
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
-	defaultValue: colors_list.white,
+	defaultValue: colors_sample.white,
 });
 
 cb.settings_choices.push({
@@ -1320,17 +1443,17 @@ cb.settings_choices.push({
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
-	defaultValue: colors_list.black,
+	defaultValue: colors_sample.black,
 });
 
 cb.settings_choices.push({
 	name: settings_list.autothank_privately_boldness,
 	label: ftm.i18n('autothank_privately_boldness'),
 	type: 'choice',
-	choice1: weight_normal,
-	choice2: weight_bold,
-	choice3: weight_bolder,
-	defaultValue: weight_bold,
+	choice1: font_weights.normal,
+	choice2: font_weights.bold,
+	choice3: font_weights.bolder,
+	defaultValue: font_weights.bold,
 });
 
 cb.settings_choices.push({
@@ -1352,7 +1475,7 @@ cb.settings_choices.push({
 });
 
 
-for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
+for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 	const menu_idx_letter = az[i].toUpperCase();
 
 	// the first offset should retain settigns from earlier versions
@@ -1360,7 +1483,7 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.tip_menu_flag + settings_idx_offset,
-		label: ftm.i18n('tip_menu_flag').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('tip_menu_flag').replace(label_patterns.menu, menu_idx_letter),
 		type: 'choice',
 		choice1: ftm.i18n('lbl_broadcaster'),
 		choice2: ftm.i18n('lbl_everyone'),
@@ -1372,7 +1495,7 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.tip_menu_header + settings_idx_offset,
-		label: ftm.i18n('tip_menu_header').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('tip_menu_header').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 99,
@@ -1381,7 +1504,7 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.tip_menu_footer + settings_idx_offset,
-		label: ftm.i18n('tip_menu_footer').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('tip_menu_footer').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 99,
@@ -1390,7 +1513,7 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.inline_separator + settings_idx_offset,
-		label: ftm.i18n('inline_separator').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('inline_separator').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 0,
 		maxLength: 10,
@@ -1399,7 +1522,7 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.inline_spacing + settings_idx_offset,
-		label: ftm.i18n('inline_spacing').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('inline_spacing').replace(label_patterns.menu, menu_idx_letter),
 		type: 'choice',
 		choice1: ftm.i18n('lbl_inline_spacing_before'),
 		choice2: ftm.i18n('lbl_inline_spacing_after'),
@@ -1411,35 +1534,35 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_background_color + settings_idx_offset,
-		label: ftm.i18n('menu_background_color').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('menu_background_color').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 6,
 		maxLength: 7,
-		defaultValue: colors_list.black,
+		defaultValue: colors_sample.black,
 	});
 
 	cb.settings_choices.push({
 		name: settings_list.menu_text_color + settings_idx_offset,
-		label: ftm.i18n('menu_text_color').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('menu_text_color').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 6,
 		maxLength: 7,
-		defaultValue: colors_list.white,
+		defaultValue: colors_sample.white,
 	});
 
 	cb.settings_choices.push({
 		name: settings_list.menu_boldness + settings_idx_offset,
-		label: ftm.i18n('menu_boldness').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('menu_boldness').replace(label_patterns.menu, menu_idx_letter),
 		type: 'choice',
-		choice1: weight_normal,
-		choice2: weight_bold,
-		choice3: weight_bolder,
-		defaultValue: weight_normal,
+		choice1: font_weights.normal,
+		choice2: font_weights.bold,
+		choice3: font_weights.bolder,
+		defaultValue: font_weights.normal,
 	});
 
 	cb.settings_choices.push({
 		name: settings_list.menu_repeat_minutes + settings_idx_offset,
-		label: ftm.i18n('menu_repeat_minutes').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('menu_repeat_minutes').replace(label_patterns.menu, menu_idx_letter),
 		type: 'int',
 		minValue: 0,
 		maxValue: 60,
@@ -1448,7 +1571,7 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_item_prefix + settings_idx_offset,
-		label: ftm.i18n('menu_item_prefix').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('menu_item_prefix').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 100,
@@ -1457,7 +1580,7 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_item_suffix + settings_idx_offset,
-		label: ftm.i18n('menu_item_suffix').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('menu_item_suffix').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 100,
@@ -1466,7 +1589,7 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.menu_item_display_format + settings_idx_offset,
-		label: ftm.i18n('menu_item_display_format').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('menu_item_display_format').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
 		maxLength: 99,
@@ -1475,7 +1598,7 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 
 	cb.settings_choices.push({
 		name: settings_list.sort_order + settings_idx_offset,
-		label: ftm.i18n('sort_order').replace(generic_patterns.menu, menu_idx_letter),
+		label: ftm.i18n('sort_order').replace(label_patterns.menu, menu_idx_letter),
 		type: 'choice',
 		choice1: ftm.i18n('lbl_sort_amount_asc'),
 		choice2: ftm.i18n('lbl_sort_amount_desc'),
@@ -1486,8 +1609,8 @@ for(let i=0; i<nb_of_individual_menus && i<az.length; ++i) {
 	const item_lbl_tpl = ftm.i18n('menu_item_lbl');
 	for(let j=0; j<nb_of_menu_items; ++j) {
 		const item_lbl = item_lbl_tpl
-			.replace(generic_patterns.menu_idx, menu_idx_letter)
-			.replace(generic_patterns.item_idx, j+1);
+			.replace(label_patterns.menu_idx, menu_idx_letter)
+			.replace(label_patterns.item_idx, j+1);
 
 		const new_item = {
 			name: settings_list.menu_item_lbl + settings_idx_offset + (j+1),
@@ -1514,23 +1637,23 @@ cb.onStart(user => {
 cb.setTimeout(function () {
 	const cfg_app_name = ftm.val('app_name');
 	const starting_lbl = ftm.i18n('errmsg_starting_app')
-		.replace(generic_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name)
-		.replace(generic_patterns.visibility, ftm.val('tip_menu_flag'));
-	cb.sendNotice(starting_lbl, user.user, colors_list.white, colors_list.black);
-	cb.sendNotice(starting_lbl, user.user, colors_list.white, colors_list.black, '', group_mods);
+		.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name)
+		.replace(label_patterns.visibility, ftm.val('tip_menu_flag'));
+	cb.sendNotice(starting_lbl, user.user, colors_sample.white, colors_sample.black);
+	cb.sendNotice(starting_lbl, user.user, colors_sample.white, colors_sample.black, '', user_groups.mods);
 }, 1000 / 2);
 
 cb.setTimeout(function () {
 	ftm.show_commands_help(user.user);
-	ftm.show_commands_help('', group_mods);
+	ftm.show_commands_help('', user_groups.mods);
 }, 1000 / 2);
 
 cb.onMessage(ftm.message_handler); // start listening on messages, possible commands
 
 
 if(is_debug) {
-	cb.sendNotice(ftm.basic_log(cbjs, 'cbjs').join("\n"), user.user, colors_list.black, colors_list.white);
-	cb.sendNotice(ftm.basic_log(cb, 'cb').join("\n"), user.user, colors_list.white, colors_list.black);
+	cb.sendNotice(ftm.basic_log(cbjs, 'cbjs').join("\n"), user.user, colors_sample.black, colors_sample.white);
+	cb.sendNotice(ftm.basic_log(cb, 'cb').join("\n"), user.user, colors_sample.white, colors_sample.black);
 }
 else if(ftm.is_disabled('tip_menu_flag')) {
 	cb.setTimeout(function () {
@@ -1562,18 +1685,18 @@ if(ftm.is_disabled('autothank_flag')) {
 	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
 	/**
 	cb.setTimeout(function () {
-		ftm.alert_error('autothank_flag', ftm.i18n('errmsg_thanks_module_disabled'), colors_list.black, colors_list.white);
+		ftm.alert_error('autothank_flag', ftm.i18n('errmsg_thanks_module_disabled'), colors_sample.black, colors_sample.white);
 	}, 1000 * 2);
 	 */
 }
 else if(!ftm.check_template_format('autothank_publicly_format', ['TIPPER'])) {
 	cb.setTimeout(function () {
-		ftm.alert_error('autothank_publicly_format', ftm.i18n('errmsg_thanks_module_errors'), colors_list['pastel red'], colors_list.black);
+		ftm.alert_error('autothank_publicly_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
 	}, 1000 * 2);
 }
 else if(!ftm.check_template_format('autothank_privately_format', ['TIPPER'])) {
 	cb.setTimeout(function () {
-		ftm.alert_error('autothank_privately_format', ftm.i18n('errmsg_thanks_module_errors'), colors_list['pastel red'], colors_list.black);
+		ftm.alert_error('autothank_privately_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
 	}, 1000 * 2);
 }
 else {
