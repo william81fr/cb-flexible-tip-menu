@@ -126,9 +126,9 @@ const misc_allowlist = [
 */
 
 /**
- * Used by automod "chars" to identify ranges of Unicode characters to test for
+ * Used by automod "unicode" to identify ranges of Unicode characters to test for
  */
-const automod_chars_allowranges = {
+const automod_unicode_allowranges = {
 	text: [
 		'\u{20}-\u{7E}', // most of ASCII 128
 		'\u{A0}-\u{FF}', // some of latin1
@@ -178,7 +178,7 @@ const label_patterns = {
  * RegExp patterns used in specific contexts (except commands and mere labels)
  */
  const specific_patterns = {
-	automod_chars_allowed: new RegExp('^['+automod_chars_allowranges.text.join(' ')+']+$'),
+	automod_unicode_allowed: new RegExp('^['+automod_unicode_allowranges.text.join(' ')+']+$'),
 	automod_link: /[0-9a-z]+:\/\/?[0-9a-z._-]+/i,
 	hex_color: /^#?([0-9a-f]{6})$/i,
 	menu_item: /^([0-9]+)(.+)$/,
@@ -212,7 +212,7 @@ const label_patterns = {
 const settings_list = {
 	app_name: 'debugmessage appName',
 	errors_flag: 'importantmessage errorsFlag',
-	automod_chars_flag: 'debugmessage automodCharsFlag',
+	automod_unicode_flag: 'debugmessage automodUnicodeFlag',
 	automod_links_flag: 'debugmessage automodLinksFlag',
 	automod_record_flag: 'debugmessage automodRecordFlag',
 	decorator_gender_flag: 'debugmessage decoratorGenderFlag',
@@ -250,7 +250,7 @@ const i18n = {
 	en: {
 		app_name: "GLOBAL SETTINGS ---------------------- App name",
 		errors_flag: "Show the start-up errors to...",
-		automod_chars_flag: 'AUTOMOD NONLATIN TEXT ----------------------',
+		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ----------------------',
 		automod_links_flag: 'AUTOMOD LINKS ----------------------',
 		automod_record_flag: 'Record automod infractions in chat (all automods)',
 		automod_noaction: '[{APP}] Automod was set up as TESTING, and the message was not blocked',
@@ -316,7 +316,7 @@ const i18n = {
 		errmsg_dbg_start: "dbg start for '{LABEL}' object at {TIME}",
 		errmsg_dbg_end: "dbg end for '{LABEL}' object at {TIME}",
 		errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
-		errmsg_automod_chars: 'disallowed text',
+		errmsg_automod_unicode: 'disallowed text',
 		errmsg_automod_link: 'link attempt',
 		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
 		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
@@ -325,7 +325,7 @@ const i18n = {
 	es: {
 		app_name: "OPCIONES GLOBALES ---------------------- Nombre de la aplicacion",
 		errors_flag: "Quien puede ver los errores...",
-		automod_chars_flag: 'AUTOMOD NONLATIN TEXT ----------------------',
+		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ----------------------',
 		automod_links_flag: 'AUTOMOD LINKS ----------------------',
 		automod_record_flag: 'Guardar las infracciones automod en el chat (todos los autmods)',
 		automod_noaction: '[{APP}] Automod esta configurado para TESTING, y el mensaje no ha sido escondido',
@@ -391,7 +391,7 @@ const i18n = {
 		errmsg_dbg_start: "dbg empieza para objeto '{LABEL}': {TIME}",
 		errmsg_dbg_end: "dbg fin para objeto '{LABEL}': {TIME}",
 		errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
-		errmsg_automod_chars: 'disallowed text',
+		errmsg_automod_unicode: 'disallowed text',
 		errmsg_automod_link: 'link attempt',
 		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
 		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
@@ -400,7 +400,7 @@ const i18n = {
 	fr: {
 		app_name: "PARAMETRES GENERAUX ---------------------- Nom de l'aplication",
 		errors_flag: "A qui montrer les erreurs de demarrage...",
-		automod_chars_flag: 'AUTOMOD NONLATIN TEXT ----------------------',
+		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ----------------------',
 		automod_links_flag: 'AUTOMOD LINKS ----------------------',
 		automod_record_flag: 'Enregistrer les infractions automod dans le chat (tous les autmods)',
 		automod_noaction: "[{APP}] Automod est configure pour TESTING, et le message n'a pas ete masque",
@@ -466,7 +466,7 @@ const i18n = {
 		errmsg_dbg_start: "debut dbg pour '{LABEL}' a {TIME}",
 		errmsg_dbg_end: "fin dbg pour '{LABEL}' a {TIME}",
 		errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
-		errmsg_automod_chars: 'disallowed text',
+		errmsg_automod_unicode: 'disallowed text',
 		errmsg_automod_link: 'link attempt',
 		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
 		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
@@ -1106,7 +1106,7 @@ const FlexibleTipMenu = {
 	 * @returns {boolean} bool
 	 */
 	automod_validate_single_char: function(c) {
-		if(specific_patterns.automod_chars_allowed.test(c)) {
+		if(specific_patterns.automod_unicode_allowed.test(c)) {
 			return true;
 		}
 
@@ -1114,7 +1114,7 @@ const FlexibleTipMenu = {
 		//const code_point_hex = code_point_int.toString(16);
 
 		let c_res = false; // assume false at first, and revise as soon as a match is found
-		for(const allowed_range of automod_chars_allowranges.emoji) {
+		for(const allowed_range of automod_unicode_allowranges.emoji) {
 			//const range_start_hex = allowed_range.start.toString(16);
 			//const range_end_hex = allowed_range.end.toString(16);
 			if(code_point_int >= allowed_range.start && code_point_int <= allowed_range.end) {
@@ -1133,12 +1133,12 @@ const FlexibleTipMenu = {
 	 * @param {string} txt_msg A copy of the message that came in from the fired event
 	 * @returns {boolean} bool
 	 */
-	automod_chars_validator: function(txt_msg) {
-		if(specific_patterns.automod_chars_allowed.test(txt_msg)) {
+	automod_unicode_validator: function(txt_msg) {
+		if(specific_patterns.automod_unicode_allowed.test(txt_msg)) {
 			return true; // whole text is ascii-128
 		}
 
-		if(!automod_chars_allowranges.emoji.length) {
+		if(!automod_unicode_allowranges.emoji.length) {
 			return true; // we don't have anything more to test against
 		}
 
@@ -1223,13 +1223,13 @@ const FlexibleTipMenu = {
 	plaintext_handler: function(message) {
 		const txt_msg = message.m.trim();
 
-		const automod_chars_enabled = !FlexibleTipMenu.is_disabled('automod_chars_flag');
-		if(automod_chars_enabled && !FlexibleTipMenu.automod_chars_validator(txt_msg)) {
+		const automod_unicode_enabled = !FlexibleTipMenu.is_disabled('automod_unicode_flag');
+		if(automod_unicode_enabled && !FlexibleTipMenu.automod_unicode_validator(txt_msg)) {
 			message = FlexibleTipMenu.automod_plaintext(
 				message,
-				'automod_chars_flag',
+				'automod_unicode_flag',
 				'errmsg_automod_hidden',
-				'errmsg_automod_chars'
+				'errmsg_automod_unicode'
 			);
 		}
 
@@ -1384,16 +1384,17 @@ cb.settings_choices.push({
 	defaultValue: ftm.i18n('lbl_broadcaster'),
 });
 
-// automod chars module
+// automod unicode module
 cb.settings_choices.push({
-	name: settings_list.automod_chars_flag,
-	label: ftm.i18n('automod_chars_flag'),
+	name: settings_list.automod_unicode_flag,
+	label: ftm.i18n('automod_unicode_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
 	choice2: ftm.i18n('lbl_everyone'),
-	choice4: ftm.i18n('lbl_not_applicable'),
+	choice3: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
+
 
 // automod links module
 cb.settings_choices.push({
@@ -1402,7 +1403,7 @@ cb.settings_choices.push({
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
 	choice2: ftm.i18n('lbl_everyone'),
-	choice4: ftm.i18n('lbl_not_applicable'),
+	choice3: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
