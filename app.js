@@ -282,13 +282,13 @@ const i18n = {
 		colorslist_header: 'This is a sample list of colors to help you configure the bot:',
 		sort_order: "Sort the menu {MENU} items before display, regardless of their order below",
 		menu_item_lbl: "menu item #{MENUIDX}{ITEMIDX}",
-		lbl_group_fans: "fans",
-		lbl_group_havetk: "own or purchased tokens (light blue)",
-		//lbl_group_50tk: "Dark Blue (Tipped 50 recently)",
-		//lbl_group_250tk: "Light Purple (Tipped 250 recently)",
-		//lbl_group_1000tk: "Dark Purple (Tipped 1000 recently)",
+		lbl_group_fans: "fans + moderators + broadcaster",
+		lbl_group_havetk: "have tokens + fans + mods + model",
+		lbl_group_50tk: "Dark Blue (Tipped 50 recently)",
+		lbl_group_250tk: "Light Purple (Tipped 250 recently)",
+		lbl_group_1000tk: "Dark Purple (Tipped 1000 recently)",
 		lbl_broadcaster: "broadcaster only",
-		lbl_host_mods: "broadcaster + moderators",
+		lbl_mods: "moderators + broadcaster",
 		lbl_everyone: "everyone in chat",
 		lbl_single_user: "user only in chat",
 		lbl_not_applicable: "n/a (disabled)",
@@ -357,13 +357,13 @@ const i18n = {
 		colorslist_header: 'A continuacion un listado de colores para ayudarle a configurar el bot:',
 		sort_order: "Ordenar el menu {MENU}, sin tener cuenta de la orden aqui abajo",
 		menu_item_lbl: "elemento del menu #{MENUIDX}{ITEMIDX}",
-		lbl_group_fans: "fans",
-		lbl_group_havetk: "teniendo tokens (azul clarito)",
-		//lbl_group_50tk: "Azul Oscuro (Ha Tippeado 50 recientemente)",
-		//lbl_group_250tk: "Violeta Clarito (Ha Tippeado 250 recientemente)",
-		//lbl_group_1000tk: "Violeta Oscuro (Ha Tippeado 1000 recientemente)",
+		lbl_group_fans: "fans + mods + streamer",
+		lbl_group_havetk: "con tokens + fans + mods + streamer",
+		lbl_group_50tk: "Azul Oscuro (Ha Tippeado 50 recientemente)",
+		lbl_group_250tk: "Violeta Clarito (Ha Tippeado 250 recientemente)",
+		lbl_group_1000tk: "Violeta Oscuro (Ha Tippeado 1000 recientemente)",
 		lbl_broadcaster: "streamer",
-		lbl_host_mods: "streamer + moderador",
+		lbl_mods: "moderadores + streamer",
 		lbl_everyone: "todo el mundo en el chat",
 		lbl_single_user: "solo el usuario en el chat",
 		lbl_not_applicable: "n/a (desactivar)",
@@ -432,13 +432,13 @@ const i18n = {
 		colorslist_header: 'Voici une liste de couleurs pour vous aider a parametrer le bot:',
 		sort_order: "Trier le menu {MENU} avant affichage, peu importe l'ordre ci dessous",
 		menu_item_lbl: "element du menu #{MENUIDX}{ITEMIDX}",
-		lbl_group_fans: "fans",
-		lbl_group_havetk: "possedant des tokens (bleu clair)",
-		//lbl_group_50tk: "Bleu Fonce (A Tippe 50 recemment)",
-		//lbl_group_250tk: "Violet Clair (A tippe 250 recemment)",
-		//lbl_group_1000tk: "Violet Fonce (A tippe 1000 recemment)",
+		lbl_group_fans: "fans + mods + streameur",
+		lbl_group_havetk: "ont des tokens + fans + mods + streameur",
+		lbl_group_50tk: "Bleu Fonce (A Tippe 50 recemment)",
+		lbl_group_250tk: "Violet Clair (A tippe 250 recemment)",
+		lbl_group_1000tk: "Violet Fonce (A tippe 1000 recemment)",
 		lbl_broadcaster: "streameur seulement",
-		lbl_host_mods: "streameur + moderateurs",
+		lbl_mods: "moderateurs + streameur",
 		lbl_everyone: "tout le monde dans le chat",
 		lbl_single_user: "utilisateur uniquement dans le chat",
 		lbl_not_applicable: "n/a (desactiver)",
@@ -533,7 +533,7 @@ const FlexibleTipMenu = {
 					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder);
 				break;
 
-				case FlexibleTipMenu.i18n('lbl_host_mods'):
+				case FlexibleTipMenu.i18n('lbl_mods'):
 					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder);
 					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder, user_groups.mods);
 				break;
@@ -719,6 +719,9 @@ const FlexibleTipMenu = {
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_group_havetk'):
+			case FlexibleTipMenu.i18n('lbl_group_50tk'):
+			case FlexibleTipMenu.i18n('lbl_group_250tk'):
+			case FlexibleTipMenu.i18n('lbl_group_1000tk'):
 				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.have_tk); // send notice only to group
 				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
 			break;
@@ -1160,22 +1163,32 @@ const FlexibleTipMenu = {
 		const decorator_gender_flag = FlexibleTipMenu.val('decorator_gender_flag');
 
 		const only_broadcaster = (FlexibleTipMenu.i18n('lbl_broadcaster') === decorator_gender_flag);
-		if(only_broadcaster && message.user !== cb.room_slug) {
+		const is_bcaster = (message.user === cb.room_slug);
+		if(only_broadcaster && !is_bcaster) {
 			return message; // change nothing
 		}
 
-		const only_mods = (FlexibleTipMenu.i18n('lbl_host_mods') === decorator_gender_flag);
-		if(only_mods && !message.is_mod) {
+		const only_mods = (FlexibleTipMenu.i18n('lbl_mods') === decorator_gender_flag);
+		const is_mod = message.is_mod;
+		if(only_mods && !(is_mod || is_bcaster)) {
 			return message; // change nothing
 		}
 
 		const only_fans = (FlexibleTipMenu.i18n('lbl_group_fans') === decorator_gender_flag);
-		if(only_fans && !message.is_fan) {
+		const is_fan = message.is_fan;
+		if(only_fans && !(is_fan || is_mod || is_bcaster)) {
 			return message; // change nothing
 		}
 
-		const only_havetk = (FlexibleTipMenu.i18n('lbl_group_havetk') === decorator_gender_flag);
-		if(only_havetk && !message.has_tokens) {
+		const tk_groups = [
+			FlexibleTipMenu.i18n('lbl_group_havetk'),
+			FlexibleTipMenu.i18n('lbl_group_50tk'),
+			FlexibleTipMenu.i18n('lbl_group_250tk'),
+			FlexibleTipMenu.i18n('lbl_group_1000tk'),
+		];
+		const only_havetk = tk_groups.includes(decorator_gender_flag);
+		const has_tokens = message.has_tokens;
+		if(only_havetk && !(has_tokens || is_fan || is_mod || is_bcaster)) {
 			return message; // change nothing
 		}
 
@@ -1366,7 +1379,7 @@ cb.settings_choices.push({
 	label: ftm.i18n('errors_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_host_mods'),
+	choice2: ftm.i18n('lbl_mods'),
 	choice3: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_broadcaster'),
 });
@@ -1378,7 +1391,6 @@ cb.settings_choices.push({
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
 	choice2: ftm.i18n('lbl_everyone'),
-	choice3: ftm.i18n('lbl_single_user'),
 	choice4: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
@@ -1390,7 +1402,6 @@ cb.settings_choices.push({
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
 	choice2: ftm.i18n('lbl_everyone'),
-	choice3: ftm.i18n('lbl_single_user'),
 	choice4: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
@@ -1413,7 +1424,7 @@ cb.settings_choices.push({
 	label: ftm.i18n('decorator_gender_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_host_mods'),
+	choice2: ftm.i18n('lbl_mods'),
 	choice3: ftm.i18n('lbl_group_fans'),
 	choice4: ftm.i18n('lbl_group_havetk'),
 	choice5: ftm.i18n('lbl_everyone'),
