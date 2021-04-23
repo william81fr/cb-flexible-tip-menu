@@ -19,7 +19,7 @@ const lang = 'en';
 /**
  * Max number of configurable menu items
  */
-const nb_of_menu_items = 40;
+const nb_of_menu_items = 50;
 
 /**
  * Number of configurable menus, not more than 26
@@ -92,38 +92,8 @@ let shown_errors = []; // Used to show error messages only once
 
 
 // cf. https://en.wikipedia.org/wiki/List_of_Unicode_characters
-/*
-const ascii_allowlist = [
-	'\u{20}-\u{2F}', // ASCII Punctuation & Symbols
-	'\u{30}-\u{39}', // ASCII Digits
-	'\u{3A}-\u{40}', // ASCII Punctuation & Symbols
-	'\u{41}-\u{5A}', // Latin Alphabet: Uppercase
-	'\u{5B}-\u{60}', // ASCII Punctuation & Symbols
-	'\u{61}-\u{7A}', // Latin Alphabet: Lowercase
-	'\u{7B}-\u{7E}', // ASCII Punctuation & Symbols
-];
-
-const latin1_allowlist = [
-	'\u{A0}-\u{BF}', // Latin-1 Punctuation & Symbols
-	'\u{C0}-\u{DE}', // Letters: Uppercase
-	'\u{DF}-\u{FF}', // Letters: Lowercase
-];
-*/
-
-
 // cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
 // cf. https://en.wikipedia.org/wiki/Emoji#Unicode_blocks
-
-/*
-const misc_allowlist = [
-	'\u{2600}-\u{26D4}',
-	'\u{2700}-\u{27BF}',
-	//'\u{1F300}-\u{1F64F}', // not recognized at the moment
-	//'\u{1F680}-\u{1F6FF}', // not recognized at the moment
-	//'\u{1F7E0}-\u{1F7EF}', // not recognized at the moment
-	//'\u{1F900}-\u{1FADF}', // not recognized at the moment
-];
-*/
 
 /**
  * Used by automod "unicode" to identify ranges of Unicode characters to test for
@@ -214,7 +184,8 @@ const settings_list = {
 	errors_flag: 'importantmessage errorsFlag',
 	automod_unicode_flag: 'debugmessage automodUnicodeFlag',
 	automod_links_flag: 'debugmessage automodLinksFlag',
-	automod_record_flag: 'debugmessage automodRecordFlag',
+	automods_verbosity: 'automodsVerbosity',
+	automods_record_flag: 'automodsRecordFlag',
 	decorator_gender_flag: 'debugmessage decoratorGenderFlag',
 	autothank_flag: 'debugmessage autothankFlag',
 	autothank_above_tokens: 'autothankAboveTokens',
@@ -250,11 +221,12 @@ const i18n = {
 	en: {
 		app_name: "GLOBAL SETTINGS ---------------------- App name",
 		errors_flag: "Show the start-up errors to...",
-		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ----------------------',
-		automod_links_flag: 'AUTOMOD LINKS ----------------------',
-		automod_record_flag: 'Record automod infractions in chat (all automods)',
-		automod_noaction: '[{APP}] Automod was set up as TESTING, and the message was not blocked',
-		automod_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
+		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ---------------------- who to allow',
+		automod_links_flag: 'AUTOMOD LINKS ---------------------- who to allow',
+		automods_verbosity: 'who gets a notice of each infraction (all automods)',
+		automods_record_flag: 'Record automod infractions in chat (all automods)',
+		automods_noaction: '[{APP}] Message from {USER} was ignored by autobot ({LABEL})',
+		automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
 		decorator_gender_flag: "INDICATOR OF USER'S SEX IN CHAT ----------------------",
 		autothank_flag: "AUTOMATICALLY THANK TIPPERS ----------------------",
 		autothank_above_tokens: "Only tips above this limit will get a thank you",
@@ -282,13 +254,13 @@ const i18n = {
 		colorslist_header: 'This is a sample list of colors to help you configure the bot:',
 		sort_order: "Sort the menu {MENU} items before display, regardless of their order below",
 		menu_item_lbl: "menu item #{MENUIDX}{ITEMIDX}",
-		lbl_group_fans: "fans + moderators + broadcaster",
 		lbl_group_havetk: "have tokens + fans + mods + model",
 		lbl_group_50tk: "Dark Blue (Tipped 50 recently)",
 		lbl_group_250tk: "Light Purple (Tipped 250 recently)",
 		lbl_group_1000tk: "Dark Purple (Tipped 1000 recently)",
 		lbl_broadcaster: "broadcaster only",
 		lbl_mods: "moderators + broadcaster",
+		lbl_fans: "fans + moderators + broadcaster",
 		lbl_everyone: "everyone in chat",
 		lbl_single_user: "user only in chat",
 		lbl_not_applicable: "n/a (disabled)",
@@ -325,11 +297,12 @@ const i18n = {
 	es: {
 		app_name: "OPCIONES GLOBALES ---------------------- Nombre de la aplicacion",
 		errors_flag: "Quien puede ver los errores...",
-		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ----------------------',
-		automod_links_flag: 'AUTOMOD LINKS ----------------------',
-		automod_record_flag: 'Guardar las infracciones automod en el chat (todos los autmods)',
-		automod_noaction: '[{APP}] Automod esta configurado para TESTING, y el mensaje no ha sido escondido',
-		automod_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
+		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ---------------------- who to allow',
+		automod_links_flag: 'AUTOMOD LINKS ---------------------- who to allow',
+		automods_verbosity: 'quien tiene una Notice de cada infraccion (todos los automods)',
+		automods_record_flag: 'Guardar las infracciones automod en el chat (todos los autmods)',
+		automods_noaction: '[{APP}] El message de {USER} ha sido ignorado por autobot ({LABEL})',
+		automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
 		decorator_gender_flag: 'INDICATION DEL SEXO DE LOS USUARIOS EN EL CHAT ----------------------',
 		autothank_flag: "MODULO AGRADECIMIENTOS ----------------------",
 		autothank_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
@@ -357,13 +330,13 @@ const i18n = {
 		colorslist_header: 'A continuacion un listado de colores para ayudarle a configurar el bot:',
 		sort_order: "Ordenar el menu {MENU}, sin tener cuenta de la orden aqui abajo",
 		menu_item_lbl: "elemento del menu #{MENUIDX}{ITEMIDX}",
-		lbl_group_fans: "fans + mods + streamer",
 		lbl_group_havetk: "con tokens + fans + mods + streamer",
 		lbl_group_50tk: "Azul Oscuro (Ha Tippeado 50 recientemente)",
 		lbl_group_250tk: "Violeta Clarito (Ha Tippeado 250 recientemente)",
 		lbl_group_1000tk: "Violeta Oscuro (Ha Tippeado 1000 recientemente)",
 		lbl_broadcaster: "streamer",
 		lbl_mods: "moderadores + streamer",
+		lbl_fans: "fans + mods + streamer",
 		lbl_everyone: "todo el mundo en el chat",
 		lbl_single_user: "solo el usuario en el chat",
 		lbl_not_applicable: "n/a (desactivar)",
@@ -400,11 +373,12 @@ const i18n = {
 	fr: {
 		app_name: "PARAMETRES GENERAUX ---------------------- Nom de l'aplication",
 		errors_flag: "A qui montrer les erreurs de demarrage...",
-		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ----------------------',
-		automod_links_flag: 'AUTOMOD LINKS ----------------------',
-		automod_record_flag: 'Enregistrer les infractions automod dans le chat (tous les autmods)',
-		automod_noaction: "[{APP}] Automod est configure pour TESTING, et le message n'a pas ete masque",
-		automod_user_count: '[{APP}] Automod a enregistre {COUNT} infractions pour {USER}',
+		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ---------------------- who to allow',
+		automod_links_flag: 'AUTOMOD LINKS ---------------------- who to allow',
+		automods_verbosity: "A qui montrer les Notices d'infractions (tous les automods)",
+		automods_record_flag: 'Enregistrer les infractions automod dans le chat (tous les autmods)',
+		automods_noaction: '[{APP}] Le message de {USER} a ete ignore par autobot ({LABEL})',
+		automods_user_count: '[{APP}] Automod a enregistre {COUNT} infractions pour {USER}',
 		decorator_gender_flag: 'INDICATEUR DU SEXE DES UTILISATEURS DU CHAT ----------------------',
 		autothank_flag: "MODULE REMERCIEMENTS ----------------------",
 		autothank_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
@@ -432,13 +406,13 @@ const i18n = {
 		colorslist_header: 'Voici une liste de couleurs pour vous aider a parametrer le bot:',
 		sort_order: "Trier le menu {MENU} avant affichage, peu importe l'ordre ci dessous",
 		menu_item_lbl: "element du menu #{MENUIDX}{ITEMIDX}",
-		lbl_group_fans: "fans + mods + streameur",
 		lbl_group_havetk: "ont des tokens + fans + mods + streameur",
 		lbl_group_50tk: "Bleu Fonce (A Tippe 50 recemment)",
 		lbl_group_250tk: "Violet Clair (A tippe 250 recemment)",
 		lbl_group_1000tk: "Violet Fonce (A tippe 1000 recemment)",
 		lbl_broadcaster: "streameur seulement",
 		lbl_mods: "moderateurs + streameur",
+		lbl_fans: "fans + mods + streameur",
 		lbl_everyone: "tout le monde dans le chat",
 		lbl_single_user: "utilisateur uniquement dans le chat",
 		lbl_not_applicable: "n/a (desactiver)",
@@ -713,8 +687,9 @@ const FlexibleTipMenu = {
 				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness);
 			break;
 
-			case FlexibleTipMenu.i18n('lbl_group_fans'):
+			case FlexibleTipMenu.i18n('lbl_fans'):
 				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.fans); // send notice only to group
+				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.mods); // also to mods
 				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
 			break;
 
@@ -723,6 +698,7 @@ const FlexibleTipMenu = {
 			case FlexibleTipMenu.i18n('lbl_group_250tk'):
 			case FlexibleTipMenu.i18n('lbl_group_1000tk'):
 				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.have_tk); // send notice only to group
+				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.mods); // also to mods
 				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
 			break;
 
@@ -1030,71 +1006,165 @@ const FlexibleTipMenu = {
 	},
 
 	/**
+	 * Notifies relevant people of an exemption made for a message;
+	 * This means that the message was detected as spammy,
+	 *   but the bot was configured to ignore this user
+	 * @param {string} username The username sending the automodded message
+	 * @param {string} reason A word to describe the reason for the exemption
+	 */
+	automod_noaction: function(username, reason) {
+		const noaction_lbl = FlexibleTipMenu.i18n('automods_noaction')
+			.replace(label_patterns.username, username)
+			.replace(label_patterns.label, reason);
+
+		const noaction_notice = FlexibleTipMenu.clean_str(noaction_lbl);
+
+		const module_verbosity = FlexibleTipMenu.val('automods_verbosity');
+		switch(module_verbosity) {
+			case FlexibleTipMenu.i18n('lbl_broadcaster'):
+				cb.setTimeout(function() {
+					cb.sendNotice(noaction_notice, cb.room_slug);
+				}, 1000);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_mods'):
+				cb.setTimeout(function() {
+					cb.sendNotice(noaction_notice, cb.room_slug);
+					cb.sendNotice(noaction_notice, cb.room_slug, null, null, null, user_groups.mods);
+				}, 1000);
+			break;
+
+			default:
+				// never mind
+		}
+	},
+
+	/**
+	 * Keeps track of infractions detected by the automods
+	 * @param {string} username The username sending the automodded message
+	 */
+	automod_infraction: function(username) {
+		if('undefined' === typeof FlexibleTipMenu.automod_infractions[username]) {
+			FlexibleTipMenu.automod_infractions[username] = 0;
+		}
+
+		++FlexibleTipMenu.automod_infractions[username];
+
+		const notice = FlexibleTipMenu.i18n('automods_user_count')
+			.replace(label_patterns.username, username)
+			.replace(label_patterns.count, FlexibleTipMenu.automod_infractions[username]);
+
+		const notice_clean = FlexibleTipMenu.clean_str(lbl);
+
+		const automods_record_flag = FlexibleTipMenu.val('automods_record_flag');
+		switch(automods_record_flag) {
+			case FlexibleTipMenu.i18n('lbl_broadcaster'):
+				cb.setTimeout(function() {
+					cb.sendNotice(notice_clean, cb.room_slug);
+				}, 1000);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_mods'):
+				cb.setTimeout(function() {
+					cb.sendNotice(notice_clean);
+				}, 1000);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_single_user'):
+				cb.setTimeout(function() {
+					cb.sendNotice(notice_clean, username, '', '', '');
+				}, 1000);
+			break;
+
+			default:
+				// never mind
+		}
+	},
+
+	/**
 	 * Modify a message according to an automod module's settings
 	 * @param {message} message The message that came in from the fired event
-	 * @param {string} module_flag The main setting to determine how this automod should run
+	 * @param {string} flag_name Name of the app setting for the automod module
 	 * @param {string} notice_tpl The main notice template
 	 * @param {string} module_lbl A small label to identify the automod in chat (in the main notice)
 	 * @returns {message} The updated message
 	 */
-	 automod_plaintext: function(message, module_flag, notice_tpl, module_lbl) {
+	 automod_plaintext: function(message, flag_name, notice_tpl, module_lbl) {
 		const txt_msg = message.m.trim();
+		const module_flag = FlexibleTipMenu.val(flag_name);
+		const lbl_not_applicable = FlexibleTipMenu.i18n('lbl_not_applicable');
+		const lbl_mods = FlexibleTipMenu.i18n('lbl_mods');
 
-		// standard warning for the model, so they know that automod did something
-		cb.setTimeout(function() {
+		if(lbl_not_applicable === module_flag) {
+			return message; // change nothing
+		}
+
+		const is_bcaster = (message.user === cb.room_slug);
+		if(is_bcaster) {
+			FlexibleTipMenu.automod_noaction(message.user, 'broadcaster');
+			return message; // change nothing
+		}
+
+		const allow_mods = (lbl_mods === module_flag);
+		const is_mod = message.is_mod;
+		if(allow_mods && (is_mod || is_bcaster)) {
+			FlexibleTipMenu.automod_noaction(message.user, 'moderator');
+			return message; // change nothing
+		}
+
+		const allow_fans = (FlexibleTipMenu.i18n('lbl_fans') === module_flag);
+		const is_fan = message.is_fan;
+		if(allow_fans && (is_fan || is_mod || is_bcaster)) {
+			FlexibleTipMenu.automod_noaction(message.user, 'fan');
+			return message; // change nothing
+		}
+
+		const tk_groups = [
+			FlexibleTipMenu.i18n('lbl_group_havetk'),
+			FlexibleTipMenu.i18n('lbl_group_50tk'),
+			FlexibleTipMenu.i18n('lbl_group_250tk'),
+			FlexibleTipMenu.i18n('lbl_group_1000tk'),
+		];
+		const allow_havetk = tk_groups.includes(module_flag);
+		const has_tokens = message.has_tokens; // the user who sent the msg has tokens
+		if(allow_havetk && (has_tokens || is_fan || is_mod || is_bcaster)) {
+			FlexibleTipMenu.automod_noaction(message.user, 'havetk');
+			return message; // change nothing
+		}
+
+
+		// take action
+		message = FlexibleTipMenu.hide_message(message);
+
+
+		const module_verbosity = FlexibleTipMenu.val('automods_verbosity');
+		if(lbl_not_applicable !== module_verbosity) {
+			// show the automod action in chat (never to everyone)
+
 			const notice = FlexibleTipMenu.i18n(notice_tpl)
 				.replace(label_patterns.label, FlexibleTipMenu.i18n(module_lbl))
 				.replace(label_patterns.username, message.user)
 				.replace(label_patterns.message, txt_msg);
 
-			cb.sendNotice(FlexibleTipMenu.clean_str(notice), cb.room_slug);
-		}, 1000);
+			const notice_clean = FlexibleTipMenu.clean_str(notice);
+			switch(module_verbosity) {
+				case FlexibleTipMenu.i18n('lbl_broadcaster'):
+					cb.sendNotice(notice_clean, cb.room_slug);
+				break;
 
-		if(FlexibleTipMenu.i18n('lbl_broadcaster') !== FlexibleTipMenu.val(module_flag)) {
-			// take action
-			message = FlexibleTipMenu.hide_message(message);
-		}
-		else {
-			// don't hide the message, only warn the model
-			cb.setTimeout(function() {
-				const notice = FlexibleTipMenu.i18n('automod_noaction');
-				cb.sendNotice(FlexibleTipMenu.clean_str(notice), cb.room_slug);
-			}, 1500);
-		}
+				case FlexibleTipMenu.i18n('lbl_mods'):
+					cb.sendNotice(notice_clean, cb.room_slug);
+					cb.sendNotice(msg, cb.room_slug, null, null, null, user_groups.mods);
+				break;
 
-		const automod_record_enabled = !FlexibleTipMenu.is_disabled('automod_record_flag');
-		if(automod_record_enabled) {
-			const automod_record_flag = FlexibleTipMenu.val('automod_record_flag');
-			if('undefined' === typeof FlexibleTipMenu.automod_infractions[message.user]) {
-				FlexibleTipMenu.automod_infractions[message.user] = 0;
+				default:
+					// never mind
 			}
+		}
 
-			++FlexibleTipMenu.automod_infractions[message.user];
-
-			cb.setTimeout(function() {
-				const lbl = FlexibleTipMenu.i18n('automod_user_count')
-					.replace(label_patterns.username, message.user)
-					.replace(label_patterns.count, FlexibleTipMenu.automod_infractions[message.user]);
-
-				const notice = FlexibleTipMenu.clean_str(lbl);
-
-				switch(automod_record_flag) {
-					case FlexibleTipMenu.i18n('lbl_broadcaster'):
-						cb.sendNotice(notice, cb.room_slug);
-					break;
-
-					case FlexibleTipMenu.i18n('lbl_everyone'):
-						cb.sendNotice(notice);
-					break;
-
-					case FlexibleTipMenu.i18n('lbl_single_user'):
-						cb.sendNotice(notice, '', '', '', '', message.user);
-					break;
-
-					default:
-						// never mind
-				}
-			}, 2000);
+		const automod_record_enabled = !FlexibleTipMenu.is_disabled('automods_record_flag');
+		if(automod_record_enabled) {
+			FlexibleTipMenu.automod_infraction(message.user);
 		}
 
 		return message;
@@ -1162,6 +1232,10 @@ const FlexibleTipMenu = {
 	decorator_gender: function(message) {
 		const decorator_gender_flag = FlexibleTipMenu.val('decorator_gender_flag');
 
+		if(FlexibleTipMenu.i18n('lbl_not_applicable') === decorator_gender_flag) {
+			return message; // change nothing
+		}
+
 		const only_broadcaster = (FlexibleTipMenu.i18n('lbl_broadcaster') === decorator_gender_flag);
 		const is_bcaster = (message.user === cb.room_slug);
 		if(only_broadcaster && !is_bcaster) {
@@ -1174,7 +1248,7 @@ const FlexibleTipMenu = {
 			return message; // change nothing
 		}
 
-		const only_fans = (FlexibleTipMenu.i18n('lbl_group_fans') === decorator_gender_flag);
+		const only_fans = (FlexibleTipMenu.i18n('lbl_fans') === decorator_gender_flag);
 		const is_fan = message.is_fan;
 		if(only_fans && !(is_fan || is_mod || is_bcaster)) {
 			return message; // change nothing
@@ -1390,11 +1464,12 @@ cb.settings_choices.push({
 	label: ftm.i18n('automod_unicode_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_everyone'),
-	choice3: ftm.i18n('lbl_not_applicable'),
+	choice2: ftm.i18n('lbl_mods'),
+	choice3: ftm.i18n('lbl_fans'),
+	choice4: ftm.i18n('lbl_group_havetk'),
+	choice5: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
-
 
 // automod links module
 cb.settings_choices.push({
@@ -1402,18 +1477,30 @@ cb.settings_choices.push({
 	label: ftm.i18n('automod_links_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_everyone'),
+	choice2: ftm.i18n('lbl_mods'),
+	choice3: ftm.i18n('lbl_fans'),
+	choice4: ftm.i18n('lbl_group_havetk'),
+	choice5: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+// settings common to all automods
+cb.settings_choices.push({
+	name: settings_list.automods_verbosity,
+	label: ftm.i18n('automods_verbosity'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_mods'),
 	choice3: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
-// record automods infractions
 cb.settings_choices.push({
-	name: settings_list.automod_record_flag,
-	label: ftm.i18n('automod_record_flag'),
+	name: settings_list.automods_record_flag,
+	label: ftm.i18n('automods_record_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_everyone'),
+	choice2: ftm.i18n('lbl_mods'),
 	choice3: ftm.i18n('lbl_single_user'),
 	choice4: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
@@ -1426,7 +1513,7 @@ cb.settings_choices.push({
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
 	choice2: ftm.i18n('lbl_mods'),
-	choice3: ftm.i18n('lbl_group_fans'),
+	choice3: ftm.i18n('lbl_fans'),
 	choice4: ftm.i18n('lbl_group_havetk'),
 	choice5: ftm.i18n('lbl_everyone'),
 	choice6: ftm.i18n('lbl_not_applicable'),
@@ -1550,7 +1637,7 @@ for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 		type: 'choice',
 		choice1: ftm.i18n('lbl_broadcaster'),
 		choice2: ftm.i18n('lbl_everyone'),
-		choice3: ftm.i18n('lbl_group_fans'),
+		choice3: ftm.i18n('lbl_fans'),
 		choice4: ftm.i18n('lbl_group_havetk'),
 		choice5: ftm.i18n('lbl_not_applicable'),
 		defaultValue: (0 === i) ? ftm.i18n('lbl_broadcaster') : ftm.i18n('lbl_not_applicable'),
