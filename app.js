@@ -503,6 +503,7 @@ const FlexibleTipMenu = {
 
 		if(!shown_errors.includes(msg)) {
 			switch(FlexibleTipMenu.val('errors_flag')) {
+				case 'broadcaster': // pass through
 				case FlexibleTipMenu.i18n('lbl_broadcaster'):
 					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder);
 				break;
@@ -679,6 +680,7 @@ const FlexibleTipMenu = {
 		}
 
 		switch(tip_menu_flag) {
+			case 'broadcaster': // pass through
 			case FlexibleTipMenu.i18n('lbl_broadcaster'):
 				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // only to the broadcaster
 			break;
@@ -1021,6 +1023,7 @@ const FlexibleTipMenu = {
 
 		const module_verbosity = FlexibleTipMenu.val('automods_verbosity');
 		switch(module_verbosity) {
+			case 'broadcaster': // pass through
 			case FlexibleTipMenu.i18n('lbl_broadcaster'):
 				cb.setTimeout(function() {
 					cb.sendNotice(noaction_notice, cb.room_slug);
@@ -1058,6 +1061,7 @@ const FlexibleTipMenu = {
 
 		const automods_record_flag = FlexibleTipMenu.val('automods_record_flag');
 		switch(automods_record_flag) {
+			case 'broadcaster': // pass through
 			case FlexibleTipMenu.i18n('lbl_broadcaster'):
 				cb.setTimeout(function() {
 					cb.sendNotice(notice_clean, cb.room_slug);
@@ -1148,6 +1152,7 @@ const FlexibleTipMenu = {
 
 			const notice_clean = FlexibleTipMenu.clean_str(notice);
 			switch(module_verbosity) {
+				case 'broadcaster': // pass through
 				case FlexibleTipMenu.i18n('lbl_broadcaster'):
 					cb.sendNotice(notice_clean, cb.room_slug);
 				break;
@@ -1225,6 +1230,20 @@ const FlexibleTipMenu = {
 	},
 
 	/**
+	 * Whether a specific module of the app is configured as "broadcaster only"
+	 * @param {string} cfg_flag_val The actual value from the app settings (not its idx)
+	 * @returns {boolean} bool
+	 */
+	is_broadcaster_only: function(cfg_flag_val) {
+		const valid_values = [
+			'broadcaster',
+			FlexibleTipMenu.i18n('lbl_broadcaster'),
+		];
+
+		return valid_values.contains(cfg_flag_val);
+	},
+
+	/**
 	 * Decorator to add the gender to messages in chat, according to the app preferences
 	 * @param {message} message The message that came in from the fired event
 	 * @returns {message} The updated message
@@ -1236,7 +1255,7 @@ const FlexibleTipMenu = {
 			return message; // change nothing
 		}
 
-		const only_broadcaster = (FlexibleTipMenu.i18n('lbl_broadcaster') === decorator_gender_flag);
+		const only_broadcaster = FlexibleTipMenu.is_broadcaster_only(decorator_gender_flag);
 		const is_bcaster = (message.user === cb.room_slug);
 		if(only_broadcaster && !is_bcaster) {
 			return message; // change nothing
