@@ -53,6 +53,16 @@ const az = 'abcdefghijklmnopqrstuvwxyz';
 const command_prefixes_allow_list = ['/', '!'];
 
 /**
+ * For date formatting in chat
+ */
+const date_tz = 'en-US';
+
+/**
+ * For date formatting in chat
+ */
+const date_opts = {hour12: false};
+
+/**
  * Sample list of hexadecimal color codes
  */
 const colors_sample = {
@@ -187,6 +197,7 @@ const settings_list = {
 	automods_verbosity: 'automodsVerbosity',
 	automods_record_flag: 'automodsRecordFlag',
 	decorator_gender_flag: 'debugmessage decoratorGenderFlag',
+	decorator_time_flag: 'debugmessage decoratorTimeFlag',
 	autothank_flag: 'debugmessage autothankFlag',
 	autothank_above_tokens: 'autothankAboveTokens',
 	autothank_publicly_background_color: 'autothankPubliclyBackgroundColor',
@@ -228,6 +239,10 @@ const i18n = {
 		automods_noaction: '[{APP}] Message from {USER} was ignored by autobot ({LABEL})',
 		automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
 		decorator_gender_flag: "INDICATOR OF USER'S SEX IN CHAT ----------------------",
+		decorator_time_flag: 'INDICATOR OF TIME IN CHAT ----------------------',
+		lbl_time_short: 'HH:MM',
+		lbl_time_medium: 'HH:MM:SS',
+		lbl_time_full: 'HH:MM:SS +timezone',
 		autothank_flag: "AUTOMATICALLY THANK TIPPERS ----------------------",
 		autothank_above_tokens: "Only tips above this limit will get a thank you",
 		autothank_publicly_background_color: "Background color for the public thanks (hexa code)",
@@ -303,7 +318,11 @@ const i18n = {
 		automods_record_flag: 'Guardar las infracciones automod en el chat (todos los autmods)',
 		automods_noaction: '[{APP}] El message de {USER} ha sido ignorado por autobot ({LABEL})',
 		automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
-		decorator_gender_flag: 'INDICATION DEL SEXO DE LOS USUARIOS EN EL CHAT ----------------------',
+		decorator_gender_flag: 'INDICACION DEL SEXO DE LOS USUARIOS EN EL CHAT ----------------------',
+		decorator_time_flag: 'INDICACION DEL TIEMPO EN EL CHAT ----------------------',
+		lbl_time_short: 'HH:MM',
+		lbl_time_medium: 'HH:MM:SS',
+		lbl_time_full: 'HH:MM:SS +timezone',
 		autothank_flag: "MODULO AGRADECIMIENTOS ----------------------",
 		autothank_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
 		autothank_publicly_background_color: "Color de fondo para las gracias en publico (codigo hexa)",
@@ -380,6 +399,10 @@ const i18n = {
 		automods_noaction: '[{APP}] Le message de {USER} a ete ignore par autobot ({LABEL})',
 		automods_user_count: '[{APP}] Automod a enregistre {COUNT} infractions pour {USER}',
 		decorator_gender_flag: 'INDICATEUR DU SEXE DES UTILISATEURS DU CHAT ----------------------',
+		decorator_time_flag: 'INDICATEUR DU TEMPS DANS LE CHAT ----------------------',
+		lbl_time_short: 'HH:MM',
+		lbl_time_medium: 'HH:MM:SS',
+		lbl_time_full: 'HH:MM:SS +timezone',
 		autothank_flag: "MODULE REMERCIEMENTS ----------------------",
 		autothank_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
 		autothank_publicly_background_color: "Couleur de fond pour les remerciements en public (code hexa)",
@@ -904,7 +927,7 @@ const FlexibleTipMenu = {
 	basic_log: function(obj, lbl) {
 		let dbg_rows = [];
 
-		const dbg_start = new Date(Date.now());
+		const dbg_start = new Date();
 		const dbg_lbl_start = FlexibleTipMenu.i18n('errmsg_dbg_start')
 			.replace(label_patterns.label, lbl)
 			.replace(label_patterns.time, dbg_start.toTimeString());
@@ -956,7 +979,7 @@ const FlexibleTipMenu = {
 			dbg_rows.push(msg);
 		}
 
-		const dbg_end = new Date(Date.now());
+		const dbg_end = new Date();
 		const dbg_lbl_end = FlexibleTipMenu.i18n('errmsg_dbg_end')
 			.replace(label_patterns.label, lbl)
 			.replace(label_patterns.time, dbg_end.toTimeString());
@@ -1240,7 +1263,45 @@ const FlexibleTipMenu = {
 			FlexibleTipMenu.i18n('lbl_broadcaster'),
 		];
 
-		return valid_values.contains(cfg_flag_val);
+		return valid_values.includes(cfg_flag_val);
+	},
+
+	/**
+	 * Decorator to add a timestamp to messages in chat
+	 * @param {message} message The message that came in from the fired event
+	 * @returns {message} The updated message
+	 */
+	decorator_time: function(message) {
+		const decorator_time_flag = FlexibleTipMenu.val('decorator_time_flag');
+
+		if(FlexibleTipMenu.i18n('lbl_not_applicable') === decorator_time_flag) {
+			return message; // change nothing
+		}
+
+		let time_str = (new Date()).toLocaleTimeString(date_tz, date_opts);
+		switch(decorator_time_flag) {
+			case FlexibleTipMenu.i18n('lbl_time_short'):
+				time_str = time_str.replace(/:[0-9]{2} .+$/, '');
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_time_medium'):
+				time_str = time_str.replace(/ .+$/, '');
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_time_full'):
+				// keep the raw date
+			break;
+
+			default:
+				return message; // change nothing
+		}
+
+		const decorated_msg = '[{TIME}] {MESSAGE}'
+			.replace(label_patterns.time, time_str)
+			.replace(label_patterns.message, message.m);
+
+		message.m = decorated_msg;
+		return message;
 	},
 
 	/**
@@ -1340,6 +1401,8 @@ const FlexibleTipMenu = {
 		if(decorator_gender_enabled) {
 			message = FlexibleTipMenu.decorator_gender(message);
 		}
+
+		message = FlexibleTipMenu.decorator_time(message);
 
 		return message;
 	},
@@ -1536,6 +1599,17 @@ cb.settings_choices.push({
 	choice4: ftm.i18n('lbl_group_havetk'),
 	choice5: ftm.i18n('lbl_everyone'),
 	choice6: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.decorator_time_flag,
+	label: ftm.i18n('decorator_time_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_time_short'),
+	choice2: ftm.i18n('lbl_time_medium'),
+	choice3: ftm.i18n('lbl_time_full'),
+	choice4: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
