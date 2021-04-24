@@ -239,7 +239,7 @@ const i18n = {
 		automods_noaction: '[{APP}] Message from {USER} was ignored by autobot ({LABEL})',
 		automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
 		decorator_gender_flag: "INDICATOR OF USER'S SEX IN CHAT ----------------------",
-		decorator_time_flag: 'INDICATOR OF TIME IN CHAT ----------------------',
+		decorator_time_flag: 'INDICATOR OF TIME IN CHAT (GMT/UTC) ----------------------',
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
@@ -319,7 +319,7 @@ const i18n = {
 		automods_noaction: '[{APP}] El message de {USER} ha sido ignorado por autobot ({LABEL})',
 		automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
 		decorator_gender_flag: 'INDICACION DEL SEXO DE LOS USUARIOS EN EL CHAT ----------------------',
-		decorator_time_flag: 'INDICACION DEL TIEMPO EN EL CHAT ----------------------',
+		decorator_time_flag: 'INDICACION DEL TIEMPO EN EL CHAT (GMT/UTC) ----------------------',
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
@@ -399,7 +399,7 @@ const i18n = {
 		automods_noaction: '[{APP}] Le message de {USER} a ete ignore par autobot ({LABEL})',
 		automods_user_count: '[{APP}] Automod a enregistre {COUNT} infractions pour {USER}',
 		decorator_gender_flag: 'INDICATEUR DU SEXE DES UTILISATEURS DU CHAT ----------------------',
-		decorator_time_flag: 'INDICATEUR DU TEMPS DANS LE CHAT ----------------------',
+		decorator_time_flag: 'INDICATEUR DU TEMPS DANS LE CHAT (GMT/UTC) ----------------------',
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
@@ -487,7 +487,7 @@ const FlexibleTipMenu = {
 	 * This is expected to run at the last moment before cb.sendNotice()
 	 * After all variables were reasonably replaced
 	 * @param {string} notice_tpl The notice template meant for cb.sendNotice()
-	 * @returns The updated message
+	 * @returns The updated notice
 	 */
 	clean_str: function(notice_tpl) {
 		if(!notice_tpl.trim()) {
@@ -1005,29 +1005,29 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Recommended way to hide message in public chat, but still echoed back to the user
-	 * @param {message} message The message that came in from the fired event
+	 * @param {message} event_msg The message that came in from the fired event
 	 * @returns {message} The updated message
 	 */
-	hide_message: function(msg) {
-		msg['X-Spam'] = true;
-		return msg;
+	hide_message: function(event_msg) {
+		event_msg['X-Spam'] = true;
+		return event_msg;
 	},
 
 	/**
 	 * Handle generic messages from users
-	 * @param {message} message The message that came in from the fired event
+	 * @param {message} event_msg The message that came in from the fired event
 	 * @returns {message} The updated message
 	 */
-	message_handler: function(message) {
-		const txt_msg = message.m.trim();
+	message_handler: function(event_msg) {
+		const txt_msg = event_msg.m.trim();
 		if(command_prefixes_allow_list.includes(txt_msg.substring(0, 1))) {
-			message = FlexibleTipMenu.commands_handler(message); // that's a command, not a plain message
+			event_msg = FlexibleTipMenu.commands_handler(event_msg); // that's a command, not a plain message
 		}
 		else {
-			message = FlexibleTipMenu.plaintext_handler(message); // not a command
+			event_msg = FlexibleTipMenu.plaintext_handler(event_msg); // not a command
 		}
 
-		return message;
+		return event_msg;
 	},
 
 	/**
@@ -1110,40 +1110,40 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Modify a message according to an automod module's settings
-	 * @param {message} message The message that came in from the fired event
+	 * @param {message} event_msg The message that came in from the fired event
 	 * @param {string} flag_name Name of the app setting for the automod module
 	 * @param {string} notice_tpl The main notice template
 	 * @param {string} module_lbl A small label to identify the automod in chat (in the main notice)
 	 * @returns {message} The updated message
 	 */
-	 automod_plaintext: function(message, flag_name, notice_tpl, module_lbl) {
-		const txt_msg = message.m.trim();
+	 automod_plaintext: function(event_msg, flag_name, notice_tpl, module_lbl) {
+		const txt_msg = event_msg.m.trim();
 		const module_flag = FlexibleTipMenu.val(flag_name);
 		const lbl_not_applicable = FlexibleTipMenu.i18n('lbl_not_applicable');
 		const lbl_mods = FlexibleTipMenu.i18n('lbl_mods');
 
 		if(lbl_not_applicable === module_flag) {
-			return message; // change nothing
+			return event_msg; // change nothing
 		}
 
-		const is_bcaster = (message.user === cb.room_slug);
+		const is_bcaster = (event_msg.user === cb.room_slug);
 		if(is_bcaster) {
-			FlexibleTipMenu.automod_noaction(message.user, 'broadcaster');
-			return message; // change nothing
+			FlexibleTipMenu.automod_noaction(event_msg.user, 'broadcaster');
+			return event_msg; // change nothing
 		}
 
 		const allow_mods = (lbl_mods === module_flag);
 		const is_mod = message.is_mod;
 		if(allow_mods && (is_mod || is_bcaster)) {
-			FlexibleTipMenu.automod_noaction(message.user, 'moderator');
-			return message; // change nothing
+			FlexibleTipMenu.automod_noaction(event_msg.user, 'moderator');
+			return event_msg; // change nothing
 		}
 
 		const allow_fans = (FlexibleTipMenu.i18n('lbl_fans') === module_flag);
-		const is_fan = message.is_fan;
+		const is_fan = event_msg.is_fan;
 		if(allow_fans && (is_fan || is_mod || is_bcaster)) {
-			FlexibleTipMenu.automod_noaction(message.user, 'fan');
-			return message; // change nothing
+			FlexibleTipMenu.automod_noaction(event_msg.user, 'fan');
+			return event_msg; // change nothing
 		}
 
 		const tk_groups = [
@@ -1153,15 +1153,15 @@ const FlexibleTipMenu = {
 			FlexibleTipMenu.i18n('lbl_group_1000tk'),
 		];
 		const allow_havetk = tk_groups.includes(module_flag);
-		const has_tokens = message.has_tokens; // the user who sent the msg has tokens
+		const has_tokens = event_msg.has_tokens; // the user who sent the msg has tokens
 		if(allow_havetk && (has_tokens || is_fan || is_mod || is_bcaster)) {
-			FlexibleTipMenu.automod_noaction(message.user, 'havetk');
-			return message; // change nothing
+			FlexibleTipMenu.automod_noaction(event_msg.user, 'havetk');
+			return event_msg; // change nothing
 		}
 
 
 		// take action
-		message = FlexibleTipMenu.hide_message(message);
+		event_msg = FlexibleTipMenu.hide_message(event_msg);
 
 
 		const module_verbosity = FlexibleTipMenu.val('automods_verbosity');
@@ -1170,7 +1170,7 @@ const FlexibleTipMenu = {
 
 			const notice = FlexibleTipMenu.i18n(notice_tpl)
 				.replace(label_patterns.label, FlexibleTipMenu.i18n(module_lbl))
-				.replace(label_patterns.username, message.user)
+				.replace(label_patterns.username, event_msg.user)
 				.replace(label_patterns.message, txt_msg);
 
 			const notice_clean = FlexibleTipMenu.clean_str(notice);
@@ -1192,10 +1192,10 @@ const FlexibleTipMenu = {
 
 		const automod_record_enabled = !FlexibleTipMenu.is_disabled('automods_record_flag');
 		if(automod_record_enabled) {
-			FlexibleTipMenu.automod_infraction(message.user);
+			FlexibleTipMenu.automod_infraction(event_msg.user);
 		}
 
-		return message;
+		return event_msg;
 	},
 
 	/**
@@ -1268,14 +1268,14 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Decorator to add a timestamp to messages in chat
-	 * @param {message} message The message that came in from the fired event
+	 * @param {message} event_msg The message that came in from the fired event
 	 * @returns {message} The updated message
 	 */
-	decorator_time: function(message) {
+	decorator_time: function(event_msg) {
 		const decorator_time_flag = FlexibleTipMenu.val('decorator_time_flag');
 
 		if(FlexibleTipMenu.i18n('lbl_not_applicable') === decorator_time_flag) {
-			return message; // change nothing
+			return event_msg; // change nothing
 		}
 
 		let time_str = (new Date()).toLocaleTimeString(date_tz, date_opts);
@@ -1293,45 +1293,45 @@ const FlexibleTipMenu = {
 			break;
 
 			default:
-				return message; // change nothing
+				return event_msg; // change nothing
 		}
 
 		const decorated_msg = '[{TIME}] {MESSAGE}'
 			.replace(label_patterns.time, time_str)
-			.replace(label_patterns.message, message.m);
+			.replace(label_patterns.message, event_msg.m);
 
-		message.m = decorated_msg;
-		return message;
+		event_msg.m = decorated_msg;
+		return event_msg;
 	},
 
 	/**
 	 * Decorator to add the gender to messages in chat, according to the app preferences
-	 * @param {message} message The message that came in from the fired event
+	 * @param {message} event_msg The message that came in from the fired event
 	 * @returns {message} The updated message
 	 */
-	decorator_gender: function(message) {
+	decorator_gender: function(event_msg) {
 		const decorator_gender_flag = FlexibleTipMenu.val('decorator_gender_flag');
 
 		if(FlexibleTipMenu.i18n('lbl_not_applicable') === decorator_gender_flag) {
-			return message; // change nothing
+			return event_msg; // change nothing
 		}
 
 		const only_broadcaster = FlexibleTipMenu.is_broadcaster_only(decorator_gender_flag);
-		const is_bcaster = (message.user === cb.room_slug);
+		const is_bcaster = (event_msg.user === cb.room_slug);
 		if(only_broadcaster && !is_bcaster) {
-			return message; // change nothing
+			return event_msg; // change nothing
 		}
 
 		const only_mods = (FlexibleTipMenu.i18n('lbl_mods') === decorator_gender_flag);
-		const is_mod = message.is_mod;
+		const is_mod = event_msg.is_mod;
 		if(only_mods && !(is_mod || is_bcaster)) {
-			return message; // change nothing
+			return event_msg; // change nothing
 		}
 
 		const only_fans = (FlexibleTipMenu.i18n('lbl_fans') === decorator_gender_flag);
-		const is_fan = message.is_fan;
+		const is_fan = event_msg.is_fan;
 		if(only_fans && !(is_fan || is_mod || is_bcaster)) {
-			return message; // change nothing
+			return event_msg; // change nothing
 		}
 
 		const tk_groups = [
@@ -1341,9 +1341,9 @@ const FlexibleTipMenu = {
 			FlexibleTipMenu.i18n('lbl_group_1000tk'),
 		];
 		const only_havetk = tk_groups.includes(decorator_gender_flag);
-		const has_tokens = message.has_tokens;
+		const has_tokens = event_msg.has_tokens;
 		if(only_havetk && !(has_tokens || is_fan || is_mod || is_bcaster)) {
-			return message; // change nothing
+			return event_msg; // change nothing
 		}
 
 		// cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
@@ -1359,28 +1359,28 @@ const FlexibleTipMenu = {
 		// ⚥⚥ U+26A5 Bisexuality
 
 		let prefix = '';
-		if('m' === message.gender) prefix = '\u2642'; // male
-		else if('f' === message.gender) prefix = '\u2640'; // female
-		else if('s' === message.gender) prefix = '\u26A7'; // trans
-		else if('c' === message.gender) prefix = '\u26A4'; // couple
-		else return message;
+		if('m' === event_msg.gender) prefix = '\u2642'; // male
+		else if('f' === event_msg.gender) prefix = '\u2640'; // female
+		else if('s' === event_msg.gender) prefix = '\u26A7'; // trans
+		else if('c' === event_msg.gender) prefix = '\u26A4'; // couple
+		else return event_msg;
 
-		message.m = prefix + ' ' + message.m.trim();
-		return message;
+		event_msg.m = prefix + ' ' + event_msg.m.trim();
+		return event_msg;
 	},
 
 	/**
 	 * Handle plain messages from users (non-commands); will pass through automods and decorators
-	 * @param {message} message The message that came in from the fired event
+	 * @param {message} event_msg The message that came in from the fired event
 	 * @returns {message} The updated message
 	 */
-	plaintext_handler: function(message) {
-		const txt_msg = message.m.trim();
+	plaintext_handler: function(event_msg) {
+		const txt_msg = event_msg.m.trim();
 
 		const automod_unicode_enabled = !FlexibleTipMenu.is_disabled('automod_unicode_flag');
 		if(automod_unicode_enabled && !FlexibleTipMenu.automod_unicode_validator(txt_msg)) {
-			message = FlexibleTipMenu.automod_plaintext(
-				message,
+			event_msg = FlexibleTipMenu.automod_plaintext(
+				event_msg,
 				'automod_unicode_flag',
 				'errmsg_automod_hidden',
 				'errmsg_automod_unicode'
@@ -1389,8 +1389,8 @@ const FlexibleTipMenu = {
 
 		const automod_links_enabled = !FlexibleTipMenu.is_disabled('automod_links_flag');
 		if(automod_links_enabled && specific_patterns.automod_link.test(txt_msg.replace(' ', ''))) {
-			message = FlexibleTipMenu.automod_plaintext(
-				message,
+			event_msg = FlexibleTipMenu.automod_plaintext(
+				event_msg,
 				'automod_links_flag',
 				'errmsg_automod_hidden',
 				'errmsg_automod_link'
@@ -1399,12 +1399,12 @@ const FlexibleTipMenu = {
 
 		const decorator_gender_enabled = !FlexibleTipMenu.is_disabled('decorator_gender_flag');
 		if(decorator_gender_enabled) {
-			message = FlexibleTipMenu.decorator_gender(message);
+			event_msg = FlexibleTipMenu.decorator_gender(event_msg);
 		}
 
-		message = FlexibleTipMenu.decorator_time(message);
+		event_msg = FlexibleTipMenu.decorator_time(event_msg);
 
-		return message;
+		return event_msg;
 	},
 
 	/**
@@ -1439,32 +1439,35 @@ const FlexibleTipMenu = {
 	/**
 	 * Handle commands from users;
 	 * This will hide the command itself in chat
-	 * @param {message} message The message that came in from the fired event
+	 * @param {message} event_msg The message that came in from the fired event
 	 * @returns {message} The updated message
 	 */
-	commands_handler: function(message) {
-		const txt_msg = message.m.trim();
+	commands_handler: function(event_msg) {
+		const txt_msg = event_msg.m.trim();
 		const txt_command = txt_msg.substring(1).trim();
+		event_msg = FlexibleTipMenu.hide_message(event_msg);
 
 		if(command_patterns.help.test(txt_command)) {
-			FlexibleTipMenu.show_commands_help(message.user);
+			FlexibleTipMenu.show_commands_help(event_msg.user);
 		}
 		else if(command_patterns.tip_menu.test(txt_command)) {
-			if(message.user === cb.room_slug || message.is_mod) {
+			if(event_msg.user === cb.room_slug || event_msg.is_mod) {
 				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_everyone'));
 			}
 			else {
-				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_single_user'), message.user);
+				FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_single_user'), event_msg.user);
 			}
 		}
 		else if(command_patterns.colors_sample.test(txt_command)) {
-			FlexibleTipMenu.show_colors_sample(message.user);
+			if(event_msg.user === cb.room_slug) {
+				FlexibleTipMenu.show_colors_sample(event_msg.user);
+			}
 		}
 		else {
 			// never mind
 		}
 
-		return FlexibleTipMenu.hide_message(message);
+		return event_msg;
 	},
 
 	/**
