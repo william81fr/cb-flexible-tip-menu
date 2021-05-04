@@ -135,21 +135,20 @@ const command_patterns = {
  * RegExp patterns used for label replacements before calling cb.sendNotice()
  */
 const label_patterns = {
-	amount: /\{AMOUNT\}/gi,
+	amount: /\{(:?AMOUNT|TK|TOKEN|TOKENS)\}/gi,
 	app_name: /\{APP\}/gi,
-	broadcaster_name: /\{BCASTER\}/gi,
+	broadcaster_name: /\{(:?BCASTER|BROADCASTER|SLUG|MODEL|SELF)\}/gi,
 	count: /\{COUNT\}/gi,
 	item_idx: /\{ITEMIDX\}/gi,
-	label: /\{LABEL\}/gi,
-	message: /\{MESSAGE\}/gi,
-	menu: /\{MENU\}/gi,
+	label: /\{(:?LBL|LABEL)\}/gi,
+	message: /\{(:?MSG|MESSAGE)\}/gi,
+	menu: /\{(:?MENU|TIPMENU)\}/gi,
 	menu_idx: /\{MENUIDX\}/gi,
 	service_name: /\{SERVICE\}/gi,
 	setting_name: /\{SETTING\}/gi,
-	setting_value: /\{VALUE\}/gi,
+	setting_value: /\{(:?VALUE|VAL)\}/gi,
 	time: /\{TIME\}/gi,
-	tipper_handle: /\{TIPPER\}/gi,
-	username: /\{USER\}/gi,
+	username: /\{(:?USER|USERNAME|TIPPER|HANDLE|NICK|NICKNAME)\}/gi,
 	varname: /\{VARNAME\}/gi,
 	visibility: /\{VISIBILITY\}/gi,
 };
@@ -198,17 +197,17 @@ const settings_list = {
 	automods_record_flag: 'automodsRecordFlag',
 	decorator_gender_flag: 'debugmessage decoratorGenderFlag',
 	decorator_time_flag: 'debugmessage decoratorTimeFlag',
-	autothank_flag: 'debugmessage autothankFlag',
-	autothank_above_tokens: 'autothankAboveTokens',
-	autothank_publicly_background_color: 'autothankPubliclyBackgroundColor',
-	autothank_publicly_text_color: 'autothankPubliclyTextColor',
-	autothank_publicly_boldness: 'autothankPubliclyBoldness',
-	autothank_publicly_format: 'successmessage autothankPubliclyFormat',
-	autothank_privately_background_color: 'autothankPrivatelyBackgroundColor',
-	autothank_privately_text_color: 'autothankPrivatelyTextColor',
-	autothank_privately_boldness: 'autothankPrivatelyBoldness',
-	autothank_privately_format: 'successmessage autothankPrivatelyFormat',
-	autothank_remind_tip_note_format: 'successmessage autothankRemindTipNoteFormat',
+	autothank_tip_flag: 'debugmessage autothankTipFlag',
+	autothank_tip_above_tokens: 'autothankTipAboveTokens',
+	autothank_tip_publicly_background_color: 'autothankTipPubliclyBackgroundColor',
+	autothank_tip_publicly_text_color: 'autothankTipPubliclyTextColor',
+	autothank_tip_publicly_boldness: 'autothankTipPubliclyBoldness',
+	autothank_tip_publicly_format: 'successmessage autothankTipPubliclyFormat',
+	autothank_tip_privately_background_color: 'autothankTipPrivatelyBackgroundColor',
+	autothank_tip_privately_text_color: 'autothankTipPrivatelyTextColor',
+	autothank_tip_privately_boldness: 'autothankTipPrivatelyBoldness',
+	autothank_tip_privately_format: 'successmessage autothankTipPrivatelyFormat',
+	autothank_tip_remind_note_format: 'successmessage autothankTipRemindTipNoteFormat',
 	tip_menu_flag: 'debugmessage tipMenuShownTo',
 	tip_menu_header: 'tipMenuHeader',
 	tip_menu_footer: 'tipMenuFooter',
@@ -243,17 +242,17 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
-		autothank_flag: "AUTOMATICALLY THANK TIPPERS ----------------------",
-		autothank_above_tokens: "Only tips above this limit will get a thank you",
-		autothank_publicly_background_color: "Background color for the public thanks (hexa code)",
-		autothank_publicly_text_color: "Text color for the public thanks (hexa code)",
-		autothank_publicly_boldness: "Text thickness for the public thanks",
-		autothank_publicly_format: "Template for the public thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE}) - english recommended",
-		autothank_privately_background_color: "Background color for the private thanks (hexa code)",
-		autothank_privately_text_color: "Text color for the private thanks (hexa code)",
-		autothank_privately_boldness: "Text thickness for the private thanks",
-		autothank_privately_format: "Template for the private thanks (variables are: {TIPPER}, {AMOUNT}, {SERVICE}) - english recommended",
-		autothank_remind_tip_note_format: "Template for the tip note reminder (variables are: {MESSAGE}) - english recommended",
+		autothank_tip_flag: "AUTOMATICALLY THANK TIPPERS ----------------------",
+		autothank_tip_above_tokens: "Only tips above this limit will get a thank you",
+		autothank_tip_publicly_background_color: "Background color for the public thanks (hexa code)",
+		autothank_tip_publicly_text_color: "Text color for the public thanks (hexa code)",
+		autothank_tip_publicly_boldness: "Text thickness for the public thanks",
+		autothank_tip_publicly_format: "Template for the public thanks (variables are: {USER}, {AMOUNT}, {SERVICE}) - english recommended",
+		autothank_tip_privately_background_color: "Background color for the private thanks (hexa code)",
+		autothank_tip_privately_text_color: "Text color for the private thanks (hexa code)",
+		autothank_tip_privately_boldness: "Text thickness for the private thanks",
+		autothank_tip_privately_format: "Template for the private thanks (variables are: {USER}, {AMOUNT}, {SERVICE}) - english recommended",
+		autothank_tip_remind_note_format: "Template for the tip note reminder (variables are: {MESSAGE}) - english recommended",
 		tip_menu_flag: "TIP MENU {MENU} ----------------------",
 		tip_menu_header: "Line before the tip menu {MENU}",
 		tip_menu_footer: "Line at the end of the tip menu {MENU}",
@@ -284,10 +283,10 @@ const i18n = {
 		lbl_inline_spacing_both: "before + after",
 		lbl_sort_amount_asc: "lowest to highest price",
 		lbl_sort_amount_desc: "highest to lowest price",
-		expl_autothank_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
-		expl_autothank_privately_format_recommend_english: "Thank you {TIPPER} for your {AMOUNT}tk tip",
-		expl_autothank_remind_tip_note_format_recommend_english: "Your tip note was: {MESSAGE}",
-		expl_menu_item_display_format_recommend_english: "{LABEL} ({AMOUNT}tk)",
+		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
+		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
+		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' in {APP} {LABEL} (currently valued at '{VALUE}')",
 		errmsg_app_disabled: "app is disabled",
 		errmsg_app_errors: "has errors: app is stopped",
@@ -305,9 +304,10 @@ const i18n = {
 		errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
 		errmsg_automod_unicode: 'disallowed text',
 		errmsg_automod_link: 'link attempt',
-		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
-		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
-		expl_commands_colorslist_recommend_english: "/colors or /colorslist -- Display a list of color codes",
+		expl_commands_available: "Available commands for {LABEL}:",
+		expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
+		expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
+		errlbl_command_not_recognized: "[{APP}] Your command was not recognized.\nReminder: any message that starts with '/' or '!' is handled as a command for this bot.",
 	},
 	es: {
 		app_name: "OPCIONES GLOBALES ---------------------- Nombre de la aplicacion",
@@ -323,17 +323,17 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
-		autothank_flag: "MODULO AGRADECIMIENTOS ----------------------",
-		autothank_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
-		autothank_publicly_background_color: "Color de fondo para las gracias en publico (codigo hexa)",
-		autothank_publicly_text_color: "Color del texto para las gracias en publico (codigo hexa)",
-		autothank_publicly_boldness: "Grosor de la letra para las gracias en publico",
-		autothank_publicly_format: "Modelo del mensaje para las gracias en publico (variables son: {TIPPER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
-		autothank_privately_background_color: "Color de fondo para las gracias en privado (codigo hexa)",
-		autothank_privately_text_color: "Color del texto para las gracias en privado (codigo hexa)",
-		autothank_privately_boldness: "Grosor de la letra para las gracias en privado",
-		autothank_privately_format: "Modelo del mensaje para las gracias en privado (variables son: {TIPPER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
-		autothank_remind_tip_note_format: "Modelo del mensaje para el recordatorio de tip note (variables son: {MESSAGE}) - Ingles recommendado",
+		autothank_tip_flag: "MODULO AGRADECIMIENTOS ----------------------",
+		autothank_tip_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
+		autothank_tip_publicly_background_color: "Color de fondo para las gracias en publico (codigo hexa)",
+		autothank_tip_publicly_text_color: "Color del texto para las gracias en publico (codigo hexa)",
+		autothank_tip_publicly_boldness: "Grosor de la letra para las gracias en publico",
+		autothank_tip_publicly_format: "Modelo del mensaje para las gracias en publico (variables son: {USER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
+		autothank_tip_privately_background_color: "Color de fondo para las gracias en privado (codigo hexa)",
+		autothank_tip_privately_text_color: "Color del texto para las gracias en privado (codigo hexa)",
+		autothank_tip_privately_boldness: "Grosor de la letra para las gracias en privado",
+		autothank_tip_privately_format: "Modelo del mensaje para las gracias en privado (variables son: {USER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
+		autothank_tip_remind_note_format: "Modelo del mensaje para el recordatorio de tip note (variables son: {MESSAGE}) - Ingles recommendado",
 		tip_menu_flag: "MENU DE TIPS {MENU} ----------------------",
 		tip_menu_header: "Linea antes del menu de tips {MENU}",
 		tip_menu_footer: "Linea despues del menu de tips {MENU}",
@@ -364,10 +364,10 @@ const i18n = {
 		lbl_inline_spacing_both: "antes + despues",
 		lbl_sort_amount_asc: "del precio mas bajo al mas alto",
 		lbl_sort_amount_desc: "del precio mas alto al mas bajo",
-		expl_autothank_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
-		expl_autothank_privately_format_recommend_english: "Thank you {TIPPER} for your {AMOUNT}tk tip",
-		expl_autothank_remind_tip_note_format_recommend_english: "Your tip note was: {MESSAGE}",
-		expl_menu_item_display_format_recommend_english: "{LABEL} ({AMOUNT}tk)",
+		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
+		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
+		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' en {APP} {LABEL} (actualmente vale '{VALUE}')",
 		errmsg_app_disabled: "el bot esta desactivado",
 		errmsg_app_errors: "hay errores: el bot esta parado",
@@ -385,9 +385,10 @@ const i18n = {
 		errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
 		errmsg_automod_unicode: 'disallowed text',
 		errmsg_automod_link: 'link attempt',
-		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
-		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
-		expl_commands_colorslist_recommend_english: "/colors or /colorslist -- Display a list of color codes",
+		expl_commands_available: "Available commands for {LABEL}:",
+		expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
+		expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
+		errlbl_command_not_recognized: "[{APP}] Su comando no ha funcionado.\nRecordatorio: todo mensaje que empieza por '/' o '!' se entiende como un comando por este bot.",
 	},
 	fr: {
 		app_name: "PARAMETRES GENERAUX ---------------------- Nom de l'aplication",
@@ -403,17 +404,17 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
-		autothank_flag: "MODULE REMERCIEMENTS ----------------------",
-		autothank_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
-		autothank_publicly_background_color: "Couleur de fond pour les remerciements en public (code hexa)",
-		autothank_publicly_text_color: "Couleur du texte pour les remerciements en public (code hexa)",
-		autothank_publicly_boldness: "Epaisseur du texte pour les remerciements en public",
-		autothank_publicly_format: "Modele du message pour les remerciements en public (variables sont : {TIPPER}, {AMOUNT}, {SERVICE}) - anglais recommande",
-		autothank_privately_background_color: "Couleur de fond pour les remerciements prives (code hexa)",
-		autothank_privately_text_color: "Couleur du texte pour les remerciements prives (code hexa)",
-		autothank_privately_boldness: "Epaisseur du texte pour les remerciements prives",
-		autothank_privately_format: "Modele du message pour les remerciements prives (variables sont : {TIPPER}, {AMOUNT}, {SERVICE}) - anglais recommande",
-		autothank_remind_tip_note_format: "Modele du message pour le rappel de tip note (variables sont : {MESSAGE}) - anglais recommande",
+		autothank_tip_flag: "MODULE REMERCIEMENTS ----------------------",
+		autothank_tip_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
+		autothank_tip_publicly_background_color: "Couleur de fond pour les remerciements en public (code hexa)",
+		autothank_tip_publicly_text_color: "Couleur du texte pour les remerciements en public (code hexa)",
+		autothank_tip_publicly_boldness: "Epaisseur du texte pour les remerciements en public",
+		autothank_tip_publicly_format: "Modele du message pour les remerciements en public (variables sont : {USER}, {AMOUNT}, {SERVICE}) - anglais recommande",
+		autothank_tip_privately_background_color: "Couleur de fond pour les remerciements prives (code hexa)",
+		autothank_tip_privately_text_color: "Couleur du texte pour les remerciements prives (code hexa)",
+		autothank_tip_privately_boldness: "Epaisseur du texte pour les remerciements prives",
+		autothank_tip_privately_format: "Modele du message pour les remerciements prives (variables sont : {USER}, {AMOUNT}, {SERVICE}) - anglais recommande",
+		autothank_tip_remind_note_format: "Modele du message pour le rappel de tip note (variables sont : {MESSAGE}) - anglais recommande",
 		tip_menu_flag: "MENU DE TIPS {MENU} ----------------------",
 		tip_menu_header: "Ligne avant le menu de tips {MENU}",
 		tip_menu_footer: "Ligne apres le menu de tips {MENU}",
@@ -444,10 +445,10 @@ const i18n = {
 		lbl_inline_spacing_both: "avant + apres",
 		lbl_sort_amount_asc: "du prix le plus faible au plus eleve",
 		lbl_sort_amount_desc: "du prix le plus eleve au plus faible",
-		expl_autothank_publicly_format_recommend_english: "{TIPPER} tipped {AMOUNT} for {SERVICE}",
-		expl_autothank_privately_format_recommend_english: "Thank you {TIPPER} for your {AMOUNT}tk tip",
-		expl_autothank_remind_tip_note_format_recommend_english: "Your tip note was: {MESSAGE}",
-		expl_menu_item_display_format_recommend_english: "{LABEL} ({AMOUNT}tk)",
+		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
+		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
+		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' dans {APP} {LABEL} (vaut actuellement '{VALUE}')",
 		errmsg_app_disabled: "l'app est desactivee",
 		errmsg_app_errors: "a des erreurs : l'app est arretee",
@@ -465,9 +466,10 @@ const i18n = {
 		errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
 		errmsg_automod_unicode: 'disallowed text',
 		errmsg_automod_link: 'link attempt',
-		expl_commands_available_recommend_english: "Available commands for {LABEL}:",
-		expl_commands_tipmenu_recommend_english: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
-		expl_commands_colorslist_recommend_english: "/colors or /colorslist -- Display a list of color codes",
+		expl_commands_available: "Available commands for {LABEL}:",
+		expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
+		expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
+		errlbl_command_not_recognized: "[{APP}] Votre commande n'est pas reconnue.\nRappel : tout message commencant par '/' ou '!' est traite comme une commande par ce bot.",
 	},
 };
 
@@ -777,7 +779,7 @@ const FlexibleTipMenu = {
 	 * @returns {boolean} bool
 	 */
 	is_public_thanks: function() {
-		return FlexibleTipMenu.i18n('lbl_everyone') === FlexibleTipMenu.val('autothank_flag');
+		return FlexibleTipMenu.i18n('lbl_everyone') === FlexibleTipMenu.val('autothank_tip_flag');
 	},
 
 	/**
@@ -787,16 +789,16 @@ const FlexibleTipMenu = {
 	 * @returns {string} The message suitable for cb.sendNotice()
 	 */
 	get_thanks_notice: function(tip_amount, from_user) {
-		if(tip_amount <= FlexibleTipMenu.val('autothank_above_tokens')) {
+		if(tip_amount <= FlexibleTipMenu.val('autothank_tip_above_tokens')) {
 			return false;
 		}
 
 		let notice_tpl;
 		if(is_public_thanks()) {
-			notice_tpl = FlexibleTipMenu.val('autothank_publicly_format');
+			notice_tpl = FlexibleTipMenu.val('autothank_tip_publicly_format');
 		}
 		else {
-			notice_tpl = FlexibleTipMenu.val('autothank_privately_format');
+			notice_tpl = FlexibleTipMenu.val('autothank_tip_privately_format');
 		}
 
 		let notice = notice_tpl;
@@ -810,7 +812,7 @@ const FlexibleTipMenu = {
 		}
 
 		notice = notice.replace(label_patterns.amount, tip_amount);
-		notice = notice.replace(label_patterns.tipper_handle, from_user);
+		notice = notice.replace(label_patterns.username, from_user);
 		notice = notice.replace(label_patterns.broadcaster_name, cb.room_slug);
 		return notice;
 	},
@@ -819,19 +821,19 @@ const FlexibleTipMenu = {
 	 * Gets the formatted message to display as a user-specific notice to remind the tipper of their tip note
 	 * @param {string} tip_note
 	 */
-	get_autothank_remind_tip_note_notice: function(tip_note) {
+	get_autothank_tip_remind_note_notice: function(tip_note) {
 		let res;
 		if('' === tip_note) {
 			res = false;
 		}
-		else if (!FlexibleTipMenu.val('autothank_remind_tip_note_format')) {
+		else if (!FlexibleTipMenu.val('autothank_tip_remind_note_format')) {
 			res = false;
 		}
-		else if(!FlexibleTipMenu.val('autothank_remind_tip_note_format').match(label_patterns.message)) {
+		else if(!FlexibleTipMenu.val('autothank_tip_remind_note_format').match(label_patterns.message)) {
 			res = false;
 		}
 		else {
-			res = FlexibleTipMenu.val('autothank_remind_tip_note_format')
+			res = FlexibleTipMenu.val('autothank_tip_remind_note_format')
 				.replace(label_patterns.message, tip_note)
 				.replace(label_patterns.broadcaster_name, cb.room_slug);
 		}
@@ -856,22 +858,22 @@ const FlexibleTipMenu = {
 			// never mind
 		}
 		else if(FlexibleTipMenu.is_public_thanks()) {
-			background_color = FlexibleTipMenu.get_color_code('autothank_publicly_background_color', colors_sample.white);
-			text_color = FlexibleTipMenu.get_color_code('autothank_publicly_text_color', colors_sample.black);
-			cb.sendNotice(msg, '', background_color, text_color, FlexibleTipMenu.val('autothank_publicly_boldness'));
+			background_color = FlexibleTipMenu.get_color_code('autothank_tip_publicly_background_color', colors_sample.white);
+			text_color = FlexibleTipMenu.get_color_code('autothank_tip_publicly_text_color', colors_sample.black);
+			cb.sendNotice(msg, '', background_color, text_color, FlexibleTipMenu.val('autothank_tip_publicly_boldness'));
 		}
 		else {
-			background_color = FlexibleTipMenu.get_color_code('autothank_privately_background_color', colors_sample.white);
-			text_color = FlexibleTipMenu.get_color_code('autothank_privately_text_color', colors_sample.black);
-			cb.sendNotice(msg, from_user, background_color, text_color, FlexibleTipMenu.val('autothank_privately_boldness'));
+			background_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_background_color', colors_sample.white);
+			text_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_text_color', colors_sample.black);
+			cb.sendNotice(msg, from_user, background_color, text_color, FlexibleTipMenu.val('autothank_tip_privately_boldness'));
 		}
 
-		const private_notice = FlexibleTipMenu.get_autothank_remind_tip_note_notice(tip_note);
+		const private_notice = FlexibleTipMenu.get_autothank_tip_remind_note_notice(tip_note);
 		const private_msg = FlexibleTipMenu.clean_str(private_notice);
 		if(private_msg) {
-			background_color = FlexibleTipMenu.get_color_code('autothank_privately_background_color', colors_sample.white);
-			text_color = FlexibleTipMenu.get_color_code('autothank_privately_text_color', colors_sample.black);
-			cb.sendNotice(private_msg, from_user, background_color, text_color, FlexibleTipMenu.val('autothank_privately_boldness'));
+			background_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_background_color', colors_sample.white);
+			text_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_text_color', colors_sample.black);
+			cb.sendNotice(private_msg, from_user, background_color, text_color, FlexibleTipMenu.val('autothank_tip_privately_boldness'));
 		}
 	},
 
@@ -995,9 +997,9 @@ const FlexibleTipMenu = {
 	 */
 	show_commands_help: function(username, usergroup = null) {
 		let commands_list = [];
-		commands_list.push(FlexibleTipMenu.i18n('expl_commands_available_recommend_english'));
-		commands_list.push(FlexibleTipMenu.i18n('expl_commands_tipmenu_recommend_english'));
-		commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist_recommend_english'));
+		commands_list.push(FlexibleTipMenu.i18n('expl_commands_available'));
+		commands_list.push(FlexibleTipMenu.i18n('expl_commands_tipmenu'));
+		commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist'));
 
 		const notice = FlexibleTipMenu.clean_str(commands_list.join("\n"));
 		cb.sendNotice(notice, username, colors_sample.black, colors_sample.white, '', usergroup);
@@ -1437,6 +1439,18 @@ const FlexibleTipMenu = {
 	},
 
 	/**
+	 * Notice to the user that their command was not recognized, and their message hidden
+	 * @param {string} username
+	 */
+	show_command_error: function(username) {
+		const errlbl_tpl = FlexibleTipMenu.i18n('errlbl_command_not_recognized');
+		const errlbl_notice = FlexibleTipMenu.clean_str(errlbl_tpl);
+		cb.setTimeout(function() {
+			cb.sendNotice(errlbl_notice, username);
+		}, 200 * ++i);
+	},
+
+	/**
 	 * Handle commands from users;
 	 * This will hide the command itself in chat
 	 * @param {message} event_msg The message that came in from the fired event
@@ -1445,6 +1459,7 @@ const FlexibleTipMenu = {
 	commands_handler: function(event_msg) {
 		const txt_msg = event_msg.m.trim();
 		const txt_command = txt_msg.substring(1).trim();
+
 		event_msg = FlexibleTipMenu.hide_message(event_msg);
 
 		if(command_patterns.help.test(txt_command)) {
@@ -1462,9 +1477,12 @@ const FlexibleTipMenu = {
 			if(event_msg.user === cb.room_slug) {
 				FlexibleTipMenu.show_colors_sample(event_msg.user);
 			}
+			else {
+				FlexibleTipMenu.show_command_error(event_msg.user);
+			}
 		}
 		else {
-			// never mind
+			FlexibleTipMenu.show_command_error(event_msg.user);
 		}
 
 		return event_msg;
@@ -1618,8 +1636,8 @@ cb.settings_choices.push({
 
 // autothank module
 cb.settings_choices.push({
-	name: settings_list.autothank_flag,
-	label: ftm.i18n('autothank_flag'),
+	name: settings_list.autothank_tip_flag,
+	label: ftm.i18n('autothank_tip_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
 	choice2: ftm.i18n('lbl_everyone'),
@@ -1629,8 +1647,8 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_above_tokens,
-	label: ftm.i18n('autothank_above_tokens'),
+	name: settings_list.autothank_tip_above_tokens,
+	label: ftm.i18n('autothank_tip_above_tokens'),
 	type: 'int',
 	minValue: 1,
 	maxValue: 999999,
@@ -1638,8 +1656,8 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_publicly_background_color,
-	label: ftm.i18n('autothank_publicly_background_color'),
+	name: settings_list.autothank_tip_publicly_background_color,
+	label: ftm.i18n('autothank_tip_publicly_background_color'),
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
@@ -1647,8 +1665,8 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_publicly_text_color,
-	label: ftm.i18n('autothank_publicly_text_color'),
+	name: settings_list.autothank_tip_publicly_text_color,
+	label: ftm.i18n('autothank_tip_publicly_text_color'),
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
@@ -1656,8 +1674,8 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_publicly_boldness,
-	label: ftm.i18n('autothank_publicly_boldness'),
+	name: settings_list.autothank_tip_publicly_boldness,
+	label: ftm.i18n('autothank_tip_publicly_boldness'),
 	type: 'choice',
 	choice1: font_weights.normal,
 	choice2: font_weights.bold,
@@ -1666,17 +1684,17 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_publicly_format,
-	label: ftm.i18n('autothank_publicly_format'),
+	name: settings_list.autothank_tip_publicly_format,
+	label: ftm.i18n('autothank_tip_publicly_format'),
 	type: 'str',
 	minLength: 1,
 	maxLength: 99,
-	defaultValue: ftm.i18n('expl_autothank_publicly_format_recommend_english'),
+	defaultValue: ftm.i18n('expl_autothank_tip_publicly_format'),
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_privately_background_color,
-	label: ftm.i18n('autothank_privately_background_color'),
+	name: settings_list.autothank_tip_privately_background_color,
+	label: ftm.i18n('autothank_tip_privately_background_color'),
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
@@ -1684,8 +1702,8 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_privately_text_color,
-	label: ftm.i18n('autothank_privately_text_color'),
+	name: settings_list.autothank_tip_privately_text_color,
+	label: ftm.i18n('autothank_tip_privately_text_color'),
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
@@ -1693,8 +1711,8 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_privately_boldness,
-	label: ftm.i18n('autothank_privately_boldness'),
+	name: settings_list.autothank_tip_privately_boldness,
+	label: ftm.i18n('autothank_tip_privately_boldness'),
 	type: 'choice',
 	choice1: font_weights.normal,
 	choice2: font_weights.bold,
@@ -1703,21 +1721,21 @@ cb.settings_choices.push({
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_privately_format,
-	label: ftm.i18n('autothank_privately_format'),
+	name: settings_list.autothank_tip_privately_format,
+	label: ftm.i18n('autothank_tip_privately_format'),
 	type: 'str',
 	minLength: 1,
 	maxLength: 99,
-	defaultValue: ftm.i18n('expl_autothank_privately_format_recommend_english'),
+	defaultValue: ftm.i18n('expl_autothank_tip_privately_format'),
 });
 
 cb.settings_choices.push({
-	name: settings_list.autothank_remind_tip_note_format,
-	label: ftm.i18n('autothank_remind_tip_note_format'),
+	name: settings_list.autothank_tip_remind_note_format,
+	label: ftm.i18n('autothank_tip_remind_note_format'),
 	type: 'str',
 	minLength: 1,
 	maxLength: 99,
-	defaultValue: ftm.i18n('expl_autothank_remind_tip_note_format_recommend_english'),
+	defaultValue: ftm.i18n('expl_autothank_tip_remind_note_format'),
 });
 
 
@@ -1839,7 +1857,7 @@ for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 		type: 'str',
 		minLength: 1,
 		maxLength: 99,
-		defaultValue: ftm.i18n('expl_menu_item_display_format_recommend_english'),
+		defaultValue: ftm.i18n('expl_menu_item_display_format'),
 	});
 
 	cb.settings_choices.push({
@@ -1918,22 +1936,22 @@ else {
 // Start the autothank module
 //
 
-if(ftm.is_disabled('autothank_flag')) {
+if(ftm.is_disabled('autothank_tip_flag')) {
 	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
 	/**
 	cb.setTimeout(function () {
-		ftm.alert_error('autothank_flag', ftm.i18n('errmsg_thanks_module_disabled'), colors_sample.black, colors_sample.white);
+		ftm.alert_error('autothank_tip_flag', ftm.i18n('errmsg_thanks_module_disabled'), colors_sample.black, colors_sample.white);
 	}, 1000 * 2);
 	 */
 }
-else if(!ftm.check_template_format('autothank_publicly_format', ['TIPPER'])) {
+else if(!ftm.check_template_format('autothank_tip_publicly_format', ['USER'])) {
 	cb.setTimeout(function () {
-		ftm.alert_error('autothank_publicly_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
+		ftm.alert_error('autothank_tip_publicly_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
 	}, 1000 * 2);
 }
-else if(!ftm.check_template_format('autothank_privately_format', ['TIPPER'])) {
+else if(!ftm.check_template_format('autothank_tip_privately_format', ['USER'])) {
 	cb.setTimeout(function () {
-		ftm.alert_error('autothank_privately_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
+		ftm.alert_error('autothank_tip_privately_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
 	}, 1000 * 2);
 }
 else {
