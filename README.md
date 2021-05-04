@@ -15,7 +15,6 @@ Please feel free to [discuss improvements and issues on GitHub](https://github.c
 
 - **lang**: the language of the admin panel
 - **nb_of_menu_items**: the number of configurable menu items from the admin panel
-- **enable_thank_tippers**: enable/disable the "Thank Tippers" module of the app in the admin panel (its options will or will not be present in the admin panel depending on this); true to enable, or false to disable
 
 ## Global settings in the admin panel
 
@@ -53,10 +52,10 @@ Please feel free to [discuss improvements and issues on GitHub](https://github.c
 - **Sort order**: in which order to sort the items (can be disabled too)
 - **Menu item XYZ**: must start with a number followed by a text label; anything else will be ignored by the app (handy to disable an item temporarily); should allow for `:emoticon`s
 
-Examples of menu item display formats:
-- `{AMOUNT} tokens - {LABEL}`
-- `{LABEL} ({AMOUNT}tk)`
-- `tip {AMOUNT} tokens for: {LABEL}`
+Examples of menu item display formats (here an example where the service is a PM, for a cost of 25 tokens):
+- `{AMOUNT} tokens - {LABEL}` to send a notice like `25 tokens - PM`
+- `{LABEL} ({AMOUNT}tk)` to send a notice like `PM (25tk)`
+- `tip {AMOUNT} tokens for: {LABEL}` to send a notice like `tip 25 tokens for: PM`
 - simply write `{AMOUNT}` and `{LABEL}` anywhere in the box, with anything around them
 
-[1] Feel free to use [a tool like this one](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool) to pick your colors (focus on the "HEXA" label that changes as you click on different colors). This app accepts both lowercase and uppercase color codes, and the # symbol is not required at the start.
+[1] Feel free to use [a tool like this one](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool) to pick your colors (focus on the "HEXA" label that changes as you click on different colors). Flexible Tip Menu accepts both lowercase and uppercase color codes, and the # symbol is not required at the start.

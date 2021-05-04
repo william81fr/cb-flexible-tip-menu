@@ -29,7 +29,7 @@
 <p class="message">Please feel free to <a href="https://github.com/william81fr/cb-flexible-tip-menu" target="_blank" rel="noreferer noopener">discuss improvements and issues on GitHub</a> (or to read a proper changelog).</p>
 <p>&nbsp;</p>
 
-<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">A. Adding visuals to your notices</span></h2>
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Adding visuals to your notices</span></h2>
 <p>All text boxes in the admin panel can display graphics (if you choose to do so). There are two kinds of graphics:</p>
 <dl>
 	<dt><span class="block" style="font-weight: bold; padding: 0">Emoji &amp; the like</span></dt>
@@ -52,7 +52,7 @@
 	<dd>&nbsp;</dd>
 </dl>
 
-<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">B. Variables in the source code</span></h2>
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Variables in the source code</span></h2>
 <dl>
 	<dt><span class="block" style="font-weight: bold; padding: 0">lang</span></dt>
 	<dd>&middot; the language of the admin panel</dd>
@@ -63,13 +63,12 @@
 	<dd>&middot; the number of menu items that can be configured from the admin panel</dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">enable_thank_tippers</span></dt>
-	<dd>&middot; enable/disable the "Thank Tippers" module of the app (its options will or will not be present in the admin panel depending on this)</dd>
-	<dd>&middot; <span class="code">true</span> to enable, or <span class="code">false</span> to disable</dd>
+	<dt><span class="block" style="font-weight: bold; padding: 0">nb_of_menu_items</span></dt>
+	<dd>&middot; the number of menu items that can be configured from the admin panel</dd>
 	<dd>&nbsp;</dd>
 </dl>
 
-<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">C. Global settings in the admin panel</span></h2>
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Global settings in the admin panel</span></h2>
 <dl>
 	<dt><span class="block" style="font-weight: bold; padding: 0">App name</span></dt>
 	<dd>&middot; if set, this will be displayed in the chat at the top of the tip menu</dd>
@@ -85,7 +84,7 @@
 	<dd>&nbsp;</dd>
 </dl>
 
-<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">D. Thank Tippers module settings in the admin panel</span></h2>
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Thank Tippers module settings in the admin panel</span></h2>
 <dl>
 	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers above tokens</span></dt>
 	<dd>&middot; allows to avoid thanking every single low tip</dd>
@@ -139,7 +138,7 @@
 	<dd>&nbsp;</dd>
 </dl>
 
-<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">E. Tip Menu settings in the admin panel</span></h2>
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Tip Menu settings in the admin panel</span></h2>
 <dl>
 	<dt><span class="block" style="font-weight: bold; padding: 0">Tip menu shown to</span></dt>
 	<dd>&middot; whether to enable the tip menu at all, show it to everyone or to a subset of users</dd>
@@ -211,4 +210,12 @@
 	<dd>&nbsp;</dd>
 </dl>
 
-<p><span style="font-weight: bold">[1]</span> Feel free to use <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool" target="_blank" rel="noreferer noopener">a tool like this one</a> to pick your colors (focus on the "HEXA" label that changes as you click on different colors). This app accepts both lowercase and uppercase color codes, and the # symbol is not required at the start.</p>
+<dl>
+	<dt><span class="block">Examples of menu item display formats (here an example where the service is a PM, for a cost of 25 tokens):</span></dt>
+	<dd>&middot; <span class="code">{AMOUNT} tokens - {LABEL}</span></dd>
+	<dd>&middot; <span class="code">{LABEL} ({AMOUNT}tk)</span></dd>
+	<dd>&middot; <span class="code">tip {AMOUNT} tokens for: {LABEL}</span></dd>
+	<dd>&middot; simply write "<span class="code">{AMOUNT}</span>" and "<span class="code">{LABEL}</span>" anywhere in the box, and they will be replaced with the current menu item</dd>
+</dl>
+
+<p><span style="font-weight: bold">[1]</span> Feel free to use <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool" target="_blank" rel="noreferer noopener">a tool like this one</a> to pick your colors (focus on the "HEXA" label that changes as you click on different colors). Flexible Tip Menu accepts both lowercase and uppercase color codes, and the # symbol is not required at the start.</p>
