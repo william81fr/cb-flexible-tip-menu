@@ -197,6 +197,11 @@ const settings_list = {
 	automods_record_flag: 'automodsRecordFlag',
 	decorator_gender_flag: 'debugmessage decoratorGenderFlag',
 	decorator_time_flag: 'debugmessage decoratorTimeFlag',
+	autothank_follower_flag: 'debugmessage autothankFollowFlag',
+	autothank_follower_background_color: 'autothankFollowBackgroundColor',
+	autothank_follower_text_color: 'autothankFollowTextColor',
+	autothank_follower_boldness: 'autothankFollowBoldness',
+	autothank_follower_format: 'successmessage autothankFollowFormat',
 	autothank_tip_flag: 'debugmessage autothankTipFlag',
 	autothank_tip_above_tokens: 'autothankTipAboveTokens',
 	autothank_tip_publicly_background_color: 'autothankTipPubliclyBackgroundColor',
@@ -207,7 +212,8 @@ const settings_list = {
 	autothank_tip_privately_text_color: 'autothankTipPrivatelyTextColor',
 	autothank_tip_privately_boldness: 'autothankTipPrivatelyBoldness',
 	autothank_tip_privately_format: 'successmessage autothankTipPrivatelyFormat',
-	autothank_tip_remind_note_format: 'successmessage autothankTipRemindTipNoteFormat',
+	autothank_tip_remind_note_format: 'successmessage autothankTipRemindNoteFormat',
+	autothank_tip_remind_note_flag: 'autothankTipRemindNoteFlag',
 	tip_menu_flag: 'debugmessage tipMenuShownTo',
 	tip_menu_header: 'tipMenuHeader',
 	tip_menu_footer: 'tipMenuFooter',
@@ -242,6 +248,11 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
+		autothank_follower_flag: 'AUTOMATICALLY THANK FOLLOWERS ----------------------',
+		autothank_follower_background_color: 'Background color (hexa code)',
+		autothank_follower_text_color: 'Text color (hexa code)',
+		autothank_follower_boldness: 'Text thickness',
+		autothank_follower_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
 		autothank_tip_flag: "AUTOMATICALLY THANK TIPPERS ----------------------",
 		autothank_tip_above_tokens: "Only tips above this limit will get a thank you",
 		autothank_tip_publicly_background_color: "Background color for the public thanks (hexa code)",
@@ -252,6 +263,7 @@ const i18n = {
 		autothank_tip_privately_text_color: "Text color for the private thanks (hexa code)",
 		autothank_tip_privately_boldness: "Text thickness for the private thanks",
 		autothank_tip_privately_format: "Template for the private thanks (variables are: {USER}, {AMOUNT}, {SERVICE}) - english recommended",
+		autothank_tip_remind_note_flag: 'Whether to repeat the tip note back to the user',
 		autothank_tip_remind_note_format: "Template for the tip note reminder (variables are: {MESSAGE}) - english recommended",
 		tip_menu_flag: "TIP MENU {MENU} ----------------------",
 		tip_menu_header: "Line before the tip menu {MENU}",
@@ -277,12 +289,15 @@ const i18n = {
 		lbl_fans: "fans + moderators + broadcaster",
 		lbl_everyone: "everyone in chat",
 		lbl_single_user: "user only in chat",
+		lbl_user_bcaster: 'user + broadcaster',
+		lbl_user_mods: 'user + mods + broadcaster',
 		lbl_not_applicable: "n/a (disabled)",
 		lbl_inline_spacing_before: "before",
 		lbl_inline_spacing_after: "after",
 		lbl_inline_spacing_both: "before + after",
 		lbl_sort_amount_asc: "lowest to highest price",
 		lbl_sort_amount_desc: "highest to lowest price",
+		expl_autothank_follower_format: "Thanks for following me {USER}!",
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
@@ -323,6 +338,11 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
+		autothank_follower_flag: 'AUTOMATICALLY THANK FOLLOWERS ----------------------',
+		autothank_follower_background_color: 'Background color (hexa code)',
+		autothank_follower_text_color: 'Text color (hexa code)',
+		autothank_follower_boldness: 'Text thickness',
+		autothank_follower_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
 		autothank_tip_flag: "MODULO AGRADECIMIENTOS ----------------------",
 		autothank_tip_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
 		autothank_tip_publicly_background_color: "Color de fondo para las gracias en publico (codigo hexa)",
@@ -333,6 +353,7 @@ const i18n = {
 		autothank_tip_privately_text_color: "Color del texto para las gracias en privado (codigo hexa)",
 		autothank_tip_privately_boldness: "Grosor de la letra para las gracias en privado",
 		autothank_tip_privately_format: "Modelo del mensaje para las gracias en privado (variables son: {USER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
+		autothank_tip_remind_note_flag: 'Whether to repeat the tip note back to the user',
 		autothank_tip_remind_note_format: "Modelo del mensaje para el recordatorio de tip note (variables son: {MESSAGE}) - Ingles recommendado",
 		tip_menu_flag: "MENU DE TIPS {MENU} ----------------------",
 		tip_menu_header: "Linea antes del menu de tips {MENU}",
@@ -358,12 +379,15 @@ const i18n = {
 		lbl_fans: "fans + mods + streamer",
 		lbl_everyone: "todo el mundo en el chat",
 		lbl_single_user: "solo el usuario en el chat",
+		lbl_user_bcaster: 'user + broadcaster',
+		lbl_user_mods: 'user + mods + broadcaster',
 		lbl_not_applicable: "n/a (desactivar)",
 		lbl_inline_spacing_before: "antes",
 		lbl_inline_spacing_after: "despues",
 		lbl_inline_spacing_both: "antes + despues",
 		lbl_sort_amount_asc: "del precio mas bajo al mas alto",
 		lbl_sort_amount_desc: "del precio mas alto al mas bajo",
+		expl_autothank_follower_format: "Thanks for following me {USER}!",
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
@@ -404,6 +428,11 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
+		autothank_follower_flag: 'AUTOMATICALLY THANK FOLLOWERS ----------------------',
+		autothank_follower_background_color: 'Background color (hexa code)',
+		autothank_follower_text_color: 'Text color (hexa code)',
+		autothank_follower_boldness: 'Text thickness',
+		autothank_follower_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
 		autothank_tip_flag: "MODULE REMERCIEMENTS ----------------------",
 		autothank_tip_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
 		autothank_tip_publicly_background_color: "Couleur de fond pour les remerciements en public (code hexa)",
@@ -414,6 +443,7 @@ const i18n = {
 		autothank_tip_privately_text_color: "Couleur du texte pour les remerciements prives (code hexa)",
 		autothank_tip_privately_boldness: "Epaisseur du texte pour les remerciements prives",
 		autothank_tip_privately_format: "Modele du message pour les remerciements prives (variables sont : {USER}, {AMOUNT}, {SERVICE}) - anglais recommande",
+		autothank_tip_remind_note_flag: 'Whether to repeat the tip note back to the user',
 		autothank_tip_remind_note_format: "Modele du message pour le rappel de tip note (variables sont : {MESSAGE}) - anglais recommande",
 		tip_menu_flag: "MENU DE TIPS {MENU} ----------------------",
 		tip_menu_header: "Ligne avant le menu de tips {MENU}",
@@ -439,12 +469,15 @@ const i18n = {
 		lbl_fans: "fans + mods + streameur",
 		lbl_everyone: "tout le monde dans le chat",
 		lbl_single_user: "utilisateur uniquement dans le chat",
+		lbl_user_bcaster: 'user + broadcaster',
+		lbl_user_mods: 'user + mods + broadcaster',
 		lbl_not_applicable: "n/a (desactiver)",
 		lbl_inline_spacing_before: "avant",
 		lbl_inline_spacing_after: "apres",
 		lbl_inline_spacing_both: "avant + apres",
 		lbl_sort_amount_asc: "du prix le plus faible au plus eleve",
 		lbl_sort_amount_desc: "du prix le plus eleve au plus faible",
+		expl_autothank_follower_format: "Thanks for following me {USER}!",
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
@@ -519,30 +552,16 @@ const FlexibleTipMenu = {
 		const cfg_setting_name = FlexibleTipMenu.i18n(cfg_name);
 		const setting_name = (null === cfg_setting_name) ? cfg_name : cfg_setting_name;
 		const setting_value = FlexibleTipMenu.val(cfg_name);
-		const msg = FlexibleTipMenu.i18n('errmsg_format')
+		const notice_raw = FlexibleTipMenu.i18n('errmsg_format')
 			.replace(label_patterns.app_name, cfg_app_name ? cfg_app_name : default_app_name)
 			.replace(label_patterns.broadcaster_name, cb.room_slug)
 			.replace(label_patterns.label, error_lbl)
 			.replace(label_patterns.setting_value, setting_value)
 			.replace(label_patterns.setting_name, setting_name);
 
-		if(!shown_errors.includes(msg)) {
-			switch(FlexibleTipMenu.val('errors_flag')) {
-				case 'broadcaster': // pass through
-				case FlexibleTipMenu.i18n('lbl_broadcaster'):
-					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder);
-				break;
-
-				case FlexibleTipMenu.i18n('lbl_mods'):
-					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder);
-					cb.sendNotice(msg, cb.room_slug, bg_color, txt_color, font_weights.bolder, user_groups.mods);
-				break;
-
-				default:
-					// never mind
-			}
-
-			shown_errors.push(msg);
+		if(!shown_errors.includes(notice_raw)) {
+			FlexibleTipMenu.send_notice(notice_raw, cb.room_slug, bg_color, txt_color, font_weights.bolder, 'errors_flag', 100);
+			shown_errors.push(notice_raw);
 		}
 	},
 
@@ -704,38 +723,7 @@ const FlexibleTipMenu = {
 			tip_menu_flag = FlexibleTipMenu.val('tip_menu_flag');
 		}
 
-		switch(tip_menu_flag) {
-			case 'broadcaster': // pass through
-			case FlexibleTipMenu.i18n('lbl_broadcaster'):
-				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // only to the broadcaster
-			break;
-
-			case FlexibleTipMenu.i18n('lbl_everyone'):
-				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness);
-			break;
-
-			case FlexibleTipMenu.i18n('lbl_fans'):
-				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.fans); // send notice only to group
-				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.mods); // also to mods
-				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
-			break;
-
-			case FlexibleTipMenu.i18n('lbl_group_havetk'):
-			case FlexibleTipMenu.i18n('lbl_group_50tk'):
-			case FlexibleTipMenu.i18n('lbl_group_250tk'):
-			case FlexibleTipMenu.i18n('lbl_group_1000tk'):
-				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.have_tk); // send notice only to group
-				cb.sendNotice(tip_menu_str, '', background_color, text_color, menu_boldness, user_groups.mods); // also to mods
-				cb.sendNotice(tip_menu_str, cb.room_slug, background_color, text_color, menu_boldness); // also to the broadcaster for good measure
-			break;
-
-			case FlexibleTipMenu.i18n('lbl_single_user'):
-				cb.sendNotice(tip_menu_str, username, background_color, text_color, menu_boldness); // send notice only to username who asked for it
-			break;
-
-			default:
-				// never mind
-		}
+		FlexibleTipMenu.send_notice(tip_menu_str, username, background_color, text_color, menu_boldness, 'tip_menu_flag', 1000);
 	},
 
 	/**
@@ -775,26 +763,18 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Whether the thanks module displays public or user-specific notices
-	 * @returns {boolean} bool
-	 */
-	is_public_thanks: function() {
-		return FlexibleTipMenu.i18n('lbl_everyone') === FlexibleTipMenu.val('autothank_tip_flag');
-	},
-
-	/**
 	 * Gets the formatted notice to display in the chat for a tip
 	 * @param {integer} tip_amount
 	 * @param {string} from_user
 	 * @returns {string} The message suitable for cb.sendNotice()
 	 */
-	get_thanks_notice: function(tip_amount, from_user) {
+	get_autothank_tip_notice: function(tip_amount, from_user) {
 		if(tip_amount <= FlexibleTipMenu.val('autothank_tip_above_tokens')) {
 			return false;
 		}
 
 		let notice_tpl;
-		if(is_public_thanks()) {
+		if(FlexibleTipMenu.i18n('lbl_everyone') === FlexibleTipMenu.val('autothank_tip_flag')()) {
 			notice_tpl = FlexibleTipMenu.val('autothank_tip_publicly_format');
 		}
 		else {
@@ -813,7 +793,6 @@ const FlexibleTipMenu = {
 
 		notice = notice.replace(label_patterns.amount, tip_amount);
 		notice = notice.replace(label_patterns.username, from_user);
-		notice = notice.replace(label_patterns.broadcaster_name, cb.room_slug);
 		return notice;
 	},
 
@@ -826,10 +805,10 @@ const FlexibleTipMenu = {
 		if('' === tip_note) {
 			res = false;
 		}
-		else if (!FlexibleTipMenu.val('autothank_tip_remind_note_format')) {
+		else if (!FlexibleTipMenu.val('autothank_tip_remind_note_format').trim()) {
 			res = false;
 		}
-		else if(!FlexibleTipMenu.val('autothank_tip_remind_note_format').match(label_patterns.message)) {
+		else if(!label_patterns.message.test(FlexibleTipMenu.val('autothank_tip_remind_note_format'))) {
 			res = false;
 		}
 		else {
@@ -842,39 +821,206 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Displays a notice to thank the tipper
-	 * @param {integer} tip_amount
-	 * @param {string} from_user
-	 * @param {string} tip_note
+	 * Gets the formatted notice to display in the chat for a new follow
+	 * @param {sring} username The name of the user
+	 * @returns {string} The message suitable for cb.sendNotice()
 	 */
-	thank_tipper: function(tip_amount, from_user, tip_note) {
-		let background_color;
-		let text_color;
+	get_autothank_follower_notice: function(username) {
+		const notice_tpl = FlexibleTipMenu.val('autothank_follower_format');
 
-		const notice = FlexibleTipMenu.get_thanks_notice(tip_amount, from_user);
-		const msg = FlexibleTipMenu.clean_str(notice);
+		let notice_raw = notice_tpl;
+		notice_raw = notice_raw.replace(label_patterns.username, username);
 
-		if(!msg) {
+		return notice_raw;
+	},
+
+	/**
+	 * Sends a notice in chat, to relevant users or groups, according to the module's verbosity and visibility settings
+	 * @param {string} notice_tpl
+	 * @param {string} username
+	 * @param {string} bgcolor
+	 * @param {string} txtcolor
+	 * @param {string} boldness
+	 * @param {string} cfg_flag_name
+	 * @param {integer} delay_ms
+	 * @param {user} user
+	 */
+	send_notice: function(notice_tpl, username, bgcolor, txtcolor, boldness, cfg_flag_name, delay_ms, user) {
+		if(!notice_tpl) {
+			return;
+		}
+
+		if(!delay_ms || delay_ms < 0) {
+			delay_ms = 100;
+		}
+
+
+		const decorator_time_enabled = !FlexibleTipMenu.is_disabled('decorator_time_flag');
+		if(decorator_time_enabled) {
+			// applies to everyone
+			notice_tpl = FlexibleTipMenu.decorator_time(notice_tpl);
+		}
+
+
+		let broadcaster_notice_tpl = notice_tpl;
+		let public_notice_tpl = notice_tpl;
+
+		switch(FlexibleTipMenu.val('decorator_gender_flag')) {
+			// broadcaster may get a different version than the rest of the room
+			case FlexibleTipMenu.i18n('lbl_broadcaster'):
+				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, user.user, user.gender);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_everyone'):
+				public_notice_tpl = FlexibleTipMenu.decorator_gender_apply(public_notice_tpl, user.user, user.gender);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_not_applicable'): // pass through
+			default:
+				// never mind
+		}
+
+
+		const broadcaster_notice_clean = FlexibleTipMenu.clean_str(broadcaster_notice_tpl);
+		const public_notice_clean = FlexibleTipMenu.clean_str(public_notice_tpl);
+
+		switch(FlexibleTipMenu.val(cfg_flag_name)) {
+			case 'broadcaster': // pass through
+			case FlexibleTipMenu.i18n('lbl_broadcaster'):
+				cb.setTimeout(function() {
+					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_mods'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
+					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_fans'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.fans);
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
+					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_group_havetk'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.have_tk);
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
+					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_group_50tk'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.lbl_group_50tk);
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
+					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_group_250tk'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.lbl_group_250tk);
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
+					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_group_1000tk'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.lbl_group_1000tk);
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
+					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_everyone'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness);
+					if(public_notice_clean !== broadcaster_notice_clean) {
+						const prefix = FlexibleTipMenu.clean_str('[{APP}] message added for you because of your settings:');
+						cb.sendNotice([prefix, broadcaster_notice_clean].join("\n"), cb.room_slug, bgcolor, txtcolor, boldness);
+					}
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_single_user'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_user_bcaster'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_user_bcaster_mods'):
+				cb.setTimeout(function() {
+					cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
+					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
+				}, delay_ms);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_not_applicable'): // pass through
+			default:
+				// never mind
+		}
+	},
+
+	/**
+	 * Displays a notice to thank the tipper
+	 * @param {tip} tip The tip object that was fired with the Event
+	 */
+	thank_tipper: function(tip) {
+		const tip_amount = parseInt(tip.amount);
+		const tip_note = tip.message.trim();
+
+		const notice_raw = FlexibleTipMenu.get_autothank_tip_notice(tip_amount, tip.from_user);
+
+		if(!notice_raw) {
 			// never mind
 		}
-		else if(FlexibleTipMenu.is_public_thanks()) {
-			background_color = FlexibleTipMenu.get_color_code('autothank_tip_publicly_background_color', colors_sample.white);
-			text_color = FlexibleTipMenu.get_color_code('autothank_tip_publicly_text_color', colors_sample.black);
-			cb.sendNotice(msg, '', background_color, text_color, FlexibleTipMenu.val('autothank_tip_publicly_boldness'));
+		else if(FlexibleTipMenu.i18n('lbl_everyone') === FlexibleTipMenu.val('autothank_tip_flag')) {
+			const background_color = FlexibleTipMenu.get_color_code('autothank_tip_publicly_background_color', colors_sample.white);
+			const text_color = FlexibleTipMenu.get_color_code('autothank_tip_publicly_text_color', colors_sample.black);
+			const boldness = FlexibleTipMenu.val('autothank_tip_publicly_boldness');
+			FlexibleTipMenu.send_notice(notice_raw, tip.from_user, background_color, text_color, boldness, 'autothank_tip_flag', 500);
 		}
 		else {
-			background_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_background_color', colors_sample.white);
-			text_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_text_color', colors_sample.black);
-			cb.sendNotice(msg, from_user, background_color, text_color, FlexibleTipMenu.val('autothank_tip_privately_boldness'));
+			const background_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_background_color', colors_sample.white);
+			const text_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_text_color', colors_sample.black);
+			const boldness = FlexibleTipMenu.val('autothank_tip_privately_boldness');
+			FlexibleTipMenu.send_notice(notice_raw, tip.from_user, background_color, text_color, boldness, 'autothank_tip_flag', 500);
 		}
 
-		const private_notice = FlexibleTipMenu.get_autothank_tip_remind_note_notice(tip_note);
-		const private_msg = FlexibleTipMenu.clean_str(private_notice);
-		if(private_msg) {
-			background_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_background_color', colors_sample.white);
-			text_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_text_color', colors_sample.black);
-			cb.sendNotice(private_msg, from_user, background_color, text_color, FlexibleTipMenu.val('autothank_tip_privately_boldness'));
-		}
+		const reminder_raw = FlexibleTipMenu.get_autothank_tip_remind_note_notice(tip_note);
+		const background_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_background_color', colors_sample.white);
+		const text_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_text_color', colors_sample.black);
+		const boldness = FlexibleTipMenu.val('autothank_tip_privately_boldness');
+		FlexibleTipMenu.send_notice(reminder_raw, tip.from_user, background_color, text_color, boldness, 'autothank_tip_remind_note_flag', 500);
+	},
+
+	/**
+	 * Displays a notice to thank the tipper
+	 * @param {user} user The user object that was fired with the Event
+	 */
+	thank_follower: function(user) {
+		const background_color = FlexibleTipMenu.get_color_code('autothank_follower_background_color', colors_sample.white);
+		const text_color = FlexibleTipMenu.get_color_code('autothank_follower_text_color', colors_sample.black);
+		const text_boldness = FlexibleTipMenu.val('autothank_follower_boldness');
+
+		const notice_raw = FlexibleTipMenu.get_autothank_follower_notice(user.user);
+
+		FlexibleTipMenu.send_notice(notice_raw, user.user, background_color, text_color, text_boldness, 'autothank_follower_flag', 1000, user);
 	},
 
 	/**
@@ -886,8 +1032,22 @@ const FlexibleTipMenu = {
 			// nothing here
 		}
 		else {
-			FlexibleTipMenu.thank_tipper(parseInt(tip.amount), tip.from_user, tip.message.trim());
+			FlexibleTipMenu.thank_tipper(tip);
 		}
+	},
+
+	/**
+	 * Callback for when a user follows
+	 * @param {user} user The user object that was fired with the event
+	 */
+	thank_follower_handler: function(user) {
+		// @todo possibly check if the user is in the room before calling the actual function
+
+		if(!user || !user.user) {
+			return;
+		}
+
+		FlexibleTipMenu.thank_follower(user);
 	},
 
 	/**
@@ -1007,7 +1167,7 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Recommended way to hide message in public chat, but still echoed back to the user
-	 * @param {message} event_msg The message that came in from the fired event
+	 * @param {message} event_msg The message that came in with the fired Event
 	 * @returns {message} The updated message
 	 */
 	hide_message: function(event_msg) {
@@ -1017,7 +1177,7 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Handle generic messages from users
-	 * @param {message} event_msg The message that came in from the fired event
+	 * @param {message} event_msg The message that came in with the fired Event
 	 * @returns {message} The updated message
 	 */
 	message_handler: function(event_msg) {
@@ -1040,31 +1200,11 @@ const FlexibleTipMenu = {
 	 * @param {string} reason A word to describe the reason for the exemption
 	 */
 	automod_noaction: function(username, reason) {
-		const noaction_lbl = FlexibleTipMenu.i18n('automods_noaction')
+		const notice_raw = FlexibleTipMenu.i18n('automods_noaction')
 			.replace(label_patterns.username, username)
 			.replace(label_patterns.label, reason);
 
-		const noaction_notice = FlexibleTipMenu.clean_str(noaction_lbl);
-
-		const module_verbosity = FlexibleTipMenu.val('automods_verbosity');
-		switch(module_verbosity) {
-			case 'broadcaster': // pass through
-			case FlexibleTipMenu.i18n('lbl_broadcaster'):
-				cb.setTimeout(function() {
-					cb.sendNotice(noaction_notice, cb.room_slug);
-				}, 1000);
-			break;
-
-			case FlexibleTipMenu.i18n('lbl_mods'):
-				cb.setTimeout(function() {
-					cb.sendNotice(noaction_notice, cb.room_slug);
-					cb.sendNotice(noaction_notice, cb.room_slug, null, null, null, user_groups.mods);
-				}, 1000);
-			break;
-
-			default:
-				// never mind
-		}
+		FlexibleTipMenu.send_notice(notice_raw, username, null, null, null, 'automods_verbosity', 100);
 	},
 
 	/**
@@ -1078,48 +1218,21 @@ const FlexibleTipMenu = {
 
 		++FlexibleTipMenu.automod_infractions[username];
 
-		const notice = FlexibleTipMenu.i18n('automods_user_count')
+		const notice_raw = FlexibleTipMenu.i18n('automods_user_count')
 			.replace(label_patterns.username, username)
 			.replace(label_patterns.count, FlexibleTipMenu.automod_infractions[username]);
 
-		const notice_clean = FlexibleTipMenu.clean_str(lbl);
-
-		const automods_record_flag = FlexibleTipMenu.val('automods_record_flag');
-		switch(automods_record_flag) {
-			case 'broadcaster': // pass through
-			case FlexibleTipMenu.i18n('lbl_broadcaster'):
-				cb.setTimeout(function() {
-					cb.sendNotice(notice_clean, cb.room_slug);
-				}, 1000);
-			break;
-
-			case FlexibleTipMenu.i18n('lbl_mods'):
-				cb.setTimeout(function() {
-					cb.sendNotice(notice_clean);
-				}, 1000);
-			break;
-
-			case FlexibleTipMenu.i18n('lbl_single_user'):
-				cb.setTimeout(function() {
-					cb.sendNotice(notice_clean, username, '', '', '');
-				}, 1000);
-			break;
-
-			default:
-				// never mind
-		}
+		FlexibleTipMenu.send_notice(notice_raw, username, null, null, null, 'automods_record_flag', 100);
 	},
 
 	/**
 	 * Modify a message according to an automod module's settings
-	 * @param {message} event_msg The message that came in from the fired event
+	 * @param {message} event_msg The message that came in with the fired Event
 	 * @param {string} flag_name Name of the app setting for the automod module
-	 * @param {string} notice_tpl The main notice template
 	 * @param {string} module_lbl A small label to identify the automod in chat (in the main notice)
 	 * @returns {message} The updated message
 	 */
-	 automod_plaintext: function(event_msg, flag_name, notice_tpl, module_lbl) {
-		const txt_msg = event_msg.m.trim();
+	 automod_plaintext: function(event_msg, flag_name, module_lbl) {
 		const module_flag = FlexibleTipMenu.val(flag_name);
 		const lbl_not_applicable = FlexibleTipMenu.i18n('lbl_not_applicable');
 		const lbl_mods = FlexibleTipMenu.i18n('lbl_mods');
@@ -1130,21 +1243,21 @@ const FlexibleTipMenu = {
 
 		const is_bcaster = (event_msg.user === cb.room_slug);
 		if(is_bcaster) {
-			FlexibleTipMenu.automod_noaction(event_msg.user, 'broadcaster');
+			FlexibleTipMenu.automod_noaction(event_msg.user, module_lbl+' & broadcaster');
 			return event_msg; // change nothing
 		}
 
 		const allow_mods = (lbl_mods === module_flag);
 		const is_mod = message.is_mod;
 		if(allow_mods && (is_mod || is_bcaster)) {
-			FlexibleTipMenu.automod_noaction(event_msg.user, 'moderator');
+			FlexibleTipMenu.automod_noaction(event_msg.user, module_lbl+' & moderator');
 			return event_msg; // change nothing
 		}
 
 		const allow_fans = (FlexibleTipMenu.i18n('lbl_fans') === module_flag);
 		const is_fan = event_msg.is_fan;
 		if(allow_fans && (is_fan || is_mod || is_bcaster)) {
-			FlexibleTipMenu.automod_noaction(event_msg.user, 'fan');
+			FlexibleTipMenu.automod_noaction(event_msg.user, module_lbl+' & fan');
 			return event_msg; // change nothing
 		}
 
@@ -1157,40 +1270,15 @@ const FlexibleTipMenu = {
 		const allow_havetk = tk_groups.includes(module_flag);
 		const has_tokens = event_msg.has_tokens; // the user who sent the msg has tokens
 		if(allow_havetk && (has_tokens || is_fan || is_mod || is_bcaster)) {
-			FlexibleTipMenu.automod_noaction(event_msg.user, 'havetk');
+			FlexibleTipMenu.automod_noaction(event_msg.user, module_lbl+' & havetk');
 			return event_msg; // change nothing
 		}
 
 
 		// take action
 		event_msg = FlexibleTipMenu.hide_message(event_msg);
+		FlexibleTipMenu.send_notice(notice_raw, event_msg.user, null, null, null, 'automods_verbosity', 100);
 
-
-		const module_verbosity = FlexibleTipMenu.val('automods_verbosity');
-		if(lbl_not_applicable !== module_verbosity) {
-			// show the automod action in chat (never to everyone)
-
-			const notice = FlexibleTipMenu.i18n(notice_tpl)
-				.replace(label_patterns.label, FlexibleTipMenu.i18n(module_lbl))
-				.replace(label_patterns.username, event_msg.user)
-				.replace(label_patterns.message, txt_msg);
-
-			const notice_clean = FlexibleTipMenu.clean_str(notice);
-			switch(module_verbosity) {
-				case 'broadcaster': // pass through
-				case FlexibleTipMenu.i18n('lbl_broadcaster'):
-					cb.sendNotice(notice_clean, cb.room_slug);
-				break;
-
-				case FlexibleTipMenu.i18n('lbl_mods'):
-					cb.sendNotice(notice_clean, cb.room_slug);
-					cb.sendNotice(msg, cb.room_slug, null, null, null, user_groups.mods);
-				break;
-
-				default:
-					// never mind
-			}
-		}
 
 		const automod_record_enabled = !FlexibleTipMenu.is_disabled('automods_record_flag');
 		if(automod_record_enabled) {
@@ -1229,11 +1317,12 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Whether a complete message is allowed for display in chat
-	 * @param {string} txt_msg A copy of the message that came in from the fired event
+	 * Whether a complete message is allowed for display in chat (as far as Unicode ranges are concerned)
+	 * @param {string} txt_msg A copy of the message that came in with the fired Event
 	 * @returns {boolean} bool
 	 */
 	automod_unicode_validator: function(txt_msg) {
+		txt_msg = txt_msg.trim();
 		if(specific_patterns.automod_unicode_allowed.test(txt_msg)) {
 			return true; // whole text is ascii-128
 		}
@@ -1255,6 +1344,16 @@ const FlexibleTipMenu = {
 	},
 
 	/**
+	 * Whether a message is allowed for display in chat (as far as links are concerned)
+	 * @param {string} txt_msg A copy of the message that came in with the fired Event
+	 * @returns {boolean} bool
+	 */
+	automod_links_validator: function(txt_msg) {
+		txt_msg = txt_msg.trim();
+		return !specific_patterns.automod_link.test(txt_msg.replace(' ', ''))
+	},
+
+	/**
 	 * Whether a specific module of the app is configured as "broadcaster only"
 	 * @param {string} cfg_flag_val The actual value from the app settings (not its idx)
 	 * @returns {boolean} bool
@@ -1270,18 +1369,12 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Decorator to add a timestamp to messages in chat
-	 * @param {message} event_msg The message that came in from the fired event
-	 * @returns {message} The updated message
+	 * @param {message} event_msg The plaintext message that came in with the fired Event
+	 * @returns {string} The decorated text
 	 */
 	decorator_time: function(event_msg) {
-		const decorator_time_flag = FlexibleTipMenu.val('decorator_time_flag');
-
-		if(FlexibleTipMenu.i18n('lbl_not_applicable') === decorator_time_flag) {
-			return event_msg; // change nothing
-		}
-
 		let time_str = (new Date()).toLocaleTimeString(date_tz, date_opts);
-		switch(decorator_time_flag) {
+		switch(FlexibleTipMenu.val('decorator_time_flag')) {
 			case FlexibleTipMenu.i18n('lbl_time_short'):
 				time_str = time_str.replace(/:[0-9]{2} .+$/, '');
 			break;
@@ -1300,54 +1393,12 @@ const FlexibleTipMenu = {
 
 		const decorated_msg = '[{TIME}] {MESSAGE}'
 			.replace(label_patterns.time, time_str)
-			.replace(label_patterns.message, event_msg.m);
+			.replace(label_patterns.message, event_msg);
 
-		event_msg.m = decorated_msg;
-		return event_msg;
+		return decorated_msg;
 	},
 
-	/**
-	 * Decorator to add the gender to messages in chat, according to the app preferences
-	 * @param {message} event_msg The message that came in from the fired event
-	 * @returns {message} The updated message
-	 */
-	decorator_gender: function(event_msg) {
-		const decorator_gender_flag = FlexibleTipMenu.val('decorator_gender_flag');
-
-		if(FlexibleTipMenu.i18n('lbl_not_applicable') === decorator_gender_flag) {
-			return event_msg; // change nothing
-		}
-
-		const only_broadcaster = FlexibleTipMenu.is_broadcaster_only(decorator_gender_flag);
-		const is_bcaster = (event_msg.user === cb.room_slug);
-		if(only_broadcaster && !is_bcaster) {
-			return event_msg; // change nothing
-		}
-
-		const only_mods = (FlexibleTipMenu.i18n('lbl_mods') === decorator_gender_flag);
-		const is_mod = event_msg.is_mod;
-		if(only_mods && !(is_mod || is_bcaster)) {
-			return event_msg; // change nothing
-		}
-
-		const only_fans = (FlexibleTipMenu.i18n('lbl_fans') === decorator_gender_flag);
-		const is_fan = event_msg.is_fan;
-		if(only_fans && !(is_fan || is_mod || is_bcaster)) {
-			return event_msg; // change nothing
-		}
-
-		const tk_groups = [
-			FlexibleTipMenu.i18n('lbl_group_havetk'),
-			FlexibleTipMenu.i18n('lbl_group_50tk'),
-			FlexibleTipMenu.i18n('lbl_group_250tk'),
-			FlexibleTipMenu.i18n('lbl_group_1000tk'),
-		];
-		const only_havetk = tk_groups.includes(decorator_gender_flag);
-		const has_tokens = event_msg.has_tokens;
-		if(only_havetk && !(has_tokens || is_fan || is_mod || is_bcaster)) {
-			return event_msg; // change nothing
-		}
-
+	decorator_gender_apply: function(txt_msg, username, gender) {
 		// cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
 		// cf. https://en.wikipedia.org/wiki/Planet_symbols#Mars
 		// ♀ U+2640 Female sign
@@ -1360,51 +1411,138 @@ const FlexibleTipMenu = {
 		// ⚢ U+26A2 Lesbianism
 		// ⚥⚥ U+26A5 Bisexuality
 
-		let prefix = '';
-		if('m' === event_msg.gender) prefix = '\u2642'; // male
-		else if('f' === event_msg.gender) prefix = '\u2640'; // female
-		else if('s' === event_msg.gender) prefix = '\u26A7'; // trans
-		else if('c' === event_msg.gender) prefix = '\u26A4'; // couple
-		else return event_msg;
+		let decoration = '';
+		if('m' === gender) decoration = '\u2642'; // male
+		else if('f' === gender) decoration = '\u2640'; // female
+		else if('s' === gender) decoration = '\u26A7'; // trans
+		else if('c' === gender) decoration = '\u26A4'; // couple
+		else return txt_msg;
 
-		event_msg.m = prefix + ' ' + event_msg.m.trim();
-		return event_msg;
+		if(txt_msg.includes(username)) {
+			txt_msg = txt_msg.replace(username, username+' '+decoration);
+		}
+		else {
+			txt_msg = decoration+' '+txt_msg;
+		}
+
+		return txt_msg.trim();
 	},
 
 	/**
-	 * Handle plain messages from users (non-commands); will pass through automods and decorators
-	 * @param {message} event_msg The message that came in from the fired event
+	 * Decorator to add the gender to messages in chat, according to the app preferences
+	 * @param {string} txt_msg The plaintext message that came in with the fired Event
+	 * @param {user} user The user object that came in with the fired Event
+	 * @returns {string} The decorated text
+	 */
+	decorator_gender_acl: function(txt_msg, username, gender) {
+		const decorator_gender_flag = FlexibleTipMenu.val('decorator_gender_flag');
+
+		if(FlexibleTipMenu.i18n('lbl_not_applicable') === decorator_gender_flag) {
+			return txt_msg; // change nothing
+		}
+
+		switch(decorator_gender_flag) {
+			case FlexibleTipMenu.i18n('lbl_broadcaster'):
+				// add a notice to the broadcaster, leave original unmodified
+				const notice_tpl = '[{APP}]: test notice for {USER}'
+					.replace(label_patterns.username, username);
+
+				const context_user = {user: username, gender: gender};
+				FlexibleTipMenu.send_notice(notice_tpl, cb.room_slug, null, null, null, 'decorator_gender_flag', 10, context_user);
+			break;
+
+			case FlexibleTipMenu.i18n('lbl_everyone'):
+				// modify original message
+				txt_msg = FlexibleTipMenu.decorator_gender_apply('{GENDER} '+txt_msg, username, gender);
+			break;
+
+			default:
+				// never mind
+		}
+
+		return txt_msg;
+
+		/*
+		const only_broadcaster = FlexibleTipMenu.is_broadcaster_only(decorator_gender_flag);
+		const is_bcaster = (user.user === cb.room_slug);
+		if(only_broadcaster && !is_bcaster) {
+			return txt_msg; // change nothing
+		}
+
+		const only_mods = (FlexibleTipMenu.i18n('lbl_mods') === decorator_gender_flag);
+		const is_mod = user.is_mod;
+		if(only_mods && !(is_mod || is_bcaster)) {
+			return txt_msg; // change nothing
+		}
+
+		const only_fans = (FlexibleTipMenu.i18n('lbl_fans') === decorator_gender_flag);
+		const is_fan = user.is_fan;
+		if(only_fans && !(is_fan || is_mod || is_bcaster)) {
+			return txt_msg; // change nothing
+		}
+
+		const tk_groups = [
+			FlexibleTipMenu.i18n('lbl_group_havetk'),
+			FlexibleTipMenu.i18n('lbl_group_50tk'),
+			FlexibleTipMenu.i18n('lbl_group_250tk'),
+			FlexibleTipMenu.i18n('lbl_group_1000tk'),
+		];
+		const only_havetk = tk_groups.includes(decorator_gender_flag);
+		const has_tokens = user.has_tokens;
+		if(only_havetk && !(has_tokens || is_fan || is_mod || is_bcaster)) {
+			return txt_msg; // change nothing
+		}
+
+		return FlexibleTipMenu.decorator_gender_apply('{GENDER} '+txt_msg, user.user, user.gender);
+		*/
+	},
+
+	/**
+	 * Handle plain messages from users (non-tips, non-commands);
+	 * Will run automods and decorators
+	 * @param {message} event_msg The message that came in with the fired Event
 	 * @returns {message} The updated message
 	 */
 	plaintext_handler: function(event_msg) {
-		const txt_msg = event_msg.m.trim();
+		if(event_msg['X-Spam']) {
+			return event_msg; // was already hidden upstream (another bot?)
+		}
 
 		const automod_unicode_enabled = !FlexibleTipMenu.is_disabled('automod_unicode_flag');
-		if(automod_unicode_enabled && !FlexibleTipMenu.automod_unicode_validator(txt_msg)) {
+		if(automod_unicode_enabled && !FlexibleTipMenu.automod_unicode_validator(event_msg.m)) {
 			event_msg = FlexibleTipMenu.automod_plaintext(
 				event_msg,
 				'automod_unicode_flag',
-				'errmsg_automod_hidden',
 				'errmsg_automod_unicode'
 			);
 		}
 
+		if(event_msg['X-Spam']) {
+			return event_msg;
+		}
+
 		const automod_links_enabled = !FlexibleTipMenu.is_disabled('automod_links_flag');
-		if(automod_links_enabled && specific_patterns.automod_link.test(txt_msg.replace(' ', ''))) {
+		if(automod_links_enabled && !FlexibleTipMenu.automod_links_validator(event_msg.m)) {
 			event_msg = FlexibleTipMenu.automod_plaintext(
 				event_msg,
 				'automod_links_flag',
-				'errmsg_automod_hidden',
 				'errmsg_automod_link'
 			);
 		}
 
-		const decorator_gender_enabled = !FlexibleTipMenu.is_disabled('decorator_gender_flag');
-		if(decorator_gender_enabled) {
-			event_msg = FlexibleTipMenu.decorator_gender(event_msg);
+		if(event_msg['X-Spam']) {
+			return event_msg;
 		}
 
-		event_msg = FlexibleTipMenu.decorator_time(event_msg);
+		const decorator_time_enabled = !FlexibleTipMenu.is_disabled('decorator_time_flag');
+		if(decorator_time_enabled) {
+			event_msg.m = FlexibleTipMenu.decorator_time(event_msg.m);
+		}
+
+		const decorator_gender_enabled = !FlexibleTipMenu.is_disabled('decorator_gender_flag');
+		if(decorator_gender_enabled) {
+			event_msg.m = FlexibleTipMenu.decorator_gender_acl(event_msg.m, event_msg.user, event_msg.gender);
+		}
 
 		return event_msg;
 	},
@@ -1453,7 +1591,7 @@ const FlexibleTipMenu = {
 	/**
 	 * Handle commands from users;
 	 * This will hide the command itself in chat
-	 * @param {message} event_msg The message that came in from the fired event
+	 * @param {message} event_msg The message that came in with the fired Event
 	 * @returns {message} The updated message
 	 */
 	commands_handler: function(event_msg) {
@@ -1605,7 +1743,9 @@ cb.settings_choices.push({
 	choice1: ftm.i18n('lbl_broadcaster'),
 	choice2: ftm.i18n('lbl_mods'),
 	choice3: ftm.i18n('lbl_single_user'),
-	choice4: ftm.i18n('lbl_not_applicable'),
+	choice4: ftm.i18n('lbl_user_bcaster'),
+	choice5: ftm.i18n('lbl_user_mods'),
+	choice6: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
@@ -1615,11 +1755,8 @@ cb.settings_choices.push({
 	label: ftm.i18n('decorator_gender_flag'),
 	type: 'choice',
 	choice1: ftm.i18n('lbl_broadcaster'),
-	choice2: ftm.i18n('lbl_mods'),
-	choice3: ftm.i18n('lbl_fans'),
-	choice4: ftm.i18n('lbl_group_havetk'),
-	choice5: ftm.i18n('lbl_everyone'),
-	choice6: ftm.i18n('lbl_not_applicable'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
@@ -1634,7 +1771,58 @@ cb.settings_choices.push({
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
-// autothank module
+// autothank module: new followers
+cb.settings_choices.push({
+	name: settings_list.autothank_follower_flag,
+	label: ftm.i18n('autothank_follower_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_single_user'),
+	choice4: ftm.i18n('lbl_user_bcaster'),
+	choice5: ftm.i18n('lbl_user_mods'),
+	choice6: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.autothank_follower_background_color,
+	label: ftm.i18n('autothank_follower_background_color'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample.white,
+});
+
+cb.settings_choices.push({
+	name: settings_list.autothank_follower_text_color,
+	label: ftm.i18n('autothank_follower_text_color'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample['pastel blue'],
+});
+
+cb.settings_choices.push({
+	name: settings_list.autothank_follower_boldness,
+	label: ftm.i18n('autothank_follower_boldness'),
+	type: 'choice',
+	choice1: font_weights.normal,
+	choice2: font_weights.bold,
+	choice3: font_weights.bolder,
+	defaultValue: font_weights.bold,
+});
+
+cb.settings_choices.push({
+	name: settings_list.autothank_follower_format,
+	label: ftm.i18n('autothank_follower_format'),
+	type: 'str',
+	minLength: 1,
+	maxLength: 99,
+	defaultValue: ftm.i18n('expl_autothank_follower_format'),
+});
+
+// autothank module: tips
 cb.settings_choices.push({
 	name: settings_list.autothank_tip_flag,
 	label: ftm.i18n('autothank_tip_flag'),
@@ -1642,7 +1830,9 @@ cb.settings_choices.push({
 	choice1: ftm.i18n('lbl_broadcaster'),
 	choice2: ftm.i18n('lbl_everyone'),
 	choice3: ftm.i18n('lbl_single_user'),
-	choice4: ftm.i18n('lbl_not_applicable'),
+	choice4: ftm.i18n('lbl_user_bcaster'),
+	choice5: ftm.i18n('lbl_user_mods'),
+	choice6: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
@@ -1727,6 +1917,15 @@ cb.settings_choices.push({
 	minLength: 1,
 	maxLength: 99,
 	defaultValue: ftm.i18n('expl_autothank_tip_privately_format'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.autothank_tip_remind_note_flag,
+	label: ftm.i18n('autothank_tip_remind_note_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_single_user'),
+	choice2: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
 cb.settings_choices.push({
@@ -1911,9 +2110,12 @@ if(is_debug) {
 	cb.sendNotice(ftm.basic_log(cb, 'cb').join("\n"), user.user, colors_sample.white, colors_sample.black);
 }
 else if(ftm.is_disabled('tip_menu_flag')) {
+	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
+	/*
 	cb.setTimeout(function () {
 		ftm.alert_error('tip_menu_flag', ftm.i18n('errmsg_app_disabled'));
 	}, 1000 * 2);
+	*/
 }
 else if (!ftm.check_template_format('menu_item_display_format', ['LABEL'])) {
 	cb.setTimeout(function () {
@@ -1933,7 +2135,30 @@ else {
 
 
 //
-// Start the autothank module
+// Start the autothank module (new folloewrs)
+//
+
+if(ftm.is_disabled('autothank_follower_flag')) {
+	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
+	/**
+	cb.setTimeout(function () {
+		ftm.alert_error('autothank_follower_flag', ftm.i18n('errmsg_thanks_module_disabled'), colors_sample.black, colors_sample.white);
+	}, 1000 * 2);
+	 */
+}
+else if(!ftm.check_template_format('autothank_follower_format', ['USER'])) {
+	cb.setTimeout(function () {
+		ftm.alert_error('autothank_follower_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
+	}, 1000 * 2);
+}
+else {
+	// self-test passes: go on...
+	cb.onFollow(user => ftm.thank_follower_handler(user)); // start listening for new followers
+}
+
+
+//
+// Start the autothank module (tips)
 //
 
 if(ftm.is_disabled('autothank_tip_flag')) {
