@@ -197,6 +197,16 @@ const settings_list = {
 	automods_record_flag: 'automodsRecordFlag',
 	decorator_gender_flag: 'debugmessage decoratorGenderFlag',
 	decorator_time_flag: 'debugmessage decoratorTimeFlag',
+	autogreet_newcomer_flag: 'debugmessage autogreetRoomFlag',
+	autogreet_newcomer_background_color: 'autogreetRoomBackgroundColor',
+	autogreet_newcomer_text_color: 'autogreetRoomTextColor',
+	autogreet_newcomer_boldness: 'autogreetRoomBoldness',
+	autogreet_newcomer_format: 'successmessage autogreetRoomFormat',
+	autogreet_newfanclub_flag: 'debugmessage autogreetFanclubFlag',
+	autogreet_newfanclub_background_color: 'autogreetFanclubBackgroundColor',
+	autogreet_newfanclub_text_color: 'autogreetFanclubTextColor',
+	autogreet_newfanclub_boldness: 'autogreetFanclubBoldness',
+	autogreet_newfanclub_format: 'successmessage autogreetFanclubFormat',
 	autothank_follower_flag: 'debugmessage autothankFollowFlag',
 	autothank_follower_background_color: 'autothankFollowBackgroundColor',
 	autothank_follower_text_color: 'autothankFollowTextColor',
@@ -235,25 +245,26 @@ const settings_list = {
  */
 const i18n = {
 	en: {
-		app_name: "GLOBAL SETTINGS ---------------------- App name",
+		app_name: "GLOBAL SETTINGS ------------ App name",
 		errors_flag: "Show the start-up errors to...",
-		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ---------------------- who to allow',
-		automod_links_flag: 'AUTOMOD LINKS ---------------------- who to allow',
-		automods_verbosity: 'who gets a notice of each infraction (all automods)',
+		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ------------ who to allow',
+		automod_links_flag: 'AUTOMOD LINKS ------------ who to allow',
+		automods_verbosity: 'Who gets a notice of each infraction (all automods)',
 		automods_record_flag: 'Record automod infractions in chat (all automods)',
 		automods_noaction: '[{APP}] Message from {USER} was ignored by autobot ({LABEL})',
 		automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
-		decorator_gender_flag: "INDICATOR OF USER'S SEX IN CHAT ----------------------",
-		decorator_time_flag: 'INDICATOR OF TIME IN CHAT (GMT/UTC) ----------------------',
+		decorator_gender_flag: "INDICATOR OF USER'S SEX IN CHAT ------------",
+		decorator_time_flag: 'INDICATOR OF TIME IN CHAT (GMT/UTC) ------------',
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
-		autothank_follower_flag: 'AUTOMATICALLY THANK FOLLOWERS ----------------------',
-		autothank_follower_background_color: 'Background color (hexa code)',
-		autothank_follower_text_color: 'Text color (hexa code)',
-		autothank_follower_boldness: 'Text thickness',
+		autogreet_newcomer_flag: 'AUTOMATICALLY GREET NEWCOMERS (in the room) ------------',
+		autogreet_newcomer_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
+		autogreet_newfanclub_flag: 'AUTOMATICALLY GREET NEW FANS (to the fanclub) ------------',
+		autogreet_newfanclub_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
+		autothank_follower_flag: 'AUTOMATICALLY THANK FOLLOWERS ------------',
 		autothank_follower_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
-		autothank_tip_flag: "AUTOMATICALLY THANK TIPPERS ----------------------",
+		autothank_tip_flag: "AUTOMATICALLY THANK TIPPERS ------------",
 		autothank_tip_above_tokens: "Only tips above this limit will get a thank you",
 		autothank_tip_publicly_background_color: "Background color for the public thanks (hexa code)",
 		autothank_tip_publicly_text_color: "Text color for the public thanks (hexa code)",
@@ -265,7 +276,7 @@ const i18n = {
 		autothank_tip_privately_format: "Template for the private thanks (variables are: {USER}, {AMOUNT}, {SERVICE}) - english recommended",
 		autothank_tip_remind_note_flag: 'Whether to repeat the tip note back to the user',
 		autothank_tip_remind_note_format: "Template for the tip note reminder (variables are: {MESSAGE}) - english recommended",
-		tip_menu_flag: "TIP MENU {MENU} ----------------------",
+		tip_menu_flag: "TIP MENU {MENU} ------------",
 		tip_menu_header: "Line before the tip menu {MENU}",
 		tip_menu_footer: "Line at the end of the tip menu {MENU}",
 		inline_separator: "Separator for a one-line tip menu {MENU} (leave empty for multi-line)",
@@ -297,7 +308,12 @@ const i18n = {
 		lbl_inline_spacing_both: "before + after",
 		lbl_sort_amount_asc: "lowest to highest price",
 		lbl_sort_amount_desc: "highest to lowest price",
-		expl_autothank_follower_format: "Thanks for following me {USER}!",
+		expl_bgcolor: 'Background color (hexa code)',
+		expl_txtcolor: 'Text color (hexa code)',
+		expl_boldness: 'Text thickness',
+		expl_autogreet_newcomer_format: 'Hi {USER}, welcome to my room!',
+		expl_autogreet_newfanclub_format: '{USER} has joined my fan club!',
+		expl_autothank_follower_format: 'Thanks for following me {USER}!',
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
@@ -325,25 +341,26 @@ const i18n = {
 		errlbl_command_not_recognized: "[{APP}] Your command was not recognized.\nReminder: any message that starts with '/' or '!' is handled as a command for this bot.",
 	},
 	es: {
-		app_name: "OPCIONES GLOBALES ---------------------- Nombre de la aplicacion",
+		app_name: "OPCIONES GLOBALES ------------ Nombre de la aplicacion",
 		errors_flag: "Quien puede ver los errores...",
-		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ---------------------- who to allow',
-		automod_links_flag: 'AUTOMOD LINKS ---------------------- who to allow',
-		automods_verbosity: 'quien tiene una Notice de cada infraccion (todos los automods)',
+		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ------------ who to allow',
+		automod_links_flag: 'AUTOMOD LINKS ------------ who to allow',
+		automods_verbosity: 'Quien tiene una Notice de cada infraccion (todos los automods)',
 		automods_record_flag: 'Guardar las infracciones automod en el chat (todos los autmods)',
 		automods_noaction: '[{APP}] El message de {USER} ha sido ignorado por autobot ({LABEL})',
 		automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
-		decorator_gender_flag: 'INDICACION DEL SEXO DE LOS USUARIOS EN EL CHAT ----------------------',
-		decorator_time_flag: 'INDICACION DEL TIEMPO EN EL CHAT (GMT/UTC) ----------------------',
+		decorator_gender_flag: 'INDICACION DEL SEXO DE LOS USUARIOS EN EL CHAT ------------',
+		decorator_time_flag: 'INDICACION DEL TIEMPO EN EL CHAT (GMT/UTC) ------------',
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
-		autothank_follower_flag: 'AUTOMATICALLY THANK FOLLOWERS ----------------------',
-		autothank_follower_background_color: 'Background color (hexa code)',
-		autothank_follower_text_color: 'Text color (hexa code)',
-		autothank_follower_boldness: 'Text thickness',
+		autogreet_newcomer_flag: 'AUTOMATICALLY GREET NEWCOMERS (in the room) ------------',
+		autogreet_newcomer_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
+		autogreet_newfanclub_flag: 'AUTOMATICALLY GREET NEW FANS (to the fanclub) ------------',
+		autogreet_newfanclub_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
+		autothank_follower_flag: 'AUTOMATICALLY THANK FOLLOWERS ------------',
 		autothank_follower_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
-		autothank_tip_flag: "MODULO AGRADECIMIENTOS ----------------------",
+		autothank_tip_flag: "MODULO AGRADECIMIENTOS ------------",
 		autothank_tip_above_tokens: "Solo los tips que superan este limite tendran agradecimientos",
 		autothank_tip_publicly_background_color: "Color de fondo para las gracias en publico (codigo hexa)",
 		autothank_tip_publicly_text_color: "Color del texto para las gracias en publico (codigo hexa)",
@@ -355,7 +372,7 @@ const i18n = {
 		autothank_tip_privately_format: "Modelo del mensaje para las gracias en privado (variables son: {USER}, {AMOUNT}, {SERVICE}) - Ingles recommendado",
 		autothank_tip_remind_note_flag: 'Whether to repeat the tip note back to the user',
 		autothank_tip_remind_note_format: "Modelo del mensaje para el recordatorio de tip note (variables son: {MESSAGE}) - Ingles recommendado",
-		tip_menu_flag: "MENU DE TIPS {MENU} ----------------------",
+		tip_menu_flag: "MENU DE TIPS {MENU} ------------",
 		tip_menu_header: "Linea antes del menu de tips {MENU}",
 		tip_menu_footer: "Linea despues del menu de tips {MENU}",
 		inline_separator: "Separacion para un menu monolinea (dejar vacio para multi linea)",
@@ -387,6 +404,11 @@ const i18n = {
 		lbl_inline_spacing_both: "antes + despues",
 		lbl_sort_amount_asc: "del precio mas bajo al mas alto",
 		lbl_sort_amount_desc: "del precio mas alto al mas bajo",
+		expl_bgcolor: 'Background color (hexa code)',
+		expl_txtcolor: 'Text color (hexa code)',
+		expl_boldness: 'Text thickness',
+		expl_autogreet_newcomer_format: 'Hi {USER}, welcome to my room!',
+		expl_autogreet_newfanclub_format: '{USER} has joined my fan club!',
 		expl_autothank_follower_format: "Thanks for following me {USER}!",
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
@@ -415,25 +437,26 @@ const i18n = {
 		errlbl_command_not_recognized: "[{APP}] Su comando no ha funcionado.\nRecordatorio: todo mensaje que empieza por '/' o '!' se entiende como un comando por este bot.",
 	},
 	fr: {
-		app_name: "PARAMETRES GENERAUX ---------------------- Nom de l'aplication",
+		app_name: "PARAMETRES GENERAUX ------------ Nom de l'aplication",
 		errors_flag: "A qui montrer les erreurs de demarrage...",
-		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ---------------------- who to allow',
-		automod_links_flag: 'AUTOMOD LINKS ---------------------- who to allow',
+		automod_unicode_flag: 'AUTOMOD NON-ENGLISH TEXT ------------ who to allow',
+		automod_links_flag: 'AUTOMOD LINKS ------------ who to allow',
 		automods_verbosity: "A qui montrer les Notices d'infractions (tous les automods)",
 		automods_record_flag: 'Enregistrer les infractions automod dans le chat (tous les autmods)',
 		automods_noaction: '[{APP}] Le message de {USER} a ete ignore par autobot ({LABEL})',
 		automods_user_count: '[{APP}] Automod a enregistre {COUNT} infractions pour {USER}',
-		decorator_gender_flag: 'INDICATEUR DU SEXE DES UTILISATEURS DU CHAT ----------------------',
-		decorator_time_flag: 'INDICATEUR DU TEMPS DANS LE CHAT (GMT/UTC) ----------------------',
+		decorator_gender_flag: 'INDICATEUR DU SEXE DES UTILISATEURS DU CHAT ------------',
+		decorator_time_flag: 'INDICATEUR DU TEMPS DANS LE CHAT (GMT/UTC) ------------',
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
-		autothank_follower_flag: 'AUTOMATICALLY THANK FOLLOWERS ----------------------',
-		autothank_follower_background_color: 'Background color (hexa code)',
-		autothank_follower_text_color: 'Text color (hexa code)',
-		autothank_follower_boldness: 'Text thickness',
+		autogreet_newcomer_flag: 'AUTOMATICALLY GREET NEWCOMERS (in the room) ------------',
+		autogreet_newcomer_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
+		autogreet_newfanclub_flag: 'AUTOMATICALLY GREET NEW FANS (to the fanclub) ------------',
+		autogreet_newfanclub_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
+		autothank_follower_flag: 'AUTOMATICALLY THANK FOLLOWERS ------------',
 		autothank_follower_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
-		autothank_tip_flag: "MODULE REMERCIEMENTS ----------------------",
+		autothank_tip_flag: "MODULE REMERCIEMENTS ------------",
 		autothank_tip_above_tokens: "Seuls les tips au dela de cette limite sont remercies",
 		autothank_tip_publicly_background_color: "Couleur de fond pour les remerciements en public (code hexa)",
 		autothank_tip_publicly_text_color: "Couleur du texte pour les remerciements en public (code hexa)",
@@ -445,7 +468,7 @@ const i18n = {
 		autothank_tip_privately_format: "Modele du message pour les remerciements prives (variables sont : {USER}, {AMOUNT}, {SERVICE}) - anglais recommande",
 		autothank_tip_remind_note_flag: 'Whether to repeat the tip note back to the user',
 		autothank_tip_remind_note_format: "Modele du message pour le rappel de tip note (variables sont : {MESSAGE}) - anglais recommande",
-		tip_menu_flag: "MENU DE TIPS {MENU} ----------------------",
+		tip_menu_flag: "MENU DE TIPS {MENU} ------------",
 		tip_menu_header: "Ligne avant le menu de tips {MENU}",
 		tip_menu_footer: "Ligne apres le menu de tips {MENU}",
 		inline_separator: "Separateur pour un menu monoligne (laisser vide pour multi ligne)",
@@ -477,6 +500,11 @@ const i18n = {
 		lbl_inline_spacing_both: "avant + apres",
 		lbl_sort_amount_asc: "du prix le plus faible au plus eleve",
 		lbl_sort_amount_desc: "du prix le plus eleve au plus faible",
+		expl_bgcolor: 'Background color (hexa code)',
+		expl_txtcolor: 'Text color (hexa code)',
+		expl_boldness: 'Text thickness',
+		expl_autogreet_newcomer_format: 'Hi {USER}, welcome to my room!',
+		expl_autogreet_newfanclub_format: '{USER} has joined my fan club!',
 		expl_autothank_follower_format: "Thanks for following me {USER}!",
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
@@ -821,20 +849,6 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Gets the formatted notice to display in the chat for a new follow
-	 * @param {sring} username The name of the user
-	 * @returns {string} The message suitable for cb.sendNotice()
-	 */
-	get_autothank_follower_notice: function(username) {
-		const notice_tpl = FlexibleTipMenu.val('autothank_follower_format');
-
-		let notice_raw = notice_tpl;
-		notice_raw = notice_raw.replace(label_patterns.username, username);
-
-		return notice_raw;
-	},
-
-	/**
 	 * Sends a notice in chat, to relevant users or groups, according to the module's verbosity and visibility settings
 	 * @param {string} notice_tpl
 	 * @param {string} username
@@ -872,6 +886,7 @@ const FlexibleTipMenu = {
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_everyone'):
+				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, user.user, user.gender);
 				public_notice_tpl = FlexibleTipMenu.decorator_gender_apply(public_notice_tpl, user.user, user.gender);
 			break;
 
@@ -942,10 +957,6 @@ const FlexibleTipMenu = {
 			case FlexibleTipMenu.i18n('lbl_everyone'):
 				cb.setTimeout(function() {
 					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness);
-					if(public_notice_clean !== broadcaster_notice_clean) {
-						const prefix = FlexibleTipMenu.clean_str('[{APP}] message added for you because of your settings:');
-						cb.sendNotice([prefix, broadcaster_notice_clean].join("\n"), cb.room_slug, bgcolor, txtcolor, boldness);
-					}
 				}, delay_ms);
 			break;
 
@@ -962,7 +973,7 @@ const FlexibleTipMenu = {
 				}, delay_ms);
 			break;
 
-			case FlexibleTipMenu.i18n('lbl_user_bcaster_mods'):
+			case FlexibleTipMenu.i18n('lbl_user_mods'):
 				cb.setTimeout(function() {
 					cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
 					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
@@ -978,9 +989,13 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Displays a notice to thank the tipper
-	 * @param {tip} tip The tip object that was fired with the Event
+	 * @param {tip} tip The tip object that was fired with the event
 	 */
-	thank_tipper: function(tip) {
+	thank_tipper_handler: function(tip) {
+		if(tip.is_anon_tip) {
+			return;
+		}
+
 		const tip_amount = parseInt(tip.amount);
 		const tip_note = tip.message.trim();
 
@@ -1010,34 +1025,7 @@ const FlexibleTipMenu = {
 	},
 
 	/**
-	 * Displays a notice to thank the tipper
-	 * @param {user} user The user object that was fired with the Event
-	 */
-	thank_follower: function(user) {
-		const background_color = FlexibleTipMenu.get_color_code('autothank_follower_background_color', colors_sample.white);
-		const text_color = FlexibleTipMenu.get_color_code('autothank_follower_text_color', colors_sample.black);
-		const text_boldness = FlexibleTipMenu.val('autothank_follower_boldness');
-
-		const notice_raw = FlexibleTipMenu.get_autothank_follower_notice(user.user);
-
-		FlexibleTipMenu.send_notice(notice_raw, user.user, background_color, text_color, text_boldness, 'autothank_follower_flag', 1000, user);
-	},
-
-	/**
-	 * Callback for when a tip is sent
-	 * @param {tip} tip The tip object that was fired with the event
-	 */
-	thank_tipper_handler: function(tip) {
-		if(tip.is_anon_tip) {
-			// nothing here
-		}
-		else {
-			FlexibleTipMenu.thank_tipper(tip);
-		}
-	},
-
-	/**
-	 * Callback for when a user follows
+	 * Displays a notice to thank the new follower
 	 * @param {user} user The user object that was fired with the event
 	 */
 	thank_follower_handler: function(user) {
@@ -1047,7 +1035,56 @@ const FlexibleTipMenu = {
 			return;
 		}
 
-		FlexibleTipMenu.thank_follower(user);
+		const background_color = FlexibleTipMenu.get_color_code('autothank_follower_background_color', colors_sample.white);
+		const text_color = FlexibleTipMenu.get_color_code('autothank_follower_text_color', colors_sample.black);
+		const text_boldness = FlexibleTipMenu.val('autothank_follower_boldness');
+
+		const notice_tpl = FlexibleTipMenu.val('autothank_follower_format');
+		const notice_raw = notice_tpl.replace(label_patterns.username, user.user);
+
+		FlexibleTipMenu.send_notice(notice_raw, user.user, background_color, text_color, text_boldness, 'autothank_follower_flag', 1000, user);
+	},
+
+	/**
+	 * Displays a notice to greet newcomers (to the room)
+	 * @param {user} user The user object that was fired with the event
+	 */
+	greet_newcomer_handler: function(user) {
+		// @todo possibly check if the user is anonymous etc
+
+		if(!user || !user.user) {
+			return;
+		}
+
+		const background_color = FlexibleTipMenu.get_color_code('autogreet_newcomer_background_color', colors_sample.white);
+		const text_color = FlexibleTipMenu.get_color_code('autogreet_newcomer_text_color', colors_sample.black);
+		const text_boldness = FlexibleTipMenu.val('autogreet_newcomer_boldness');
+
+		const notice_tpl = FlexibleTipMenu.val('autogreet_newcomer_format');
+		const notice_raw = notice_tpl.replace(label_patterns.username, user.user);
+
+		FlexibleTipMenu.send_notice(notice_raw, user.user, background_color, text_color, text_boldness, 'autogreet_newcomer_flag', 1000, user);
+	},
+
+	/**
+	 * Displays a notice to greet new fanclub members
+	 * @param {user} user The user object that was fired with the event
+	 */
+	greet_newfanclub_handler: function(user) {
+		// @todo possibly check if the user is anonymous etc
+
+		if(!user || !user.user) {
+			return;
+		}
+
+		const background_color = FlexibleTipMenu.get_color_code('autogreet_newfanclub_background_color', colors_sample.white);
+		const text_color = FlexibleTipMenu.get_color_code('autogreet_newfanclub_text_color', colors_sample.black);
+		const text_boldness = FlexibleTipMenu.val('autogreet_newfanclub_boldness');
+
+		const notice_tpl = FlexibleTipMenu.val('autogreet_newfanclub_format');
+		const notice_raw = notice_tpl.replace(label_patterns.username, user.user);
+
+		FlexibleTipMenu.send_notice(notice_raw, user.user, background_color, text_color, text_boldness, 'autogreet_newfanclub_flag', 1000, user);
 	},
 
 	/**
@@ -1369,10 +1406,10 @@ const FlexibleTipMenu = {
 
 	/**
 	 * Decorator to add a timestamp to messages in chat
-	 * @param {message} event_msg The plaintext message that came in with the fired Event
+	 * @param {message} txt_msg The plaintext message that came in with the fired Event
 	 * @returns {string} The decorated text
 	 */
-	decorator_time: function(event_msg) {
+	decorator_time: function(txt_msg) {
 		let time_str = (new Date()).toLocaleTimeString(date_tz, date_opts);
 		switch(FlexibleTipMenu.val('decorator_time_flag')) {
 			case FlexibleTipMenu.i18n('lbl_time_short'):
@@ -1388,17 +1425,17 @@ const FlexibleTipMenu = {
 			break;
 
 			default:
-				return event_msg; // change nothing
+				return txt_msg; // change nothing
 		}
 
 		const decorated_msg = '[{TIME}] {MESSAGE}'
 			.replace(label_patterns.time, time_str)
-			.replace(label_patterns.message, event_msg);
+			.replace(label_patterns.message, txt_msg);
 
 		return decorated_msg;
 	},
 
-	decorator_gender_apply: function(txt_msg, username, gender) {
+	decorator_gender_apply: function(txt_msg, username, gender_code) {
 		// cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
 		// cf. https://en.wikipedia.org/wiki/Planet_symbols#Mars
 		// ♀ U+2640 Female sign
@@ -1411,21 +1448,26 @@ const FlexibleTipMenu = {
 		// ⚢ U+26A2 Lesbianism
 		// ⚥⚥ U+26A5 Bisexuality
 
-		let decoration = '';
-		if('m' === gender) decoration = '\u2642'; // male
-		else if('f' === gender) decoration = '\u2640'; // female
-		else if('s' === gender) decoration = '\u26A7'; // trans
-		else if('c' === gender) decoration = '\u26A4'; // couple
-		else return txt_msg;
+		let gender_str = '';
+		if('m' === gender_code) gender_str = '\u2642'; // male
+		else if('f' === gender_code) gender_str = '\u2640'; // female
+		else if('s' === gender_code) gender_str = '\u26A7'; // trans
+		else if('c' === gender_code) gender_str = '\u26A4'; // couple
+		else return txt_msg.replace(label_patterns.gender, '').trim();
+
+		let decorated_msg = txt_msg
+			.replace(label_patterns.username, username);
 
 		if(txt_msg.includes(username)) {
-			txt_msg = txt_msg.replace(username, username+' '+decoration);
+			// append to username
+			decorated_msg = txt_msg.replace(username, username+' '+gender_str);
 		}
 		else {
-			txt_msg = decoration+' '+txt_msg;
+			// prepend to entire message
+			decorated_msg = gender_str+' '+txt_msg;
 		}
 
-		return txt_msg.trim();
+		return decorated_msg.replace(label_patterns.gender, '').trim();
 	},
 
 	/**
@@ -1544,6 +1586,7 @@ const FlexibleTipMenu = {
 			event_msg.m = FlexibleTipMenu.decorator_gender_acl(event_msg.m, event_msg.user, event_msg.gender);
 		}
 
+		event_msg.m = event_msg.m.replace(specific_patterns.all_var_names, ' ');
 		return event_msg;
 	},
 
@@ -1771,6 +1814,111 @@ cb.settings_choices.push({
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+
+// autogreet module: newcomers
+cb.settings_choices.push({
+	name: settings_list.autogreet_newcomer_flag,
+	label: ftm.i18n('autogreet_newcomer_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_single_user'),
+	choice4: ftm.i18n('lbl_user_bcaster'),
+	choice5: ftm.i18n('lbl_user_mods'),
+	choice6: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.autogreet_newcomer_background_color,
+	label: ftm.i18n('expl_bgcolor'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample.white,
+});
+
+cb.settings_choices.push({
+	name: settings_list.autogreet_newcomer_text_color,
+	label: ftm.i18n('expl_txtcolor'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample['pastel blue'],
+});
+
+cb.settings_choices.push({
+	name: settings_list.autogreet_newcomer_boldness,
+	label: ftm.i18n('expl_boldness'),
+	type: 'choice',
+	choice1: font_weights.normal,
+	choice2: font_weights.bold,
+	choice3: font_weights.bolder,
+	defaultValue: font_weights.bold,
+});
+
+cb.settings_choices.push({
+	name: settings_list.autogreet_newcomer_format,
+	label: ftm.i18n('autogreet_newcomer_format'),
+	type: 'str',
+	minLength: 1,
+	maxLength: 99,
+	defaultValue: ftm.i18n('expl_autogreet_newcomer_format'),
+});
+
+
+// autogreet module: new fan club members
+cb.settings_choices.push({
+	name: settings_list.autogreet_newfanclub_flag,
+	label: ftm.i18n('autogreet_newfanclub_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_single_user'),
+	choice4: ftm.i18n('lbl_user_bcaster'),
+	choice5: ftm.i18n('lbl_user_mods'),
+	choice6: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.autogreet_newfanclub_background_color,
+	label: ftm.i18n('expl_bgcolor'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample.white,
+});
+
+cb.settings_choices.push({
+	name: settings_list.autogreet_newfanclub_text_color,
+	label: ftm.i18n('expl_txtcolor'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample['pastel blue'],
+});
+
+cb.settings_choices.push({
+	name: settings_list.autogreet_newfanclub_boldness,
+	label: ftm.i18n('expl_boldness'),
+	type: 'choice',
+	choice1: font_weights.normal,
+	choice2: font_weights.bold,
+	choice3: font_weights.bolder,
+	defaultValue: font_weights.bold,
+});
+
+cb.settings_choices.push({
+	name: settings_list.autogreet_newfanclub_format,
+	label: ftm.i18n('autogreet_newfanclub_format'),
+	type: 'str',
+	minLength: 1,
+	maxLength: 99,
+	defaultValue: ftm.i18n('expl_autogreet_newfanclub_format'),
+});
+
+
 // autothank module: new followers
 cb.settings_choices.push({
 	name: settings_list.autothank_follower_flag,
@@ -1787,7 +1935,7 @@ cb.settings_choices.push({
 
 cb.settings_choices.push({
 	name: settings_list.autothank_follower_background_color,
-	label: ftm.i18n('autothank_follower_background_color'),
+	label: ftm.i18n('expl_bgcolor'),
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
@@ -1796,7 +1944,7 @@ cb.settings_choices.push({
 
 cb.settings_choices.push({
 	name: settings_list.autothank_follower_text_color,
-	label: ftm.i18n('autothank_follower_text_color'),
+	label: ftm.i18n('expl_txtcolor'),
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
@@ -1805,7 +1953,7 @@ cb.settings_choices.push({
 
 cb.settings_choices.push({
 	name: settings_list.autothank_follower_boldness,
-	label: ftm.i18n('autothank_follower_boldness'),
+	label: ftm.i18n('expl_boldness'),
 	type: 'choice',
 	choice1: font_weights.normal,
 	choice2: font_weights.bold,
@@ -2135,7 +2283,43 @@ else {
 
 
 //
-// Start the autothank module (new folloewrs)
+// Start the autogreet module (in the room)
+//
+
+if(ftm.is_disabled('autogreet_newcomer_flag')) {
+	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
+}
+else if(!ftm.check_template_format('autogreet_newcomer_format', ['USER'])) {
+	cb.setTimeout(function () {
+		ftm.alert_error('autogreet_newcomer_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
+	}, 1000 * 2);
+}
+else {
+	// self-test passes: go on...
+	cb.onEnter(user => ftm.greet_newcomer_handler(user)); // start listening for newcomers
+}
+
+
+//
+// Start the autogreet module (to the fanclub)
+//
+
+if(ftm.is_disabled('autogreet_newfanclub_flag')) {
+	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
+}
+else if(!ftm.check_template_format('autogreet_newfanclub_format', ['USER'])) {
+	cb.setTimeout(function () {
+		ftm.alert_error('autogreet_newfanclub_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
+	}, 1000 * 2);
+}
+else {
+	// self-test passes: go on...
+	cb.onFanclubJoin(user => ftm.greet_newfanclub_handler(user)); // start listening for new fan club members
+}
+
+
+//
+// Start the autothank module (new followers)
 //
 
 if(ftm.is_disabled('autothank_follower_flag')) {
