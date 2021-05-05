@@ -1896,7 +1896,7 @@ cb.settings_choices.push({
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
-	defaultValue: colors_sample['pastel blue'],
+	defaultValue: colors_sample['pastel green'],
 });
 
 cb.settings_choices.push({
@@ -1948,7 +1948,7 @@ cb.settings_choices.push({
 	type: 'str',
 	minLength: 6,
 	maxLength: 7,
-	defaultValue: colors_sample['pastel blue'],
+	defaultValue: colors_sample['pastel red'],
 });
 
 cb.settings_choices.push({
