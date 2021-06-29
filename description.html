@@ -62,10 +62,6 @@
 	<dt><span class="block" style="font-weight: bold; padding: 0">nb_of_menu_items</span></dt>
 	<dd>&middot; the number of menu items that can be configured from the admin panel</dd>
 	<dd>&nbsp;</dd>
-
-	<dt><span class="block" style="font-weight: bold; padding: 0">nb_of_menu_items</span></dt>
-	<dd>&middot; the number of menu items that can be configured from the admin panel</dd>
-	<dd>&nbsp;</dd>
 </dl>
 
 <h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Global settings in the admin panel</span></h2>
@@ -77,64 +73,204 @@
 	<dt><span class="block" style="font-weight: bold; padding: 0">Errors shown to</span></dt>
 	<dd>&middot; either the broadcaster or the moderators will be able to see the errors in the configuration of the app (in the chat), or nobody</dd>
 	<dd>&nbsp;</dd>
+</dl>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers</span></dt>
-	<dd>&middot; if set to "n/a", the module is disabled</dd>
-	<dd>&middot; otherwise, tippers are thanked either publicly or privately</dd>
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Automod features</span></h2>
+<dl>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Automod feature: non-english text</span></dt>
+	<dd>&middot; aims to hide spammy messages from chat by detecting non-english text, which spammers use to avoid Chaturbate's own spam prevention system</dd>
+	<dd>&middot; you know what these messages are, don't you</dd>
+	<dd>&middot; enable this feature ONLY if you expect strict english in your chatroom: if you are eastern european and you chat in your language, this may not work well for you</dd>
+	<dd>&middot; choose here who is exempt from this Flexible Tip Menu feature (or "n/a" to disable this feature)</dd>
+	<dd>&middot; NB 1: setting to "broadcaster only" will allow you to test-run this feature without modifying public chat messages</dd>
+	<dd>&middot; NB 2: on a technical note, this feature works by detecting Unicode code points, rather than natural language detection</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Automod feature: links</span></dt>
+	<dd>&middot; aims to hide messages that contain links in chat, which is a feature already offered natively by Chaturbate and is also covered by the non-english automod above</dd>
+	<dd>&middot; you do not need to enable this Flexible Tip Menu feature, unless you are seeing links posted publicly in your chat room</dd>
+	<dd>&middot; choose here who is exempt from this Flexible Tip Menu feature (or "n/a" to disable this feature)</dd>
+	<dd>&middot; NB: setting to "broadcaster only" will allow you to test-run this feature without modifying public chat messages</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Who gets a notice of each infraction (all automods)</span></dt>
+	<dd>&middot; when any of the "automods" above are enabled, they keep track of infractions</dd>
+	<dd>&middot; this box allows you to send a notice in chat whenever such an infraction was made, for individual infractions, and choose here who gets to see these notices</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Record automod infractions in chat (all automods)</span></dt>
+	<dd>&middot; when any of the "automods" above are enabled, they keep track of infractions</dd>
+	<dd>&middot; this box allows you to send a notice in chat whenever such an infraction was made, with a tally of the number of infractions for that user, and choose here who gets to see these notices</dd>
 	<dd>&nbsp;</dd>
 </dl>
 
-<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Thank Tippers module settings in the admin panel</span></h2>
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Decorate messages in chat</span></h2>
 <dl>
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers above tokens</span></dt>
+	<dt><span class="block" style="font-weight: bold; padding: 0">INDICATOR OF USER'S SEX IN CHAT</span></dt>
+	<dd>&middot; this feature adds an emoji to every userame in chat and in notices, to represent their gender as declared in their profile</dd>
+	<dd>&middot; these emoji were gleaned from https://en.wikipedia.org/wiki/Miscellaneous_Symbols and https://en.wikipedia.org/wiki/Planet_symbols#Mars</dd>
+	<dd>&middot; choose here who to apply the feature to, or to disable it completely</dd>
+	<dd>&middot; NB: setting this to "broadcaster only" means you will get every message twice, since you will also receive the normal messages from chat; this is meant for you to test-run the feature, and you'll want to choose either everyone or disabled</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">INDICATOR OF TIME IN CHAT</span></dt>
+	<dd>&middot; this feature adds a timestamp to all messages and notices, to represent the passing of time</dd>
+	<dd>&middot; choose here the precision of the timestamp (minutes, seconds etc) or to disable the feature completely</dd>
+	<dd>&middot; NB 1: setting this to "broadcaster only" means you will get every message twice, since you will also receive the normal messages from chat; this is meant for you to test-run the feature, and you'll want to choose either everyone or disabled</dd>
+	<dd>&middot; NB 2: the hours are all set to GMT/UTC, so that nobody can figure out anybody else's location with this feature</dd>
+	<dd>&nbsp;</dd>
+</dl>
+
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Autogreet features</span></h2>
+<dl>
+	<dt><span class="block" style="font-weight: bold; padding: 0">AUTOMATICALLY GREET NEWCOMERS</span></dt>
+	<dd>&middot; this feature is meant to greet people as they enter the room</dd>
+	<dd>&middot; if set to "n/a", the module is disabled</dd>
+	<dd>&middot; otherwise, a notice is sent to the people and groups as configured in this box</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Background color</span></dt>
+	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#ffffff; text-shadow:gray 1px 0 1px">#ffffff</span></dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text color</span></dt>
+	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#a4c2f4; text-shadow:gray 0.5px 0 0.5px">#a4c2f4</span></dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text thickness</span></dt>
+	<dd>&middot; NB: "bold" and "bolder" are often the same</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Template for the notice in chat</span></dt>
+	<dd>&middot; template to format the notice</dd>
+	<dd>&middot; available variables are: <span class="code">{USER}</span> for the nickname of the person joining the room</dd>
+	<dd>&middot; example: Hi {USER}, welcome to my room!</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">AUTOMATICALLY GREET NEW FANS</span></dt>
+	<dd>&middot; this feature is meant to greet/thank people as they join the fan club</dd>
+	<dd>&middot; if set to "n/a", the module is disabled</dd>
+	<dd>&middot; otherwise, a notice is sent to the people and groups as configured in this box</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Background color</span></dt>
+	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#ffffff; text-shadow:gray 1px 0 1px">#ffffff</span></dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text color</span></dt>
+	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#b6d7a8; text-shadow:gray 0.5px 0 0.5px">#b6d7a8</span></dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text thickness</span></dt>
+	<dd>&middot; NB: "bold" and "bolder" are often the same</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Template for the notice in chat</span></dt>
+	<dd>&middot; template to format the notice</dd>
+	<dd>&middot; available variables are: <span class="code">{USER}</span> for the nickname of the person joining the fanclub</dd>
+	<dd>&middot; example: {USER} has joined my fan club!</dd>
+	<dd>&nbsp;</dd>
+</dl>
+
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Autothank features</span></h2>
+<dl>
+	<dt><span class="block" style="font-weight: bold; padding: 0">AUTOMATICALLY THANK FOLLOWERS</span></dt>
+	<dd>&middot; this feature is meant to greet/thank people when they click the Follow button</dd>
+	<dd>&middot; if set to "n/a", the module is disabled</dd>
+	<dd>&middot; otherwise, a notice is sent to the people and groups as configured in this box</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Background color</span></dt>
+	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#ffffff; text-shadow:gray 1px 0 1px">#ffffff</span></dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text color</span></dt>
+	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#ea9999; text-shadow:gray 0.5px 0 0.5px">#ea9999</span></dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text thickness</span></dt>
+	<dd>&middot; NB: "bold" and "bolder" are often the same</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Template for the notice in chat</span></dt>
+	<dd>&middot; template to format the notice</dd>
+	<dd>&middot; available variables are: <span class="code">{USER}</span> for the nickname of the person following you</dd>
+	<dd>&middot; example: Thanks for following me {USER}!</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">AUTOMATICALLY THANK TIPPERS</span></dt>
+	<dd>&middot; if set to "n/a", the module is disabled</dd>
+	<dd>&middot; otherwise, a notice is sent to the people and groups as configured in this box</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Only tips above this limit will get a thank you</span></dt>
 	<dd>&middot; allows to avoid thanking every single low tip</dd>
 	<dd>&middot; NB: this is off-by-one on purpose, so that to thank people for their tips from 25 tokens and up, you have to set this to 24</dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers publicly background color</span></dt>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Background color for the public thanks</span></dt>
 	<dd>&middot; color of the background for the public notice</dd>
 	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#ffffff; text-shadow:gray 1px 0 1px">#ffffff</span></dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers publicly text color</span></dt>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text color for the public thanks</span></dt>
 	<dd>&middot; color of the text for the public notice</dd>
 	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#000000; text-shadow:gray 0.5px 0 0.5px">#000000</span></dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers publicly boldness</span></dt>
-	<dd>&middot; thickness of the the text for the public notice</dd>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text thickness for the public thanks</span></dt>
+	<dd>&middot; thickness of the text for the public notice</dd>
 	<dd>&middot; NB: "bold" and "bolder" are often the same</dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers publicly format</span></dt>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Template for the public thanks</span></dt>
 	<dd>&middot; template to format the public notice</dd>
-	<dd>&middot; available variables are: <span class="code">{AMOUNT}</span> for the tip amount, <span class="code">{TIPPER}</span> for the tipper's nickname, <span class="code">{SERVICE}</span> for the label of the item corresponding to the tip amount</dd>
+	<dd>&middot; available variables are: <span class="code">{AMOUNT}</span> for the tip amount, <span class="code">{USER}</span> for the tipper's nickname, <span class="code">{SERVICE}</span> for the label of the item corresponding to the tip amount</dd>
+	<dd>&middot; example 1: {USER} tipped {AMOUNT} for {SERVICE}</dd>
+	<dd>&middot; example 2: Thank you {USER} for your {AMOUNT}tk tip</dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers privately background color</span></dt>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Background color for the private thanks</span></dt>
 	<dd>&middot; color of the text for the private notice</dd>
 	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#ffffff; text-shadow:gray 1px 0 1px">#ffffff</span></dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers privately text color</span></dt>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text color for the private thanks</span></dt>
 	<dd>&middot; color of the text for the private notice</dd>
 	<dd>&middot; written in CSS/HTML format <sup>[1]</sup></dd>
+	<dd>&middot; default color is: <span style="color:#000000; text-shadow:gray 0.5px 0 0.5px">#000000</span></dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers privately boldness</span></dt>
-	<dd>&middot; thickness of the the text for the private notice</dd>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Text thickness for the private thanks</span></dt>
+	<dd>&middot; thickness of the text for the private notice</dd>
 	<dd>&middot; NB: "bold" and "bolder" are often the same</dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers privately format</span></dt>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Template for the private thanks</span></dt>
 	<dd>&middot; template to format the private notice</dd>
-	<dd>&middot; available variables are: <span class="code">{AMOUNT}</span> for the tip amount, <span class="code">{TIPPER}</span> for the tipper's nickname, <span class="code">{SERVICE}</span> for the label of the item corresponding to the tip amount</dd>
+	<dd>&middot; available variables are: <span class="code">{AMOUNT}</span> for the tip amount, <span class="code">{USER}</span> for the tipper's nickname, <span class="code">{SERVICE}</span> for the label of the item corresponding to the tip amount</dd>
+	<dd>&middot; example 1: {USER} tipped {AMOUNT} for {SERVICE}</dd>
+	<dd>&middot; example 2: Thank you {USER} for your {AMOUNT}tk tip</dd>
 	<dd>&nbsp;</dd>
 
-	<dt><span class="block" style="font-weight: bold; padding: 0">Thank tippers remind tip note format</span></dt>
+	<dt><span class="block" style="font-weight: bold; padding: 0">Whether to repeat the tip note back to the user</span></dt>
+	<dd>&middot; if you want tippers to get a notice to repeat their tip note back to them</dd>
+	<dd>&nbsp;</dd>
+
+	<dt><span class="block" style="font-weight: bold; padding: 0">Template for the tip note reminder</span></dt>
 	<dd>&middot; template to format the personal reminder of the tip message (to its author, not in public chat)</dd>
 	<dd>&middot; same format options as the private thanks</dd>
 	<dd>&middot; available variables are: <span class="code">{MESSAGE}</span></dd>
+	<dd>&middot; example: Your tip note was: {MESSAGE}</dd>
 	<dd>&nbsp;</dd>
 </dl>
 
@@ -173,7 +309,7 @@
 	<dd>&nbsp;</dd>
 
 	<dt><span class="block" style="font-weight: bold; padding: 0">Menu boldness</span></dt>
-	<dd>&middot; thickness of the the text</dd>
+	<dd>&middot; thickness of the text</dd>
 	<dd>&middot; NB: "bold" and "bolder" are often the same</dd>
 	<dd>&nbsp;</dd>
 
@@ -193,10 +329,13 @@
 
 	<dt><span class="block" style="font-weight: bold; padding: 0">Menu item display format</span></dt>
 	<dd>&middot; all menu items are reformatted according to this pattern</dd>
+	<dd>&middot; allows the use of <span class="code">:emoticons</span></dd>
 	<dd>&middot; remember to include both <span class="code">{AMOUNT}</span> and <span class="code">{LABEL}</span></dd>
 	<dd>&middot; available variables are: <span class="code">{AMOUNT}</span>, <span class="code">{LABEL}</span></dd>
-	<dd>&middot; see examples below</dd>
-	<dd>&middot; allows the use of <span class="code">:emoticons</span></dd>
+	<dd>&middot; example 1: {AMOUNT} tokens - {LABEL}</dd>
+	<dd>&middot; example 2: {LABEL} ({AMOUNT}tk)</dd>
+	<dd>&middot; example 3: tip {AMOUNT} tokens for: {LABEL}</dd>
+	<dd>&middot; simply write "<span class="code">{AMOUNT}</span>" and "<span class="code">{LABEL}</span>" anywhere in the box, and they will be replaced with the current menu item</dd>
 	<dd>&nbsp;</dd>
 
 	<dt><span class="block" style="font-weight: bold; padding: 0">Sort order</span></dt>
@@ -208,14 +347,6 @@
 	<dd>&middot; anything else will be ignored by the app (handy to disable an item temporarily)</dd>
 	<dd>&middot; allows the use of <span class="code">:emoticons</span></dd>
 	<dd>&nbsp;</dd>
-</dl>
-
-<dl>
-	<dt><span class="block">Examples of menu item display formats (here an example where the service is a PM, for a cost of 25 tokens):</span></dt>
-	<dd>&middot; <span class="code">{AMOUNT} tokens - {LABEL}</span></dd>
-	<dd>&middot; <span class="code">{LABEL} ({AMOUNT}tk)</span></dd>
-	<dd>&middot; <span class="code">tip {AMOUNT} tokens for: {LABEL}</span></dd>
-	<dd>&middot; simply write "<span class="code">{AMOUNT}</span>" and "<span class="code">{LABEL}</span>" anywhere in the box, and they will be replaced with the current menu item</dd>
 </dl>
 
 <p><span style="font-weight: bold">[1]</span> Feel free to use <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool" target="_blank" rel="noreferer noopener">a tool like this one</a> to pick your colors (focus on the "HEXA" label that changes as you click on different colors). Flexible Tip Menu accepts both lowercase and uppercase color codes, and the # symbol is not required at the start.</p>

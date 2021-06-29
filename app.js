@@ -298,6 +298,7 @@ const i18n = {
 		lbl_broadcaster: "broadcaster only",
 		lbl_mods: "moderators + broadcaster",
 		lbl_fans: "fans + moderators + broadcaster",
+		lbl_guests: "anonymous only",
 		lbl_everyone: "everyone in chat",
 		lbl_single_user: "user only in chat",
 		lbl_user_bcaster: 'user + broadcaster',
@@ -394,6 +395,7 @@ const i18n = {
 		lbl_broadcaster: "streamer",
 		lbl_mods: "moderadores + streamer",
 		lbl_fans: "fans + mods + streamer",
+		lbl_guests: "no conectados / anon",
 		lbl_everyone: "todo el mundo en el chat",
 		lbl_single_user: "solo el usuario en el chat",
 		lbl_user_bcaster: 'user + broadcaster',
@@ -490,6 +492,7 @@ const i18n = {
 		lbl_broadcaster: "streameur seulement",
 		lbl_mods: "moderateurs + streameur",
 		lbl_fans: "fans + mods + streameur",
+		lbl_guests: "non connectes / anonymes",
 		lbl_everyone: "tout le monde dans le chat",
 		lbl_single_user: "utilisateur uniquement dans le chat",
 		lbl_user_bcaster: 'user + broadcaster',
@@ -968,14 +971,18 @@ const FlexibleTipMenu = {
 
 			case FlexibleTipMenu.i18n('lbl_user_bcaster'):
 				cb.setTimeout(function() {
-					cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					if(username !== cb.room_slug) {
+						cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					}
 					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
 				}, delay_ms);
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_user_mods'):
 				cb.setTimeout(function() {
-					cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					if(username !== cb.room_slug) {
+						cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					}
 					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
 					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
 				}, delay_ms);
@@ -1728,7 +1735,7 @@ cb.settings_choices.push({
 	label: ftm.i18n('app_name'),
 	type: 'str',
 	minLength: 1,
-	maxLength: 99,
+	maxLength: 250,
 	required: false,
 });
 
@@ -1862,7 +1869,7 @@ cb.settings_choices.push({
 	label: ftm.i18n('autogreet_newcomer_format'),
 	type: 'str',
 	minLength: 1,
-	maxLength: 99,
+	maxLength: 250,
 	defaultValue: ftm.i18n('expl_autogreet_newcomer_format'),
 });
 
@@ -1914,7 +1921,7 @@ cb.settings_choices.push({
 	label: ftm.i18n('autogreet_newfanclub_format'),
 	type: 'str',
 	minLength: 1,
-	maxLength: 99,
+	maxLength: 250,
 	defaultValue: ftm.i18n('expl_autogreet_newfanclub_format'),
 });
 
@@ -1966,7 +1973,7 @@ cb.settings_choices.push({
 	label: ftm.i18n('autothank_follower_format'),
 	type: 'str',
 	minLength: 1,
-	maxLength: 99,
+	maxLength: 250,
 	defaultValue: ftm.i18n('expl_autothank_follower_format'),
 });
 
@@ -2026,7 +2033,7 @@ cb.settings_choices.push({
 	label: ftm.i18n('autothank_tip_publicly_format'),
 	type: 'str',
 	minLength: 1,
-	maxLength: 99,
+	maxLength: 250,
 	defaultValue: ftm.i18n('expl_autothank_tip_publicly_format'),
 });
 
@@ -2063,7 +2070,7 @@ cb.settings_choices.push({
 	label: ftm.i18n('autothank_tip_privately_format'),
 	type: 'str',
 	minLength: 1,
-	maxLength: 99,
+	maxLength: 250,
 	defaultValue: ftm.i18n('expl_autothank_tip_privately_format'),
 });
 
@@ -2081,7 +2088,7 @@ cb.settings_choices.push({
 	label: ftm.i18n('autothank_tip_remind_note_format'),
 	type: 'str',
 	minLength: 1,
-	maxLength: 99,
+	maxLength: 250,
 	defaultValue: ftm.i18n('expl_autothank_tip_remind_note_format'),
 });
 
@@ -2109,7 +2116,7 @@ for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 		label: ftm.i18n('tip_menu_header').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
-		maxLength: 99,
+		maxLength: 250,
 		required: false,
 	});
 
@@ -2118,7 +2125,7 @@ for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 		label: ftm.i18n('tip_menu_footer').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
-		maxLength: 99,
+		maxLength: 250,
 		required: false,
 	});
 
@@ -2185,7 +2192,7 @@ for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 		label: ftm.i18n('menu_item_prefix').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
-		maxLength: 100,
+		maxLength: 250,
 		required: false,
 	});
 
@@ -2194,7 +2201,7 @@ for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 		label: ftm.i18n('menu_item_suffix').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
-		maxLength: 100,
+		maxLength: 250,
 		required: false,
 	});
 
@@ -2203,7 +2210,7 @@ for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 		label: ftm.i18n('menu_item_display_format').replace(label_patterns.menu, menu_idx_letter),
 		type: 'str',
 		minLength: 1,
-		maxLength: 99,
+		maxLength: 250,
 		defaultValue: ftm.i18n('expl_menu_item_display_format'),
 	});
 
@@ -2228,7 +2235,7 @@ for(let i=0; i<nb_of_distinct_menus && i<az.length; ++i) {
 			label: item_lbl,
 			type: 'str',
 			minLength: 1,
-			maxLength: 99,
+			maxLength: 250,
 			defaultValue: '',
 			required: false,
 		};
