@@ -825,7 +825,7 @@ const FlexibleTipMenu = {
 	 *
 	 * @param {user} user The user object that was fired with the event
 	 */
-	 collect_stats_user: function(namespace, user) {
+	collect_stats_user: function(namespace, user) {
 		// @todo possibly check if the user is anonymous etc
 		if(!user || !user.user) {
 			return;
@@ -1465,12 +1465,25 @@ const FlexibleTipMenu = {
 	 */
 	show_commands_help: function(username, usergroup = null) {
 		let commands_list = [];
-		commands_list.push(FlexibleTipMenu.i18n('expl_commands_available'));
-		commands_list.push(FlexibleTipMenu.i18n('expl_commands_tipmenu'));
-		commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist'));
-		commands_list.push(FlexibleTipMenu.i18n('expl_commands_stats'));
+		const tip_menu_enabled = !FlexibleTipMenu.is_disabled('tip_menu_flag');
+		if(tip_menu_enabled) {
+			commands_list.push(FlexibleTipMenu.i18n('expl_commands_tipmenu'));
+		}
 
+		commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist'));
+
+		const collect_stats_enabled = !FlexibleTipMenu.is_disabled('collect_stats_flag');
+		if(collect_stats_enabled) {
+			commands_list.push(FlexibleTipMenu.i18n('expl_commands_stats'));
+		}
+
+		if(!commands_list.length) {
+			return;
+		}
+
+		commands_list.unshift(FlexibleTipMenu.i18n('expl_commands_available'));
 		const notice = FlexibleTipMenu.clean_str(commands_list.join("\n"));
+
 		cb.sendNotice(notice, username, colors_sample.black, colors_sample.white, '', usergroup);
 	},
 
@@ -1511,7 +1524,7 @@ const FlexibleTipMenu = {
 	 * @param {*} message
 	 * @returns {message} The updated message
 	 */
-	 on_message: function(message) {
+	on_message: function(message) {
 		return FlexibleTipMenu.message_handler(message);
 	},
 
@@ -1555,7 +1568,7 @@ const FlexibleTipMenu = {
 	 * @param {string} module_lbl A small label to identify the automod in chat (in the main notice)
 	 * @returns {message} The updated message
 	 */
-	 automod_plaintext: function(event_msg, flag_name, module_lbl) {
+	automod_plaintext: function(event_msg, flag_name, module_lbl) {
 		const module_flag = FlexibleTipMenu.val(flag_name);
 		const lbl_not_applicable = FlexibleTipMenu.i18n('lbl_not_applicable');
 		const lbl_mods = FlexibleTipMenu.i18n('lbl_mods');
