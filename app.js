@@ -2118,7 +2118,14 @@ const FlexibleTipMenu = {
 			return true;
 		}
 
-		return null === FlexibleTipMenu.val(setting_name);
+		if('undefined' !== typeof FlexibleTipMenu.run_flags[setting_name]) {
+			return FlexibleTipMenu.run_flags[setting_name];
+		}
+
+		const flag_res = (null === FlexibleTipMenu.val(setting_name));
+		FlexibleTipMenu.run_flags[setting_name] = flag_res;
+
+		return flag_res;
 	},
 };
 
