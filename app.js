@@ -203,6 +203,7 @@ const settings_list = {
 	automods_record_flag: 'automodsRecordFlag',
 	decorator_gender_flag: 'debugmessage decoratorGenderFlag',
 	decorator_time_flag: 'debugmessage decoratorTimeFlag',
+	decorator_tips_flag: 'debugmessage decoratorTipsFlag',
 	autogreet_newcomer_flag: 'debugmessage autogreetRoomFlag',
 	autogreet_newcomer_background_color: 'autogreetRoomBackgroundColor',
 	autogreet_newcomer_text_color: 'autogreetRoomTextColor',
@@ -268,6 +269,7 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
+		decorator_tips_flag: 'INDICATOR OF TIPPED AMOUNT IN CHAT ------------',
 		autogreet_newcomer_flag: 'AUTOMATICALLY GREET NEWCOMERS (in the room) ------------',
 		autogreet_newcomer_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
 		autogreet_newfanclub_flag: 'AUTOMATICALLY GREET NEW FANS (to the fanclub) ------------',
@@ -338,7 +340,7 @@ const i18n = {
 		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
 		lbl_collect_stats_notes: '{COUNT} tip notes',
 		lbl_collect_stats_followers: '{COUNT} new followers',
-		lbl_collect_stats_newcomers: ,'{COUNT} new chat members'
+		lbl_collect_stats_newcomers: '{COUNT} new chat members',
 		lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
 		lbl_collect_stats_nothingyet: 'nothing yet',
 		lbl_collect_stats_nochange: 'no change since last time',
@@ -382,6 +384,7 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
+		decorator_tips_flag: 'INDICATOR OF TIPPED AMOUNT IN CHAT ------------',
 		autogreet_newcomer_flag: 'AUTOMATICALLY GREET NEWCOMERS (in the room) ------------',
 		autogreet_newcomer_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
 		autogreet_newfanclub_flag: 'AUTOMATICALLY GREET NEW FANS (to the fanclub) ------------',
@@ -452,7 +455,7 @@ const i18n = {
 		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
 		lbl_collect_stats_notes: '{COUNT} tip notes',
 		lbl_collect_stats_followers: '{COUNT} new followers',
-		lbl_collect_stats_newcomers: ,'{COUNT} new chat members'
+		lbl_collect_stats_newcomers: '{COUNT} new chat members',
 		lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
 		lbl_collect_stats_nothingyet: 'nothing yet',
 		lbl_collect_stats_nochange: 'no change since last time',
@@ -496,6 +499,7 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
+		decorator_tips_flag: 'INDICATOR OF TIPPED AMOUNT IN CHAT ------------',
 		autogreet_newcomer_flag: 'AUTOMATICALLY GREET NEWCOMERS (in the room) ------------',
 		autogreet_newcomer_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
 		autogreet_newfanclub_flag: 'AUTOMATICALLY GREET NEW FANS (to the fanclub) ------------',
@@ -566,7 +570,7 @@ const i18n = {
 		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
 		lbl_collect_stats_notes: '{COUNT} tip notes',
 		lbl_collect_stats_followers: '{COUNT} new followers',
-		lbl_collect_stats_newcomers: ,'{COUNT} new chat members'
+		lbl_collect_stats_newcomers: '{COUNT} new chat members',
 		lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
 		lbl_collect_stats_nothingyet: 'nothing yet',
 		lbl_collect_stats_nochange: 'no change since last time',
@@ -638,6 +642,7 @@ const FlexibleTipMenu = {
 			nb_newcomers: 0,
 			nb_fanclubs: 0,
 		},
+		tippers: {},
 		followers: [],
 		newcomers: [],
 		fanclubs: [],
@@ -846,6 +851,19 @@ const FlexibleTipMenu = {
 		if('' !== tip_note) {
 			++FlexibleTipMenu.collected_stats.all.nb_notes;
 		}
+
+		if(tip.is_anon_tip) {
+			return;
+		}
+
+		const tip_user = tip.from_user;
+		if('undefined' === typeof FlexibleTipMenu.collected_stats.tippers[tip_user]) {
+			FlexibleTipMenu.collected_stats.tippers[tip_user] = {
+				total_amount: 0, // in tokens
+			};
+		}
+
+		FlexibleTipMenu.collected_stats.tippers[tip_user].total_amount += tip_amount;
 	},
 
 	/**
@@ -1101,6 +1119,12 @@ const FlexibleTipMenu = {
 		if(decorator_time_enabled) {
 			// applies to everyone
 			notice_tpl = FlexibleTipMenu.decorator_time(notice_tpl);
+		}
+
+		const decorator_tips_enabled = !FlexibleTipMenu.is_disabled('decorator_tips_flag');
+		if(decorator_tips_enabled) {
+			// applies to everyone
+			notice_tpl = FlexibleTipMenu.decorator_tips(notice_tpl, user.user);
 		}
 
 
@@ -1878,6 +1902,38 @@ const FlexibleTipMenu = {
 		*/
 	},
 
+	decorator_tips: function(txt_msg, username) {
+		if(username === cb.room_slug) {
+			return txt_msg; // no change
+		}
+
+		if('undefined' === typeof FlexibleTipMenu.collected_stats.tippers[username]) {
+			return txt_msg; // no change
+		}
+
+		const total_amount = FlexibleTipMenu.collected_stats.tippers[username].total_amount;
+		if(!total_amount) {
+			return txt_msg; // no change
+		}
+
+		const amount_str = '|{AMOUNT}|'
+			.replace(label_patterns.amount, total_amount);
+
+		let decorated_msg = txt_msg
+			.replace(label_patterns.username, username);
+
+		if(txt_msg.includes(username)) {
+			// append to username
+			decorated_msg = txt_msg.replace(username, username+' '+amount_str);
+		}
+		else {
+			// prepend to entire message
+			decorated_msg = amount_str+' '+txt_msg;
+		}
+
+		return decorated_msg.trim();
+	},
+
 	/**
 	 * Handle plain messages from users (non-tips, non-commands);
 	 * Will run automods and decorators
@@ -1918,6 +1974,11 @@ const FlexibleTipMenu = {
 		const decorator_time_enabled = !FlexibleTipMenu.is_disabled('decorator_time_flag');
 		if(decorator_time_enabled) {
 			event_msg.m = FlexibleTipMenu.decorator_time(event_msg.m);
+		}
+
+		const decorator_tips_enabled = !FlexibleTipMenu.is_disabled('decorator_tips_flag');
+		if(decorator_tips_enabled) {
+			event_msg.m = FlexibleTipMenu.decorator_tips(event_msg.m, event_msg.user);
 		}
 
 		const decorator_gender_enabled = !FlexibleTipMenu.is_disabled('decorator_gender_flag');
@@ -2140,7 +2201,7 @@ cb.settings_choices.push({
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
-// decorator gender module
+// decorator modules
 cb.settings_choices.push({
 	name: settings_list.decorator_gender_flag,
 	label: ftm.i18n('decorator_gender_flag'),
@@ -2159,6 +2220,16 @@ cb.settings_choices.push({
 	choice2: ftm.i18n('lbl_time_medium'),
 	choice3: ftm.i18n('lbl_time_full'),
 	choice4: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.decorator_tips_flag,
+	label: ftm.i18n('decorator_tips_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
