@@ -974,7 +974,7 @@ const FlexibleTipMenu = {
 		const header_lbl = FlexibleTipMenu.i18n('lbl_collect_stats_header')
 			.replace(label_patterns.label, FlexibleTipMenu.start);
 
-		const separator_lbl = FlexibleTipMenu.i18n('lbl_collect_stats_separator');
+		const separator_lbl = FlexibleTipMenu.i18n('lbl_collect_stats_separator', false);
 
 		FlexibleTipMenu.send_notice(header_lbl+"\n"+stats_rows.join(separator_lbl), username, null, null, font_weights.bolder, 'collect_stats_flag', 100, {user: username, gender: ''});
 	},
@@ -2115,12 +2115,13 @@ const FlexibleTipMenu = {
 	 * @param {string} idx The identifier of the label or template to localize
 	 * @returns {string} The value
 	 */
-	i18n: function(idx) {
+	i18n: function(idx, do_trim=true) {
 		if('undefined' === typeof i18n[lang][idx]) {
 			return null;
 		}
 
-		return i18n[lang][idx].trim();
+		const lbl = i18n[lang][idx];
+		return do_trim ? lbl.trim() : lbl;
 	},
 
 	/**
