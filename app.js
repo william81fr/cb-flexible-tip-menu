@@ -872,7 +872,7 @@ const FlexibleTipMenu = {
 	 */
 	collect_stats_user: function(namespace, user) {
 		// @todo possibly check if the user is anonymous etc
-		if(!user || !user.user) {
+		if(!user || !user.user || user.user === cb.room_slug) {
 			return;
 		}
 
@@ -1307,12 +1307,12 @@ const FlexibleTipMenu = {
 			return;
 		}
 
-		if(FlexibleTipMenu.run_flags.collect_stats) {
-			FlexibleTipMenu.collect_stats_follower(user);
-		}
-
 		if(FlexibleTipMenu.run_flags.autothank_follower) {
 			FlexibleTipMenu.thank_follower(user);
+		}
+
+		if(FlexibleTipMenu.run_flags.collect_stats) {
+			FlexibleTipMenu.collect_stats_follower(user);
 		}
 	},
 
@@ -1323,8 +1323,13 @@ const FlexibleTipMenu = {
 	thank_follower: function(user) {
 		// @todo possibly check if the user is in the room before calling the actual function
 
-		if(!user || !user.user) {
+		if(!user || !user.user || user.user === cb.room_slug) {
 			return;
+		}
+
+		const collect_stats_ns_enabled = !FlexibleTipMenu.is_disabled('collect_stats_followers');
+		if(collect_stats_ns_enabled && FlexibleTipMenu.collected_stats.followers.includes(user.user)) {
+			return; // already thanked
 		}
 
 		const background_color = FlexibleTipMenu.get_color_code('autothank_follower_background_color', colors_sample.white);
@@ -1344,8 +1349,13 @@ const FlexibleTipMenu = {
 	greet_newcomer_handler: function(user) {
 		// @todo possibly check if the user is anonymous etc
 
-		if(!user || !user.user) {
+		if(!user || !user.user || user.user === cb.room_slug) {
 			return;
+		}
+
+		const collect_stats_ns_enabled = !FlexibleTipMenu.is_disabled('collect_stats_newcomers');
+		if(collect_stats_ns_enabled && FlexibleTipMenu.collected_stats.newcomers.includes(user.user)) {
+			return; // already greeted
 		}
 
 		const background_color = FlexibleTipMenu.get_color_code('autogreet_newcomer_background_color', colors_sample.white);
@@ -1367,12 +1377,12 @@ const FlexibleTipMenu = {
 			return;
 		}
 
-		if(FlexibleTipMenu.run_flags.collect_stats) {
-			FlexibleTipMenu.collect_stats_newcomer(user);
-		}
-
 		if(FlexibleTipMenu.run_flags.autogreet_newcomer) {
 			FlexibleTipMenu.greet_newcomer_handler(user);
+		}
+
+		if(FlexibleTipMenu.run_flags.collect_stats) {
+			FlexibleTipMenu.collect_stats_newcomer(user);
 		}
 	},
 
@@ -1383,8 +1393,13 @@ const FlexibleTipMenu = {
 	greet_newfanclub_handler: function(user) {
 		// @todo possibly check if the user is anonymous etc
 
-		if(!user || !user.user) {
+		if(!user || !user.user || user.user === cb.room_slug) {
 			return;
+		}
+
+		const collect_stats_ns_enabled = !FlexibleTipMenu.is_disabled('collect_stats_fanclubs');
+		if(collect_stats_ns_enabled && FlexibleTipMenu.collected_stats.fanclubs.includes(user.user)) {
+			return; // already greeted
 		}
 
 		const background_color = FlexibleTipMenu.get_color_code('autogreet_newfanclub_background_color', colors_sample.white);
@@ -1406,12 +1421,12 @@ const FlexibleTipMenu = {
 			return;
 		}
 
-		if(FlexibleTipMenu.run_flags.collect_stats) {
-			FlexibleTipMenu.collect_stats_fanclub(user);
-		}
-
 		if(FlexibleTipMenu.run_flags.autogreet_newfanclub) {
 			FlexibleTipMenu.greet_newfanclub_handler(user);
+		}
+
+		if(FlexibleTipMenu.run_flags.collect_stats) {
+			FlexibleTipMenu.collect_stats_fanclub(user);
 		}
 	},
 
