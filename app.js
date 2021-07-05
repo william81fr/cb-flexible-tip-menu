@@ -333,6 +333,15 @@ const i18n = {
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		lbl_collect_stats_header: '[{APP}] current stats (since {LABEL} GMT):',
+		lbl_collect_stats_separator: "; ",
+		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
+		lbl_collect_stats_notes: '{COUNT} tip notes',
+		lbl_collect_stats_followers: '{COUNT} new followers',
+		lbl_collect_stats_newcomers: ,'{COUNT} new chat members'
+		lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
+		lbl_collect_stats_nothingyet: 'nothing yet',
+		lbl_collect_stats_nochange: 'no change since last time',
 		expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' in {APP} {LABEL} (currently valued at '{VALUE}')",
 		errmsg_app_disabled: "app is disabled",
@@ -438,6 +447,15 @@ const i18n = {
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		lbl_collect_stats_header: '[{APP}] current stats (since {LABEL} GMT):',
+		lbl_collect_stats_separator: "; ",
+		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
+		lbl_collect_stats_notes: '{COUNT} tip notes',
+		lbl_collect_stats_followers: '{COUNT} new followers',
+		lbl_collect_stats_newcomers: ,'{COUNT} new chat members'
+		lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
+		lbl_collect_stats_nothingyet: 'nothing yet',
+		lbl_collect_stats_nochange: 'no change since last time',
 		expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' en {APP} {LABEL} (actualmente vale '{VALUE}')",
 		errmsg_app_disabled: "el bot esta desactivado",
@@ -543,6 +561,15 @@ const i18n = {
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		lbl_collect_stats_header: '[{APP}] current stats (since {LABEL} GMT):',
+		lbl_collect_stats_separator: "; ",
+		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
+		lbl_collect_stats_notes: '{COUNT} tip notes',
+		lbl_collect_stats_followers: '{COUNT} new followers',
+		lbl_collect_stats_newcomers: ,'{COUNT} new chat members'
+		lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
+		lbl_collect_stats_nothingyet: 'nothing yet',
+		lbl_collect_stats_nochange: 'no change since last time',
 		expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' dans {APP} {LABEL} (vaut actuellement '{VALUE}')",
 		errmsg_app_disabled: "l'app est desactivee",
@@ -883,7 +910,7 @@ const FlexibleTipMenu = {
 		let stats_rows = [];
 		//stats_rows.push('{COUNT} events'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_events));
 		if(FlexibleTipMenu.collected_stats.all.nb_tips) {
-			const lbl = '{AMOUNT} tokens in {COUNT} tips'
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_tips')
 				.replace(label_patterns.amount, FlexibleTipMenu.collected_stats.all.total_amount)
 				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_tips);
 
@@ -891,41 +918,47 @@ const FlexibleTipMenu = {
 		}
 
 		if(FlexibleTipMenu.collected_stats.all.nb_notes) {
-			const lbl = '{COUNT} tip notes'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_notes);
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_notes')
+				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_notes);
 			stats_rows.push(lbl);
 		}
 
 		if(FlexibleTipMenu.collected_stats.all.nb_followers) {
-			const lbl = '{COUNT} new followers'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_followers);
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_followers')
+				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_followers);
 			stats_rows.push(lbl);
 		}
 
 		if(FlexibleTipMenu.collected_stats.all.nb_newcomers) {
-			const lbl = '{COUNT} new chat members'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_newcomers);
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_newcomers')
+				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_newcomers);
 			stats_rows.push(lbl);
 		}
 
 		if(FlexibleTipMenu.collected_stats.all.nb_fanclubs) {
-			const lbl = '{COUNT} new fanclub members'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_fanclubs);
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_fanclubs')
+				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_fanclubs);
 			stats_rows.push(lbl);
 		}
 
 		if(!stats_rows.length) {
-			stats_rows.push('nothing yet');
+			stats_rows.push(FlexibleTipMenu.i18n('lbl_collect_stats_nothingyet'));
 		}
 
 		const current_hash = FlexibleTipMenu.hash(stats_rows);
 		if(current_hash === FlexibleTipMenu.collected_stats.last_hash) {
-			stats_rows.unshift('no change since last time');
+			stats_rows.unshift(FlexibleTipMenu.i18n('lbl_collect_stats_nochange'));
 		}
 		else {
 			FlexibleTipMenu.collected_stats.last_hash = current_hash;
 		}
 
-		const header_lbl = '[{APP}] current stats (since {LABEL}):'
+		const header_lbl = FlexibleTipMenu.i18n('lbl_collect_stats_header')
 			.replace(label_patterns.label, FlexibleTipMenu.start);
 
-		FlexibleTipMenu.send_notice(header_lbl+"\n"+stats_rows.join("; "), username, null, null, font_weights.bolder, 'collect_stats_flag', 100, {user: username, gender: ''});
+		const separator_lbl = FlexibleTipMenu.i18n('lbl_collect_stats_separator');
+
+		FlexibleTipMenu.send_notice(header_lbl+"\n"+stats_rows.join(separator_lbl), username, null, null, font_weights.bolder, 'collect_stats_flag', 100, {user: username, gender: ''});
 	},
 
 	/**
