@@ -2414,8 +2414,9 @@ cb.settings_choices.push({
 	name: settings_list.best_tippers_flag,
 	label: ftm.i18n('best_tippers_flag'),
 	type: 'choice',
-	choice1: ftm.i18n('lbl_enabled'),
-	choice2: ftm.i18n('lbl_not_applicable'),
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
