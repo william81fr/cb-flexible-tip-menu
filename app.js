@@ -203,6 +203,7 @@ const settings_list = {
 	automods_record_flag: 'automodsRecordFlag',
 	decorator_gender_flag: 'debugmessage decoratorGenderFlag',
 	decorator_time_flag: 'debugmessage decoratorTimeFlag',
+	decorator_tips_flag: 'debugmessage decoratorTipsFlag',
 	autogreet_newcomer_flag: 'debugmessage autogreetRoomFlag',
 	autogreet_newcomer_background_color: 'autogreetRoomBackgroundColor',
 	autogreet_newcomer_text_color: 'autogreetRoomTextColor',
@@ -234,6 +235,14 @@ const settings_list = {
 	collect_stats_followers: 'collectStatsFollowers',
 	collect_stats_newcomers: 'collectStatsNewcomers',
 	collect_stats_fanclubs: 'collectStatsFanclubs',
+	best_tippers_flag: 'debugmessage bestTippersFlag',
+	best_tippers_start_tokens: 'bestTippersStartTokens',
+	best_tippers_repeat_minutes: 'bestTippersRepeatMinutes',
+	best_tippers_stack_size: 'bestTippersStackSize',
+	best_tippers_background_color: 'bestTippersBackgroundColor',
+	best_tippers_text_color: 'bestTippersTextColor',
+	best_tippers_boldness: 'bestTippersBoldness',
+	best_tippers_format: 'successmessage bestTippersFormat',
 	tip_menu_flag: 'debugmessage tipMenuShownTo',
 	tip_menu_header: 'tipMenuHeader',
 	tip_menu_footer: 'tipMenuFooter',
@@ -268,6 +277,7 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
+		decorator_tips_flag: 'INDICATOR OF TIPPED AMOUNT IN CHAT ------------',
 		autogreet_newcomer_flag: 'AUTOMATICALLY GREET NEWCOMERS (in the room) ------------',
 		autogreet_newcomer_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
 		autogreet_newfanclub_flag: 'AUTOMATICALLY GREET NEW FANS (to the fanclub) ------------',
@@ -290,6 +300,11 @@ const i18n = {
 		collect_stats_followers: 'Include new follower stats?',
 		collect_stats_newcomers: 'Include influx (chat members)?',
 		collect_stats_fanclubs: 'Include fanclub subscriptions?',
+		best_tippers_flag: 'BEST TIPPER(S) ------------',
+		best_tippers_start_tokens: 'Minimum tokens',
+		best_tippers_repeat_minutes: 'Repeat every X minute',
+		best_tippers_stack_size: 'Show X winners',
+		best_tippers_format: 'Template for the best tipper(s) notice (variables are: {USER}, {AMOUNT}) - english recommended',
 		tip_menu_flag: "TIP MENU {MENU} ------------",
 		tip_menu_header: "Line before the tip menu {MENU}",
 		tip_menu_footer: "Line at the end of the tip menu {MENU}",
@@ -333,6 +348,16 @@ const i18n = {
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		expl_best_tippers_format: "Be the king with {AMOUNT} and get special treatment!",
+		lbl_collect_stats_header: '[{APP}] current stats (since {LABEL} GMT):',
+		lbl_collect_stats_separator: "; ",
+		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
+		lbl_collect_stats_notes: '{COUNT} tip notes',
+		lbl_collect_stats_followers: '{COUNT} new followers',
+		lbl_collect_stats_newcomers: '{COUNT} new chat members',
+		lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
+		lbl_collect_stats_nothingyet: 'nothing yet',
+		lbl_collect_stats_nochange: 'no change since last time',
 		expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' in {APP} {LABEL} (currently valued at '{VALUE}')",
 		errmsg_app_disabled: "app is disabled",
@@ -373,6 +398,7 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
+		decorator_tips_flag: 'INDICATOR OF TIPPED AMOUNT IN CHAT ------------',
 		autogreet_newcomer_flag: 'AUTOMATICALLY GREET NEWCOMERS (in the room) ------------',
 		autogreet_newcomer_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
 		autogreet_newfanclub_flag: 'AUTOMATICALLY GREET NEW FANS (to the fanclub) ------------',
@@ -395,6 +421,11 @@ const i18n = {
 		collect_stats_followers: 'Incluir nuevos seguidores?',
 		collect_stats_newcomers: 'Incluir afluencia (miembros del chat)?',
 		collect_stats_fanclubs: 'Incluir suscripciones al fanclub?',
+		best_tippers_flag: 'MEJOR(ES) TIPPER(S) ------------',
+		best_tippers_start_tokens: 'Minimum tokens',
+		best_tippers_repeat_minutes: 'Repeat every X minute',
+		best_tippers_stack_size: 'Show X winners',
+		best_tippers_format: '',
 		tip_menu_flag: "MENU DE TIPS {MENU} ------------",
 		tip_menu_header: "Linea antes del menu de tips {MENU}",
 		tip_menu_footer: "Linea despues del menu de tips {MENU}",
@@ -438,6 +469,16 @@ const i18n = {
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		expl_best_tippers_format: "Be the king with {AMOUNT} and get special treatment!",
+		lbl_collect_stats_header: '[{APP}] current stats (since {LABEL} GMT):',
+		lbl_collect_stats_separator: "; ",
+		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
+		lbl_collect_stats_notes: '{COUNT} tip notes',
+		lbl_collect_stats_followers: '{COUNT} new followers',
+		lbl_collect_stats_newcomers: '{COUNT} new chat members',
+		lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
+		lbl_collect_stats_nothingyet: 'nothing yet',
+		lbl_collect_stats_nochange: 'no change since last time',
 		expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' en {APP} {LABEL} (actualmente vale '{VALUE}')",
 		errmsg_app_disabled: "el bot esta desactivado",
@@ -478,6 +519,7 @@ const i18n = {
 		lbl_time_short: 'HH:MM',
 		lbl_time_medium: 'HH:MM:SS',
 		lbl_time_full: 'HH:MM:SS +timezone',
+		decorator_tips_flag: 'INDICATOR OF TIPPED AMOUNT IN CHAT ------------',
 		autogreet_newcomer_flag: 'AUTOMATICALLY GREET NEWCOMERS (in the room) ------------',
 		autogreet_newcomer_format: 'Template for the notice in chat (variables are: {USER}) - english recommended',
 		autogreet_newfanclub_flag: 'AUTOMATICALLY GREET NEW FANS (to the fanclub) ------------',
@@ -500,6 +542,11 @@ const i18n = {
 		collect_stats_followers: 'Inclure nouveaux abonnes?',
 		collect_stats_newcomers: 'Inclure affluence (du chat)?',
 		collect_stats_fanclubs: 'Inclure inscriptions au fanclub?',
+		best_tippers_flag: 'MEILLEUR(S) TIPPERS ------------',
+		best_tippers_start_tokens: 'Minimum tokens',
+		best_tippers_repeat_minutes: 'Repeat every X minute',
+		best_tippers_stack_size: 'Show X winners',
+		best_tippers_format: '',
 		tip_menu_flag: "MENU DE TIPS {MENU} ------------",
 		tip_menu_header: "Ligne avant le menu de tips {MENU}",
 		tip_menu_footer: "Ligne apres le menu de tips {MENU}",
@@ -543,6 +590,16 @@ const i18n = {
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		expl_best_tippers_format: "Be the king with {AMOUNT} and get special treatment!",
+		lbl_collect_stats_header: '[{APP}] current stats (since {LABEL} GMT):',
+		lbl_collect_stats_separator: "; ",
+		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
+		lbl_collect_stats_notes: '{COUNT} tip notes',
+		lbl_collect_stats_followers: '{COUNT} new followers',
+		lbl_collect_stats_newcomers: '{COUNT} new chat members',
+		lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
+		lbl_collect_stats_nothingyet: 'nothing yet',
+		lbl_collect_stats_nochange: 'no change since last time',
 		expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
 		errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' dans {APP} {LABEL} (vaut actuellement '{VALUE}')",
 		errmsg_app_disabled: "l'app est desactivee",
@@ -611,6 +668,8 @@ const FlexibleTipMenu = {
 			nb_newcomers: 0,
 			nb_fanclubs: 0,
 		},
+		tippers: {},
+		top_tippers: [],
 		followers: [],
 		newcomers: [],
 		fanclubs: [],
@@ -819,15 +878,59 @@ const FlexibleTipMenu = {
 		if('' !== tip_note) {
 			++FlexibleTipMenu.collected_stats.all.nb_notes;
 		}
+
+		if(tip.is_anon_tip) {
+			return;
+		}
+
+		const tip_user = tip.from_user;
+		if('undefined' === typeof FlexibleTipMenu.collected_stats.tippers[tip_user]) {
+			FlexibleTipMenu.collected_stats.tippers[tip_user] = {
+				total_amount: 0, // in tokens
+			};
+		}
+
+		FlexibleTipMenu.collected_stats.tippers[tip_user].total_amount += tip_amount;
+
+		FlexibleTipMenu.collect_best_tippers();
+	},
+
+	collect_best_tippers: function() {
+		if(FlexibleTipMenu.is_disabled('collect_stats_flag')) {
+			return; // never mind
+		}
+
+		if(FlexibleTipMenu.is_disabled('best_tippers_flag')) {
+			return; // never mind
+		}
+
+		const stack_size = FlexibleTipMenu.val('best_tippers_stack_size');
+		if(isNaN(stack_size) || !parseInt(stack_size)) {
+			return; // never mind
+		}
+
+		let top_x = [];
+		for(const _username in FlexibleTipMenu.collected_stats.tippers) {
+			const _total = FlexibleTipMenu.collected_stats.tippers[_username].total_amount;
+			top_x.push({user: _username, total: _total});
+		}
+
+		if(!top_x.length) {
+			FlexibleTipMenu.collected_stats.top_tippers = []; // not necessary, but...
+			return; // never mind
+		}
+
+		top_x.sort((user1, user2) => user1.total - user2.total); // ORDER BY total DESC
+		FlexibleTipMenu.collected_stats.top_tippers = top_x.slice(0, parseInt(stack_size));
 	},
 
 	/**
-	 *
+	 * Collect stats about a user action (non-tip)
 	 * @param {user} user The user object that was fired with the event
 	 */
 	collect_stats_user: function(namespace, user) {
 		// @todo possibly check if the user is anonymous etc
-		if(!user || !user.user) {
+		if(!user || !user.user || user.user === cb.room_slug) {
 			return;
 		}
 
@@ -883,7 +986,7 @@ const FlexibleTipMenu = {
 		let stats_rows = [];
 		//stats_rows.push('{COUNT} events'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_events));
 		if(FlexibleTipMenu.collected_stats.all.nb_tips) {
-			const lbl = '{AMOUNT} tokens in {COUNT} tips'
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_tips')
 				.replace(label_patterns.amount, FlexibleTipMenu.collected_stats.all.total_amount)
 				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_tips);
 
@@ -891,41 +994,47 @@ const FlexibleTipMenu = {
 		}
 
 		if(FlexibleTipMenu.collected_stats.all.nb_notes) {
-			const lbl = '{COUNT} tip notes'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_notes);
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_notes')
+				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_notes);
 			stats_rows.push(lbl);
 		}
 
 		if(FlexibleTipMenu.collected_stats.all.nb_followers) {
-			const lbl = '{COUNT} new followers'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_followers);
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_followers')
+				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_followers);
 			stats_rows.push(lbl);
 		}
 
 		if(FlexibleTipMenu.collected_stats.all.nb_newcomers) {
-			const lbl = '{COUNT} new chat members'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_newcomers);
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_newcomers')
+				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_newcomers);
 			stats_rows.push(lbl);
 		}
 
 		if(FlexibleTipMenu.collected_stats.all.nb_fanclubs) {
-			const lbl = '{COUNT} new fanclub members'.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_fanclubs);
+			const lbl = FlexibleTipMenu.i18n('lbl_collect_stats_fanclubs')
+				.replace(label_patterns.count, FlexibleTipMenu.collected_stats.all.nb_fanclubs);
 			stats_rows.push(lbl);
 		}
 
 		if(!stats_rows.length) {
-			stats_rows.push('nothing yet');
+			stats_rows.push(FlexibleTipMenu.i18n('lbl_collect_stats_nothingyet'));
 		}
 
 		const current_hash = FlexibleTipMenu.hash(stats_rows);
 		if(current_hash === FlexibleTipMenu.collected_stats.last_hash) {
-			stats_rows.unshift('no change since last time');
+			stats_rows.unshift(FlexibleTipMenu.i18n('lbl_collect_stats_nochange'));
 		}
 		else {
 			FlexibleTipMenu.collected_stats.last_hash = current_hash;
 		}
 
-		const header_lbl = '[{APP}] current stats (since {LABEL}):'
+		const header_lbl = FlexibleTipMenu.i18n('lbl_collect_stats_header')
 			.replace(label_patterns.label, FlexibleTipMenu.start);
 
-		FlexibleTipMenu.send_notice(header_lbl+"\n"+stats_rows.join("; "), username, null, null, font_weights.bolder, 'collect_stats_flag', 100, {user: username, gender: ''});
+		const separator_lbl = FlexibleTipMenu.i18n('lbl_collect_stats_separator', false);
+
+		FlexibleTipMenu.send_notice(header_lbl+"\n"+stats_rows.join(separator_lbl), username, null, null, font_weights.bolder, 'collect_stats_flag', 100, {user: username, gender: ''});
 	},
 
 	/**
@@ -958,11 +1067,10 @@ const FlexibleTipMenu = {
 
 		const nb_minutes = FlexibleTipMenu.val('menu_repeat_minutes');
 		if(isNaN(nb_minutes) || !parseInt(nb_minutes)) {
-			// never mind
+			return; // never mind
 		}
-		else {
-			cb.setTimeout(FlexibleTipMenu.show_menu_handler, 1000 * 60 * parseInt(nb_minutes));
-		}
+
+		cb.setTimeout(FlexibleTipMenu.show_menu_handler, 1000 * 60 * parseInt(nb_minutes));
 	},
 
 	/**
@@ -1046,21 +1154,25 @@ const FlexibleTipMenu = {
 	/**
 	 * Sends a notice in chat, to relevant users or groups, according to the module's verbosity and visibility settings
 	 * @param {string} notice_tpl
-	 * @param {string} username
+	 * @param {string} dst_username
 	 * @param {string} bgcolor
 	 * @param {string} txtcolor
 	 * @param {string} boldness
 	 * @param {string} cfg_flag_name
 	 * @param {integer} delay_ms
-	 * @param {user} user
+	 * @param {user} src_user
 	 */
-	send_notice: function(notice_tpl, username, bgcolor, txtcolor, boldness, cfg_flag_name, delay_ms, user) {
+	send_notice: function(notice_tpl, dst_username, bgcolor, txtcolor, boldness, cfg_flag_name, delay_ms, src_user) {
 		if(!notice_tpl) {
 			return;
 		}
 
 		if(!delay_ms || delay_ms < 0) {
 			delay_ms = 100;
+		}
+
+		if('undefined' === typeof src_user) {
+			src_user = {user: dst_username, gender: ''};
 		}
 
 
@@ -1070,6 +1182,12 @@ const FlexibleTipMenu = {
 			notice_tpl = FlexibleTipMenu.decorator_time(notice_tpl);
 		}
 
+		const decorator_tips_enabled = !FlexibleTipMenu.is_disabled('decorator_tips_flag');
+		if(decorator_tips_enabled) {
+			// applies to everyone
+			notice_tpl = FlexibleTipMenu.decorator_tips(notice_tpl, src_user.user);
+		}
+
 
 		let broadcaster_notice_tpl = notice_tpl;
 		let public_notice_tpl = notice_tpl;
@@ -1077,12 +1195,12 @@ const FlexibleTipMenu = {
 		switch(FlexibleTipMenu.val('decorator_gender_flag')) {
 			// broadcaster may get a different version than the rest of the room
 			case FlexibleTipMenu.i18n('lbl_broadcaster'):
-				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, user.user, user.gender);
+				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, src_user.user, src_user.gender);
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_everyone'):
-				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, user.user, user.gender);
-				public_notice_tpl = FlexibleTipMenu.decorator_gender_apply(public_notice_tpl, user.user, user.gender);
+				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, src_user.user, src_user.gender);
+				public_notice_tpl = FlexibleTipMenu.decorator_gender_apply(public_notice_tpl, src_user.user, src_user.gender);
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_not_applicable'): // pass through
@@ -1149,6 +1267,7 @@ const FlexibleTipMenu = {
 				}, delay_ms);
 			break;
 
+			case FlexibleTipMenu.i18n('lbl_enabled'): // pass through
 			case FlexibleTipMenu.i18n('lbl_everyone'):
 				cb.setTimeout(function() {
 					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness);
@@ -1157,14 +1276,14 @@ const FlexibleTipMenu = {
 
 			case FlexibleTipMenu.i18n('lbl_single_user'):
 				cb.setTimeout(function() {
-					cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					cb.sendNotice(public_notice_clean, dst_username, bgcolor, txtcolor, boldness);
 				}, delay_ms);
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_user_bcaster'):
 				cb.setTimeout(function() {
-					if(username !== cb.room_slug) {
-						cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					if(dst_username !== cb.room_slug) {
+						cb.sendNotice(public_notice_clean, dst_username, bgcolor, txtcolor, boldness);
 					}
 					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
 				}, delay_ms);
@@ -1172,8 +1291,8 @@ const FlexibleTipMenu = {
 
 			case FlexibleTipMenu.i18n('lbl_user_mods'):
 				cb.setTimeout(function() {
-					if(username !== cb.room_slug) {
-						cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					if(dst_username !== cb.room_slug) {
+						cb.sendNotice(public_notice_clean, dst_username, bgcolor, txtcolor, boldness);
 					}
 					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
 					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
@@ -1250,12 +1369,12 @@ const FlexibleTipMenu = {
 			return;
 		}
 
-		if(FlexibleTipMenu.run_flags.collect_stats) {
-			FlexibleTipMenu.collect_stats_follower(user);
-		}
-
 		if(FlexibleTipMenu.run_flags.autothank_follower) {
 			FlexibleTipMenu.thank_follower(user);
+		}
+
+		if(FlexibleTipMenu.run_flags.collect_stats) {
+			FlexibleTipMenu.collect_stats_follower(user);
 		}
 	},
 
@@ -1266,8 +1385,13 @@ const FlexibleTipMenu = {
 	thank_follower: function(user) {
 		// @todo possibly check if the user is in the room before calling the actual function
 
-		if(!user || !user.user) {
+		if(!user || !user.user || user.user === cb.room_slug) {
 			return;
+		}
+
+		const collect_stats_ns_enabled = !FlexibleTipMenu.is_disabled('collect_stats_followers');
+		if(collect_stats_ns_enabled && FlexibleTipMenu.collected_stats.followers.includes(user.user)) {
+			return; // already thanked
 		}
 
 		const background_color = FlexibleTipMenu.get_color_code('autothank_follower_background_color', colors_sample.white);
@@ -1287,8 +1411,13 @@ const FlexibleTipMenu = {
 	greet_newcomer_handler: function(user) {
 		// @todo possibly check if the user is anonymous etc
 
-		if(!user || !user.user) {
+		if(!user || !user.user || user.user === cb.room_slug) {
 			return;
+		}
+
+		const collect_stats_ns_enabled = !FlexibleTipMenu.is_disabled('collect_stats_newcomers');
+		if(collect_stats_ns_enabled && FlexibleTipMenu.collected_stats.newcomers.includes(user.user)) {
+			return; // already greeted
 		}
 
 		const background_color = FlexibleTipMenu.get_color_code('autogreet_newcomer_background_color', colors_sample.white);
@@ -1310,12 +1439,12 @@ const FlexibleTipMenu = {
 			return;
 		}
 
-		if(FlexibleTipMenu.run_flags.collect_stats) {
-			FlexibleTipMenu.collect_stats_newcomer(user);
-		}
-
 		if(FlexibleTipMenu.run_flags.autogreet_newcomer) {
 			FlexibleTipMenu.greet_newcomer_handler(user);
+		}
+
+		if(FlexibleTipMenu.run_flags.collect_stats) {
+			FlexibleTipMenu.collect_stats_newcomer(user);
 		}
 	},
 
@@ -1326,8 +1455,13 @@ const FlexibleTipMenu = {
 	greet_newfanclub_handler: function(user) {
 		// @todo possibly check if the user is anonymous etc
 
-		if(!user || !user.user) {
+		if(!user || !user.user || user.user === cb.room_slug) {
 			return;
+		}
+
+		const collect_stats_ns_enabled = !FlexibleTipMenu.is_disabled('collect_stats_fanclubs');
+		if(collect_stats_ns_enabled && FlexibleTipMenu.collected_stats.fanclubs.includes(user.user)) {
+			return; // already greeted
 		}
 
 		const background_color = FlexibleTipMenu.get_color_code('autogreet_newfanclub_background_color', colors_sample.white);
@@ -1349,12 +1483,12 @@ const FlexibleTipMenu = {
 			return;
 		}
 
-		if(FlexibleTipMenu.run_flags.collect_stats) {
-			FlexibleTipMenu.collect_stats_fanclub(user);
-		}
-
 		if(FlexibleTipMenu.run_flags.autogreet_newfanclub) {
 			FlexibleTipMenu.greet_newfanclub_handler(user);
+		}
+
+		if(FlexibleTipMenu.run_flags.collect_stats) {
+			FlexibleTipMenu.collect_stats_fanclub(user);
 		}
 	},
 
@@ -1845,6 +1979,88 @@ const FlexibleTipMenu = {
 		*/
 	},
 
+	decorator_tips: function(txt_msg, username) {
+		if(username === cb.room_slug) {
+			return txt_msg; // no change
+		}
+
+		if('undefined' === typeof FlexibleTipMenu.collected_stats.tippers[username]) {
+			return txt_msg; // no change
+		}
+
+		const total_amount = FlexibleTipMenu.collected_stats.tippers[username].total_amount;
+		if(!total_amount) {
+			return txt_msg; // no change
+		}
+
+		const amount_str = '|{AMOUNT}|'
+			.replace(label_patterns.amount, total_amount);
+
+		let decorated_msg = txt_msg
+			.replace(label_patterns.username, username);
+
+		if(txt_msg.includes(username)) {
+			// append to username
+			decorated_msg = txt_msg.replace(username, username+' '+amount_str);
+		}
+		else {
+			// prepend to entire message
+			decorated_msg = amount_str+' '+txt_msg;
+		}
+
+		return decorated_msg.trim();
+	},
+
+	/**
+	 * Show best tipper(s), high king etc
+	 */
+	show_best_tippers: function() {
+		const background_color = FlexibleTipMenu.get_color_code('best_tippers_background_color', colors_sample.black);
+		const text_color = FlexibleTipMenu.get_color_code('best_tippers_text_color', colors_sample.white);
+		const boldness = FlexibleTipMenu.val('best_tippers_boldness');
+
+		let cfg_high_tip = FlexibleTipMenu.val('best_tippers_start_tokens');
+		if(isNaN(cfg_high_tip) || !parseInt(cfg_high_tip)) {
+			return; // never mind
+		}
+
+		cfg_high_tip = parseInt(cfg_high_tip);
+		let next_high_tip;
+		if(!FlexibleTipMenu.collected_stats.top_tippers.length) {
+			next_high_tip = cfg_high_tip;
+		}
+		else if(cfg_high_tip > FlexibleTipMenu.collected_stats.top_tippers[0].total) {
+			next_high_tip = cfg_high_tip;
+		}
+		else {
+			next_high_tip = 1 + FlexibleTipMenu.collected_stats.top_tippers[0].total;
+		}
+
+		let best_tippers_str = FlexibleTipMenu.val('best_tippers_format')
+			.replace(label_patterns.amount, next_high_tip);
+
+		if(FlexibleTipMenu.collected_stats.top_tippers.length) {
+			best_tippers_str = best_tippers_str
+				.replace(label_patterns.username, FlexibleTipMenu.collected_stats.top_tippers[0].user);
+		}
+
+		FlexibleTipMenu.send_notice(best_tippers_str, null, background_color, text_color, boldness, 'best_tippers_flag', 1000, {});
+	},
+
+	/**
+	 * Starting point for the best tippers notice
+	 */
+	 show_best_tippers_handler: function() {
+		FlexibleTipMenu.show_best_tippers();
+
+		const nb_minutes = FlexibleTipMenu.val('best_tippers_repeat_minutes');
+		if(isNaN(nb_minutes) || !parseInt(nb_minutes)) {
+			return; // never mind
+		}
+
+		cb.setTimeout(FlexibleTipMenu.show_best_tippers_handler, 1000 * 60 * parseInt(nb_minutes));
+	},
+
 	/**
 	 * Handle plain messages from users (non-tips, non-commands);
 	 * Will run automods and decorators
@@ -1885,6 +2101,11 @@ const FlexibleTipMenu = {
 		const decorator_time_enabled = !FlexibleTipMenu.is_disabled('decorator_time_flag');
 		if(decorator_time_enabled) {
 			event_msg.m = FlexibleTipMenu.decorator_time(event_msg.m);
+		}
+
+		const decorator_tips_enabled = !FlexibleTipMenu.is_disabled('decorator_tips_flag');
+		if(decorator_tips_enabled) {
+			event_msg.m = FlexibleTipMenu.decorator_tips(event_msg.m, event_msg.user);
 		}
 
 		const decorator_gender_enabled = !FlexibleTipMenu.is_disabled('decorator_gender_flag');
@@ -2006,12 +2227,13 @@ const FlexibleTipMenu = {
 	 * @param {string} idx The identifier of the label or template to localize
 	 * @returns {string} The value
 	 */
-	i18n: function(idx) {
+	i18n: function(idx, do_trim=true) {
 		if('undefined' === typeof i18n[lang][idx]) {
 			return null;
 		}
 
-		return i18n[lang][idx].trim();
+		const lbl = i18n[lang][idx];
+		return do_trim ? lbl.trim() : lbl;
 	},
 
 	/**
@@ -2024,7 +2246,14 @@ const FlexibleTipMenu = {
 			return true;
 		}
 
-		return null === FlexibleTipMenu.val(setting_name);
+		if('undefined' !== typeof FlexibleTipMenu.run_flags[setting_name]) {
+			return FlexibleTipMenu.run_flags[setting_name];
+		}
+
+		const flag_res = (null === FlexibleTipMenu.val(setting_name));
+		FlexibleTipMenu.run_flags[setting_name] = flag_res;
+
+		return flag_res;
 	},
 };
 
@@ -2107,7 +2336,7 @@ cb.settings_choices.push({
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
-// decorator gender module
+// decorator modules
 cb.settings_choices.push({
 	name: settings_list.decorator_gender_flag,
 	label: ftm.i18n('decorator_gender_flag'),
@@ -2126,6 +2355,16 @@ cb.settings_choices.push({
 	choice2: ftm.i18n('lbl_time_medium'),
 	choice3: ftm.i18n('lbl_time_full'),
 	choice4: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.decorator_tips_flag,
+	label: ftm.i18n('decorator_tips_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
@@ -2166,6 +2405,82 @@ cb.settings_choices.push({
 	choice1: ftm.i18n('lbl_enabled'),
 	choice2: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_enabled'),
+});
+
+
+// best tippers module
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_flag,
+	label: ftm.i18n('best_tippers_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_broadcaster'),
+	choice2: ftm.i18n('lbl_everyone'),
+	choice3: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_start_tokens,
+	label: ftm.i18n('best_tippers_start_tokens'),
+	type: 'int',
+	minValue: 1,
+	defaultValue: 1000,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_repeat_minutes,
+	label: ftm.i18n('best_tippers_repeat_minutes'),
+	type: 'int',
+	minValue: 1,
+	maxValue: 60,
+	defaultValue: 10,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_stack_size,
+	label: ftm.i18n('best_tippers_stack_size'),
+	type: 'int',
+	minValue: 1,
+	maxValue: 25,
+	defaultValue: 3,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_background_color,
+	label: ftm.i18n('expl_bgcolor'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample.white,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_text_color,
+	label: ftm.i18n('expl_txtcolor'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample['pastel blue'],
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_boldness,
+	label: ftm.i18n('expl_boldness'),
+	type: 'choice',
+	choice1: font_weights.normal,
+	choice2: font_weights.bold,
+	choice3: font_weights.bolder,
+	defaultValue: font_weights.bold,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_format,
+	label: ftm.i18n('best_tippers_format'),
+	type: 'str',
+	minLength: 1,
+	maxLength: 250,
+	defaultValue: ftm.i18n('expl_best_tippers_format'),
 });
 
 
@@ -2738,6 +3053,16 @@ if(ftm.is_disabled('collect_stats_flag')) {
 else {
 	// self-test passes: go on...
 	ftm.run_flags.collect_stats = true;
+}
+
+
+
+if(ftm.is_disabled('best_tippers_flag')) {
+	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
+}
+else {
+	// self-test passes: go on...
+	cb.setTimeout(ftm.show_best_tippers_handler, 1500 * 2); // Repeatedly show the best tipper(s) notice
 }
 
 
