@@ -235,6 +235,14 @@ const settings_list = {
 	collect_stats_followers: 'collectStatsFollowers',
 	collect_stats_newcomers: 'collectStatsNewcomers',
 	collect_stats_fanclubs: 'collectStatsFanclubs',
+	best_tippers_flag: 'debugmessage bestTippersFlag',
+	best_tippers_start_tokens: 'bestTippersStartTokens',
+	best_tippers_repeat_minutes: 'bestTippersRepeatMinutes',
+	best_tippers_stack_size: 'bestTippersStackSize',
+	best_tippers_background_color: 'bestTippersBackgroundColor',
+	best_tippers_text_color: 'bestTippersTextColor',
+	best_tippers_boldness: 'bestTippersBoldness',
+	best_tippers_format: 'successmessage bestTippersFormat',
 	tip_menu_flag: 'debugmessage tipMenuShownTo',
 	tip_menu_header: 'tipMenuHeader',
 	tip_menu_footer: 'tipMenuFooter',
@@ -292,6 +300,11 @@ const i18n = {
 		collect_stats_followers: 'Include new follower stats?',
 		collect_stats_newcomers: 'Include influx (chat members)?',
 		collect_stats_fanclubs: 'Include fanclub subscriptions?',
+		best_tippers_flag: 'BEST TIPPER(S) ------------',
+		best_tippers_start_tokens: 'Minimum tokens',
+		best_tippers_repeat_minutes: 'Repeat every X minute',
+		best_tippers_stack_size: 'Show X winners',
+		best_tippers_format: 'Template for the best tipper(s) notice (variables are: {USER}, {AMOUNT}) - english recommended',
 		tip_menu_flag: "TIP MENU {MENU} ------------",
 		tip_menu_header: "Line before the tip menu {MENU}",
 		tip_menu_footer: "Line at the end of the tip menu {MENU}",
@@ -335,6 +348,7 @@ const i18n = {
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		expl_best_tippers_format: "Be the king with {AMOUNT} and get special treatment!",
 		lbl_collect_stats_header: '[{APP}] current stats (since {LABEL} GMT):',
 		lbl_collect_stats_separator: "; ",
 		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
@@ -407,6 +421,11 @@ const i18n = {
 		collect_stats_followers: 'Incluir nuevos seguidores?',
 		collect_stats_newcomers: 'Incluir afluencia (miembros del chat)?',
 		collect_stats_fanclubs: 'Incluir suscripciones al fanclub?',
+		best_tippers_flag: 'MEJOR(ES) TIPPER(S) ------------',
+		best_tippers_start_tokens: 'Minimum tokens',
+		best_tippers_repeat_minutes: 'Repeat every X minute',
+		best_tippers_stack_size: 'Show X winners',
+		best_tippers_format: '',
 		tip_menu_flag: "MENU DE TIPS {MENU} ------------",
 		tip_menu_header: "Linea antes del menu de tips {MENU}",
 		tip_menu_footer: "Linea despues del menu de tips {MENU}",
@@ -450,6 +469,7 @@ const i18n = {
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		expl_best_tippers_format: "Be the king with {AMOUNT} and get special treatment!",
 		lbl_collect_stats_header: '[{APP}] current stats (since {LABEL} GMT):',
 		lbl_collect_stats_separator: "; ",
 		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
@@ -522,6 +542,11 @@ const i18n = {
 		collect_stats_followers: 'Inclure nouveaux abonnes?',
 		collect_stats_newcomers: 'Inclure affluence (du chat)?',
 		collect_stats_fanclubs: 'Inclure inscriptions au fanclub?',
+		best_tippers_flag: 'MEILLEUR(S) TIPPERS ------------',
+		best_tippers_start_tokens: 'Minimum tokens',
+		best_tippers_repeat_minutes: 'Repeat every X minute',
+		best_tippers_stack_size: 'Show X winners',
+		best_tippers_format: '',
 		tip_menu_flag: "MENU DE TIPS {MENU} ------------",
 		tip_menu_header: "Ligne avant le menu de tips {MENU}",
 		tip_menu_footer: "Ligne apres le menu de tips {MENU}",
@@ -565,6 +590,7 @@ const i18n = {
 		expl_autothank_tip_publicly_format: "{USER} tipped {AMOUNT} for {SERVICE}",
 		expl_autothank_tip_privately_format: "Thank you {USER} for your {AMOUNT}tk tip",
 		expl_autothank_tip_remind_note_format: "Your tip note was: {MESSAGE}",
+		expl_best_tippers_format: "Be the king with {AMOUNT} and get special treatment!",
 		lbl_collect_stats_header: '[{APP}] current stats (since {LABEL} GMT):',
 		lbl_collect_stats_separator: "; ",
 		lbl_collect_stats_tips: '{AMOUNT} tokens in {COUNT} tips',
@@ -643,6 +669,7 @@ const FlexibleTipMenu = {
 			nb_fanclubs: 0,
 		},
 		tippers: {},
+		top_tippers: [],
 		followers: [],
 		newcomers: [],
 		fanclubs: [],
@@ -864,10 +891,41 @@ const FlexibleTipMenu = {
 		}
 
 		FlexibleTipMenu.collected_stats.tippers[tip_user].total_amount += tip_amount;
+
+		FlexibleTipMenu.collect_best_tippers();
+	},
+
+	collect_best_tippers: function() {
+		if(FlexibleTipMenu.is_disabled('collect_stats_flag')) {
+			return; // never mind
+		}
+
+		if(FlexibleTipMenu.is_disabled('best_tippers_flag')) {
+			return; // never mind
+		}
+
+		const stack_size = FlexibleTipMenu.val('best_tippers_stack_size');
+		if(isNaN(stack_size) || !parseInt(stack_size)) {
+			return; // never mind
+		}
+
+		let top_x = [];
+		for(const _username in FlexibleTipMenu.collected_stats.tippers) {
+			const _total = FlexibleTipMenu.collected_stats.tippers[_username].total_amount;
+			top_x.push({user: _username, total: _total});
+		}
+
+		if(!top_x.length) {
+			FlexibleTipMenu.collected_stats.top_tippers = []; // not necessary, but...
+			return; // never mind
+		}
+
+		top_x.sort((user1, user2) => user1.total - user2.total); // ORDER BY total DESC
+		FlexibleTipMenu.collected_stats.top_tippers = top_x.slice(0, parseInt(stack_size));
 	},
 
 	/**
-	 *
+	 * Collect stats about a user action (non-tip)
 	 * @param {user} user The user object that was fired with the event
 	 */
 	collect_stats_user: function(namespace, user) {
@@ -1009,11 +1067,10 @@ const FlexibleTipMenu = {
 
 		const nb_minutes = FlexibleTipMenu.val('menu_repeat_minutes');
 		if(isNaN(nb_minutes) || !parseInt(nb_minutes)) {
-			// never mind
+			return; // never mind
 		}
-		else {
-			cb.setTimeout(FlexibleTipMenu.show_menu_handler, 1000 * 60 * parseInt(nb_minutes));
-		}
+
+		cb.setTimeout(FlexibleTipMenu.show_menu_handler, 1000 * 60 * parseInt(nb_minutes));
 	},
 
 	/**
@@ -1097,21 +1154,25 @@ const FlexibleTipMenu = {
 	/**
 	 * Sends a notice in chat, to relevant users or groups, according to the module's verbosity and visibility settings
 	 * @param {string} notice_tpl
-	 * @param {string} username
+	 * @param {string} dst_username
 	 * @param {string} bgcolor
 	 * @param {string} txtcolor
 	 * @param {string} boldness
 	 * @param {string} cfg_flag_name
 	 * @param {integer} delay_ms
-	 * @param {user} user
+	 * @param {user} src_user
 	 */
-	send_notice: function(notice_tpl, username, bgcolor, txtcolor, boldness, cfg_flag_name, delay_ms, user) {
+	send_notice: function(notice_tpl, dst_username, bgcolor, txtcolor, boldness, cfg_flag_name, delay_ms, src_user) {
 		if(!notice_tpl) {
 			return;
 		}
 
 		if(!delay_ms || delay_ms < 0) {
 			delay_ms = 100;
+		}
+
+		if('undefined' === typeof src_user) {
+			src_user = {user: dst_username, gender: ''};
 		}
 
 
@@ -1124,7 +1185,7 @@ const FlexibleTipMenu = {
 		const decorator_tips_enabled = !FlexibleTipMenu.is_disabled('decorator_tips_flag');
 		if(decorator_tips_enabled) {
 			// applies to everyone
-			notice_tpl = FlexibleTipMenu.decorator_tips(notice_tpl, user.user);
+			notice_tpl = FlexibleTipMenu.decorator_tips(notice_tpl, src_user.user);
 		}
 
 
@@ -1134,12 +1195,12 @@ const FlexibleTipMenu = {
 		switch(FlexibleTipMenu.val('decorator_gender_flag')) {
 			// broadcaster may get a different version than the rest of the room
 			case FlexibleTipMenu.i18n('lbl_broadcaster'):
-				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, user.user, user.gender);
+				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, src_user.user, src_user.gender);
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_everyone'):
-				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, user.user, user.gender);
-				public_notice_tpl = FlexibleTipMenu.decorator_gender_apply(public_notice_tpl, user.user, user.gender);
+				broadcaster_notice_tpl = FlexibleTipMenu.decorator_gender_apply(broadcaster_notice_tpl, src_user.user, src_user.gender);
+				public_notice_tpl = FlexibleTipMenu.decorator_gender_apply(public_notice_tpl, src_user.user, src_user.gender);
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_not_applicable'): // pass through
@@ -1206,6 +1267,7 @@ const FlexibleTipMenu = {
 				}, delay_ms);
 			break;
 
+			case FlexibleTipMenu.i18n('lbl_enabled'): // pass through
 			case FlexibleTipMenu.i18n('lbl_everyone'):
 				cb.setTimeout(function() {
 					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness);
@@ -1214,14 +1276,14 @@ const FlexibleTipMenu = {
 
 			case FlexibleTipMenu.i18n('lbl_single_user'):
 				cb.setTimeout(function() {
-					cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					cb.sendNotice(public_notice_clean, dst_username, bgcolor, txtcolor, boldness);
 				}, delay_ms);
 			break;
 
 			case FlexibleTipMenu.i18n('lbl_user_bcaster'):
 				cb.setTimeout(function() {
-					if(username !== cb.room_slug) {
-						cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					if(dst_username !== cb.room_slug) {
+						cb.sendNotice(public_notice_clean, dst_username, bgcolor, txtcolor, boldness);
 					}
 					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
 				}, delay_ms);
@@ -1229,8 +1291,8 @@ const FlexibleTipMenu = {
 
 			case FlexibleTipMenu.i18n('lbl_user_mods'):
 				cb.setTimeout(function() {
-					if(username !== cb.room_slug) {
-						cb.sendNotice(public_notice_clean, username, bgcolor, txtcolor, boldness);
+					if(dst_username !== cb.room_slug) {
+						cb.sendNotice(public_notice_clean, dst_username, bgcolor, txtcolor, boldness);
 					}
 					cb.sendNotice(public_notice_clean, '', bgcolor, txtcolor, boldness, user_groups.mods);
 					cb.sendNotice(broadcaster_notice_clean, cb.room_slug, bgcolor, txtcolor, boldness);
@@ -1950,6 +2012,56 @@ const FlexibleTipMenu = {
 	},
 
 	/**
+	 * Show best tipper(s), high king etc
+	 */
+	show_best_tippers: function() {
+		const background_color = FlexibleTipMenu.get_color_code('best_tippers_background_color', colors_sample.black);
+		const text_color = FlexibleTipMenu.get_color_code('best_tippers_text_color', colors_sample.white);
+		const boldness = FlexibleTipMenu.val('best_tippers_boldness');
+
+		let cfg_high_tip = FlexibleTipMenu.val('best_tippers_start_tokens');
+		if(isNaN(cfg_high_tip) || !parseInt(cfg_high_tip)) {
+			return; // never mind
+		}
+
+		cfg_high_tip = parseInt(cfg_high_tip);
+		let next_high_tip;
+		if(!FlexibleTipMenu.collected_stats.top_tippers.length) {
+			next_high_tip = cfg_high_tip;
+		}
+		else if(cfg_high_tip > FlexibleTipMenu.collected_stats.top_tippers[0].total) {
+			next_high_tip = cfg_high_tip;
+		}
+		else {
+			next_high_tip = 1 + FlexibleTipMenu.collected_stats.top_tippers[0].total;
+		}
+
+		let best_tippers_str = FlexibleTipMenu.val('best_tippers_format')
+			.replace(label_patterns.amount, next_high_tip);
+
+		if(FlexibleTipMenu.collected_stats.top_tippers.length) {
+			best_tippers_str = best_tippers_str
+				.replace(label_patterns.username, FlexibleTipMenu.collected_stats.top_tippers[0].user);
+		}
+
+		FlexibleTipMenu.send_notice(best_tippers_str, null, background_color, text_color, boldness, 'best_tippers_flag', 1000, {});
+	},
+
+	/**
+	 * Starting point for the best tippers notice
+	 */
+	 show_best_tippers_handler: function() {
+		FlexibleTipMenu.show_best_tippers();
+
+		const nb_minutes = FlexibleTipMenu.val('best_tippers_repeat_minutes');
+		if(isNaN(nb_minutes) || !parseInt(nb_minutes)) {
+			return; // never mind
+		}
+
+		cb.setTimeout(FlexibleTipMenu.show_best_tippers_handler, 1000 * 60 * parseInt(nb_minutes));
+	},
+
+	/**
 	 * Handle plain messages from users (non-tips, non-commands);
 	 * Will run automods and decorators
 	 * @param {message} event_msg The message that came in with the fired Event
@@ -2293,6 +2405,81 @@ cb.settings_choices.push({
 	choice1: ftm.i18n('lbl_enabled'),
 	choice2: ftm.i18n('lbl_not_applicable'),
 	defaultValue: ftm.i18n('lbl_enabled'),
+});
+
+
+// best tippers module
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_flag,
+	label: ftm.i18n('best_tippers_flag'),
+	type: 'choice',
+	choice1: ftm.i18n('lbl_enabled'),
+	choice2: ftm.i18n('lbl_not_applicable'),
+	defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_start_tokens,
+	label: ftm.i18n('best_tippers_start_tokens'),
+	type: 'int',
+	minValue: 1,
+	defaultValue: 1000,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_repeat_minutes,
+	label: ftm.i18n('best_tippers_repeat_minutes'),
+	type: 'int',
+	minValue: 1,
+	maxValue: 60,
+	defaultValue: 10,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_stack_size,
+	label: ftm.i18n('best_tippers_stack_size'),
+	type: 'int',
+	minValue: 1,
+	maxValue: 25,
+	defaultValue: 3,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_background_color,
+	label: ftm.i18n('expl_bgcolor'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample.white,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_text_color,
+	label: ftm.i18n('expl_txtcolor'),
+	type: 'str',
+	minLength: 6,
+	maxLength: 7,
+	defaultValue: colors_sample['pastel blue'],
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_boldness,
+	label: ftm.i18n('expl_boldness'),
+	type: 'choice',
+	choice1: font_weights.normal,
+	choice2: font_weights.bold,
+	choice3: font_weights.bolder,
+	defaultValue: font_weights.bold,
+});
+
+cb.settings_choices.push({
+	name: settings_list.best_tippers_format,
+	label: ftm.i18n('best_tippers_format'),
+	type: 'str',
+	minLength: 1,
+	maxLength: 250,
+	defaultValue: ftm.i18n('expl_best_tippers_format'),
 });
 
 
@@ -2865,6 +3052,16 @@ if(ftm.is_disabled('collect_stats_flag')) {
 else {
 	// self-test passes: go on...
 	ftm.run_flags.collect_stats = true;
+}
+
+
+
+if(ftm.is_disabled('best_tippers_flag')) {
+	// possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
+}
+else {
+	// self-test passes: go on...
+	cb.setTimeout(ftm.show_best_tippers_handler, 1500 * 2); // Repeatedly show the best tipper(s) notice
 }
 
 
