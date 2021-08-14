@@ -939,8 +939,7 @@ const FlexibleTipMenu = {
             return;
         }
 
-        const collect_stats_ns_enabled = !FlexibleTipMenu.is_disabled('collect_stats_' + namespace);
-        if (!collect_stats_ns_enabled) {
+        if (FlexibleTipMenu.is_disabled('collect_stats_' + namespace)) {
             return;
         }
 
@@ -971,10 +970,10 @@ const FlexibleTipMenu = {
 
     /**
      * Display general stats about the room (current streaming session)
+     * @param {string} username Specific user who may have asked for the stats
      */
     show_stats: function(username) {
-        const collect_stats_enabled = !FlexibleTipMenu.is_disabled('collect_stats_flag');
-        if (!collect_stats_enabled) {
+        if (FlexibleTipMenu.is_disabled('collect_stats_flag')) {
             return;
         }
 
@@ -1166,14 +1165,12 @@ const FlexibleTipMenu = {
         }
 
 
-        const decorator_time_enabled = !FlexibleTipMenu.is_disabled('decorator_time_flag');
-        if (decorator_time_enabled) {
+        if (!FlexibleTipMenu.is_disabled('decorator_time_flag')) {
             // applies to everyone
             notice_tpl = FlexibleTipMenu.decorator_time(notice_tpl);
         }
 
-        const decorator_tips_enabled = !FlexibleTipMenu.is_disabled('decorator_tips_flag');
-        if (decorator_tips_enabled) {
+        if (!FlexibleTipMenu.is_disabled('decorator_tips_flag')) {
             // applies to everyone
             notice_tpl = FlexibleTipMenu.decorator_tips(notice_tpl, src_user.user);
         }
@@ -1587,15 +1584,13 @@ const FlexibleTipMenu = {
      */
     show_commands_help: function(username, usergroup = null) {
         let commands_list = [];
-        const tip_menu_enabled = !FlexibleTipMenu.is_disabled('tip_menu_flag');
-        if (tip_menu_enabled) {
+        if (!FlexibleTipMenu.is_disabled('tip_menu_flag')) {
             commands_list.push(FlexibleTipMenu.i18n('expl_commands_tipmenu'));
         }
 
         commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist'));
 
-        const collect_stats_enabled = !FlexibleTipMenu.is_disabled('collect_stats_flag');
-        if (collect_stats_enabled) {
+        if (!FlexibleTipMenu.is_disabled('collect_stats_flag')) {
             commands_list.push(FlexibleTipMenu.i18n('expl_commands_stats'));
         }
 
@@ -1737,8 +1732,7 @@ const FlexibleTipMenu = {
         FlexibleTipMenu.send_notice(notice_raw, event_msg.user, null, null, null, 'automods_verbosity', 100);
 
 
-        const automod_record_enabled = !FlexibleTipMenu.is_disabled('automods_record_flag');
-        if (automod_record_enabled) {
+        if (!FlexibleTipMenu.is_disabled('automods_record_flag')) {
             FlexibleTipMenu.automod_infraction(event_msg.user);
         }
 
@@ -2081,18 +2075,15 @@ const FlexibleTipMenu = {
             return event_msg;
         }
 
-        const decorator_time_enabled = !FlexibleTipMenu.is_disabled('decorator_time_flag');
-        if (decorator_time_enabled) {
+        if (!FlexibleTipMenu.is_disabled('decorator_time_flag')) {
             event_msg.m = FlexibleTipMenu.decorator_time(event_msg.m);
         }
 
-        const decorator_tips_enabled = !FlexibleTipMenu.is_disabled('decorator_tips_flag');
-        if (decorator_tips_enabled) {
+        if (!FlexibleTipMenu.is_disabled('decorator_tips_flag')) {
             event_msg.m = FlexibleTipMenu.decorator_tips(event_msg.m, event_msg.user);
         }
 
-        const decorator_gender_enabled = !FlexibleTipMenu.is_disabled('decorator_gender_flag');
-        if (decorator_gender_enabled) {
+        if (!FlexibleTipMenu.is_disabled('decorator_gender_flag')) {
             event_msg.m = FlexibleTipMenu.decorator_gender_acl(event_msg.m, event_msg.user, event_msg.gender);
         }
 
