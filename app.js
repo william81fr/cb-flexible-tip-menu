@@ -1301,11 +1301,11 @@ const FlexibleTipMenu = {
             return;
         }
 
-        if (!FlexibleTipMenu.is_disabled('collect_stats')) {
+        if (!FlexibleTipMenu.is_disabled('collect_stats_flag')) {
             FlexibleTipMenu.collect_stats_tip(tip);
         }
 
-        if (!FlexibleTipMenu.is_disabled('autothank_tip')) {
+        if (!FlexibleTipMenu.is_disabled('autothank_tip_flag')) {
             FlexibleTipMenu.thank_tipper(tip);
         }
     },
@@ -1354,11 +1354,11 @@ const FlexibleTipMenu = {
             return;
         }
 
-        if (!FlexibleTipMenu.is_disabled('autothank_follower')) {
+        if (!FlexibleTipMenu.is_disabled('autothank_follower_flag')) {
             FlexibleTipMenu.thank_follower(user);
         }
 
-        if (!FlexibleTipMenu.is_disabled('collect_stats')) {
+        if (!FlexibleTipMenu.is_disabled('collect_stats_flag')) {
             FlexibleTipMenu.collect_stats_follower(user);
         }
     },
@@ -1424,11 +1424,11 @@ const FlexibleTipMenu = {
             return;
         }
 
-        if (!FlexibleTipMenu.is_disabled('autogreet_newcomer')) {
+        if (!FlexibleTipMenu.is_disabled('autogreet_newcomer_flag')) {
             FlexibleTipMenu.greet_newcomer_handler(user);
         }
 
-        if (!FlexibleTipMenu.is_disabled('collect_stats')) {
+        if (!FlexibleTipMenu.is_disabled('collect_stats_flag')) {
             FlexibleTipMenu.collect_stats_newcomer(user);
         }
     },
@@ -1468,11 +1468,11 @@ const FlexibleTipMenu = {
             return;
         }
 
-        if (!FlexibleTipMenu.is_disabled('autogreet_newfanclub')) {
+        if (!FlexibleTipMenu.is_disabled('autogreet_newfanclub_flag')) {
             FlexibleTipMenu.greet_newfanclub_handler(user);
         }
 
-        if (!FlexibleTipMenu.is_disabled('collect_stats')) {
+        if (!FlexibleTipMenu.is_disabled('collect_stats_flag')) {
             FlexibleTipMenu.collect_stats_fanclub(user);
         }
     },
