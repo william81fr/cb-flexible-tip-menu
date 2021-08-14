@@ -130,6 +130,7 @@ const command_patterns = {
     tip_menu: /^(?:tip)?_?menu$/i,
     colors_sample: /^colou?rs_?(?:list)?$/i,
     stats: /^stats$/i,
+    notes: /^notes$/i,
 };
 
 /**
@@ -235,6 +236,10 @@ const settings_list = {
     collect_stats_followers: 'collectStatsFollowers',
     collect_stats_newcomers: 'collectStatsNewcomers',
     collect_stats_fanclubs: 'collectStatsFanclubs',
+    collect_tipnotes_trigger_flag: 'debugmessage collectNotesTriggerFlag',
+    collect_tipnotes_trigger_tokens: 'collectNotesTriggerTokens',
+    collect_tipnotes_trigger_prev: 'collectNotesTriggerPrev',
+    collect_tipnotes_trigger_subseq: 'collectNotesTriggerSubseq',
     best_tippers_flag: 'debugmessage bestTippersFlag',
     best_tippers_start_tokens: 'bestTippersStartTokens',
     best_tippers_repeat_minutes: 'bestTippersRepeatMinutes',
@@ -300,6 +305,10 @@ const i18n = {
         collect_stats_followers: 'Include new follower stats?',
         collect_stats_newcomers: 'Include influx (chat members)?',
         collect_stats_fanclubs: 'Include fanclub subscriptions?',
+        collect_tipnotes_trigger_flag: 'REMEMBER TIPNOTES AFTER CERTAIN TIPS ------------',
+        collect_tipnotes_trigger_tokens: 'Tip amounts to trigger this (one or several, separate by commas)',
+        collect_tipnotes_trigger_prev: 'Record X tipnotes before the tip',
+        collect_tipnotes_trigger_subseq: 'Record X tipnotes after the tip',
         best_tippers_flag: 'BEST TIPPER(S) ------------',
         best_tippers_start_tokens: 'Minimum tokens',
         best_tippers_repeat_minutes: 'Repeat every X minute',
@@ -358,6 +367,7 @@ const i18n = {
         lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
         lbl_collect_stats_nothingyet: 'nothing yet',
         lbl_collect_stats_nochange: 'no change since last time',
+        lbl_collect_tipnotes_header: '[{APP}] recorded tip notes for {USER}:',
         expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
         errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' in {APP} {LABEL} (currently valued at '{VALUE}')",
         errmsg_app_disabled: "app is disabled",
@@ -382,6 +392,7 @@ const i18n = {
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
+        expl_command_collected_tipnotes: '/notes -- Display the tip notes collected for this streaming session',
         errlbl_command_not_recognized: "[{APP}] Your command was not recognized.\nReminder: any message that starts with '/' or '!' is handled as a command for this bot.",
     },
     es: {
@@ -421,6 +432,10 @@ const i18n = {
         collect_stats_followers: 'Incluir nuevos seguidores?',
         collect_stats_newcomers: 'Incluir afluencia (miembros del chat)?',
         collect_stats_fanclubs: 'Incluir suscripciones al fanclub?',
+        collect_tipnotes_trigger_flag: '',
+        collect_tipnotes_trigger_tokens: '',
+        collect_tipnotes_trigger_prev: '',
+        collect_tipnotes_trigger_subseq: '',
         best_tippers_flag: 'MEJOR(ES) TIPPER(S) ------------',
         best_tippers_start_tokens: 'Minimum tokens',
         best_tippers_repeat_minutes: 'Repeat every X minute',
@@ -479,6 +494,7 @@ const i18n = {
         lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
         lbl_collect_stats_nothingyet: 'nothing yet',
         lbl_collect_stats_nochange: 'no change since last time',
+        lbl_collect_tipnotes_header: '[{APP}] recorded tip notes for {USER}:',
         expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
         errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' en {APP} {LABEL} (actualmente vale '{VALUE}')",
         errmsg_app_disabled: "el bot esta desactivado",
@@ -503,6 +519,7 @@ const i18n = {
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
+        expl_command_collected_tipnotes: '/notes -- Display the tip notes collected for this streaming session',
         errlbl_command_not_recognized: "[{APP}] Su comando no ha funcionado.\nRecordatorio: todo mensaje que empieza por '/' o '!' se entiende como un comando por este bot.",
     },
     fr: {
@@ -542,6 +559,10 @@ const i18n = {
         collect_stats_followers: 'Inclure nouveaux abonnes?',
         collect_stats_newcomers: 'Inclure affluence (du chat)?',
         collect_stats_fanclubs: 'Inclure inscriptions au fanclub?',
+        collect_tipnotes_trigger_flag: '',
+        collect_tipnotes_trigger_tokens: '',
+        collect_tipnotes_trigger_prev: '',
+        collect_tipnotes_trigger_subseq: '',
         best_tippers_flag: 'MEILLEUR(S) TIPPERS ------------',
         best_tippers_start_tokens: 'Minimum tokens',
         best_tippers_repeat_minutes: 'Repeat every X minute',
@@ -600,6 +621,7 @@ const i18n = {
         lbl_collect_stats_fanclubs: '{COUNT} new fanclub members',
         lbl_collect_stats_nothingyet: 'nothing yet',
         lbl_collect_stats_nochange: 'no change since last time',
+        lbl_collect_tipnotes_header: '[{APP}] recorded tip notes for {USER}:',
         expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
         errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' dans {APP} {LABEL} (vaut actuellement '{VALUE}')",
         errmsg_app_disabled: "l'app est desactivee",
@@ -624,6 +646,7 @@ const i18n = {
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
+        expl_command_collected_tipnotes: '/notes -- Display the tip notes collected for this streaming session',
         errlbl_command_not_recognized: "[{APP}] Votre commande n'est pas reconnue.\nRappel : tout message commencant par '/' ou '!' est traite comme une commande par ce bot.",
     },
 };
@@ -675,6 +698,9 @@ const FlexibleTipMenu = {
         fanclubs: [],
         last_hash: null,
     },
+
+    collected_tipnotes: {},
+    collect_tipnotes_cfg: {},
 
     /**
      * Removes remaining {VAR} syntax from a notice template;
@@ -1031,6 +1057,35 @@ const FlexibleTipMenu = {
     },
 
     /**
+     * Display the list of tip notes collected so far
+     * @param {string} username Specific user who may have asked for the list
+     */
+    show_collected_tipnotes: function(username) {
+        if (FlexibleTipMenu.is_disabled('collect_tipnotes_trigger_flag')) {
+            return;
+        }
+
+        for (const tipper_name in FlexibleTipMenu.collected_tipnotes) {
+            const tipnotes_list = FlexibleTipMenu.collected_tipnotes[tipper_name].messages;
+            if (!tipnotes_list.length) {
+                continue;
+            }
+
+            /*
+            const dbgmsg = "{USER} ({COUNT} tip notes):\n{MESSAGE}"
+                .replace(label_patterns.username, tipper_name)
+                .replace(label_patterns.count, tipnotes_list.length)
+                .replace(label_patterns.message, tipnotes_list.join("\n"));
+            */
+
+            const header_lbl = FlexibleTipMenu.i18n('lbl_collect_tipnotes_header')
+                .replace(label_patterns.username, tipper_name);
+
+            FlexibleTipMenu.send_notice(header_lbl + "\n" + tipnotes_list.join("\n"), username, null, null, font_weights.bolder, 'collect_tipnotes_trigger_flag', 100, { user: username, gender: '' });
+        }
+    },
+
+    /**
      * Display the tip menu, potentially to a specific user or group
      * @param {string} tip_menu_flag Name of the app setting to know who to display to (if anyone)
      * @param {string} username Specific user who may have asked for the menu
@@ -1308,6 +1363,10 @@ const FlexibleTipMenu = {
         if (!FlexibleTipMenu.is_disabled('autothank_tip_flag')) {
             FlexibleTipMenu.thank_tipper(tip);
         }
+
+        if (!FlexibleTipMenu.is_disabled('collect_tipnotes_trigger_flag')) {
+            FlexibleTipMenu.collect_tipnote(tip);
+        }
     },
 
     /**
@@ -1343,6 +1402,98 @@ const FlexibleTipMenu = {
         const text_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_text_color', colors_sample.black);
         const boldness = FlexibleTipMenu.val('autothank_tip_privately_boldness');
         FlexibleTipMenu.send_notice(reminder_raw, tip.from_user, background_color, text_color, boldness, 'autothank_tip_remind_note_flag', 500);
+    },
+
+    /**
+     * Records the tip note message (if any)
+     * @param {tip} tip The tip object that was fired with the event
+     */
+    collect_tipnote: function(tip) {
+        if (tip.is_anon_tip) {
+            return;
+        }
+
+        const tip_amount = parseInt(tip.amount);
+        const tip_note = tip.message.trim();
+
+        const cfg = FlexibleTipMenu.collect_tipnotes_cfg;
+        const disabled_counter = -1;
+        const start_counter = 0;
+        const max_counter = 1 + cfg.record_previous + cfg.record_subsequent;
+        if ('undefined' === typeof FlexibleTipMenu.collected_tipnotes[tip.from_user]) {
+            FlexibleTipMenu.collected_tipnotes[tip.from_user] = { counter: disabled_counter, messages: [], history: [] };
+        }
+
+        if (cfg.trigger_tokens.includes(tip_amount)) {
+            // this is the turning point: archive history + record current note + make sure the next few messages are saved
+            FlexibleTipMenu.collected_tipnotes[tip.from_user].counter = start_counter;
+            const hist = FlexibleTipMenu.collected_tipnotes[tip.from_user].history;
+            if (hist.length) {
+                FlexibleTipMenu.collected_tipnotes[tip.from_user].messages = FlexibleTipMenu.collected_tipnotes[tip.from_user].messages.concat(hist);
+                FlexibleTipMenu.collected_tipnotes[tip.from_user].history = [];
+            }
+
+            const owner_notice = '[{APP}] starting to record {COUNT} tip notes from {USER} because of their special {AMOUNT}tk tip\nYou can call up the "/notes" command (without quotes) at any time to see these records'
+                .replace(label_patterns.username, tip.from_user)
+                .replace(label_patterns.count, cfg.record_subsequent)
+                .replace(label_patterns.amount, tip_amount);
+            cb.sendNotice(FlexibleTipMenu.clean_str(owner_notice), cb.room_slug, colors_sample.black, colors_sample.white, '');
+        }
+
+        if ('' === tip_note) {
+            /*
+            const errlbl = 'missing tip note';
+            cb.sendNotice(errlbl, cb.room_slug, colors_sample.black, colors_sample.white, '');
+            */
+            return; // nothing to record
+        }
+
+        const log_lbl = '[{TIME}] {USER} tipped {AMOUNT}tk and said: {MESSAGE}'
+            .replace(label_patterns.amount, tip_amount)
+            .replace(label_patterns.username, tip.from_user)
+            .replace(label_patterns.time, FlexibleTipMenu.current_time_str().replace(date_patterns.time_short, ''))
+            .replace(label_patterns.message, tip_note);
+
+        if (disabled_counter === FlexibleTipMenu.collected_tipnotes[tip.from_user].counter) {
+            if (0 < cfg.record_previous) {
+                // record separately in case the right tip amount comes later
+                FlexibleTipMenu.collected_tipnotes[tip.from_user].history.push(log_lbl);
+                /*
+                const errlbl = 'disabled counter: recorded in history';
+                cb.sendNotice(errlbl, cb.room_slug, colors_sample.black, colors_sample.white, '');
+                */
+                if (cfg.record_previous < FlexibleTipMenu.collected_tipnotes[tip.from_user].history.length) {
+                    // keep the history mangeable
+                    FlexibleTipMenu.collected_tipnotes[tip.from_user].history = FlexibleTipMenu.collected_tipnotes[tip.from_user].history.slice(-1 * cfg.record_previous);
+                    /*
+                    const errlbl = 'keep the history mangeable';
+                    cb.sendNotice(errlbl, cb.room_slug, colors_sample.black, colors_sample.white, '');
+                    */
+                }
+            }
+
+            /*
+            const errlbl = 'not the right amount {AMOUNT} (not in {MESSAGE})'
+                .replace(label_patterns.amount, tip_amount)
+                .replace(label_patterns.message, cfg.trigger_tokens.join('/'));
+            cb.sendNotice(errlbl, cb.room_slug, colors_sample.black, colors_sample.white, '');
+            */
+            return; // this user is irrelevant at the moment
+        }
+
+        FlexibleTipMenu.collected_tipnotes[tip.from_user].messages.push(log_lbl);
+        ++FlexibleTipMenu.collected_tipnotes[tip.from_user].counter;
+
+        if (max_counter <= FlexibleTipMenu.collected_tipnotes[tip.from_user].counter) {
+            // disable further recording
+            FlexibleTipMenu.collected_tipnotes[tip.from_user].counter = disabled_counter;
+            FlexibleTipMenu.collected_tipnotes[tip.from_user].history = []; // just in case but shouldn't be necessary here
+            /*
+            const errlbl = 'already recorded {COUNT}'
+                .replace(label_patterns.count, max_counter);
+            cb.sendNotice(errlbl, cb.room_slug, colors_sample.black, colors_sample.white, '');
+            */
+        }
     },
 
     /**
@@ -1592,6 +1743,10 @@ const FlexibleTipMenu = {
 
         if (!FlexibleTipMenu.is_disabled('collect_stats_flag')) {
             commands_list.push(FlexibleTipMenu.i18n('expl_commands_stats'));
+        }
+
+        if (!FlexibleTipMenu.is_disabled('collect_tipnotes_trigger_flag')) {
+            commands_list.push(FlexibleTipMenu.i18n('expl_command_collected_tipnotes'));
         }
 
         if (!commands_list.length) {
@@ -2131,6 +2286,12 @@ const FlexibleTipMenu = {
             } else {
                 FlexibleTipMenu.show_command_error(event_msg.user);
             }
+        } else if (command_patterns.notes.test(txt_command)) {
+            if (event_msg.user === cb.room_slug) {
+                FlexibleTipMenu.show_collected_tipnotes(event_msg.user);
+            } else {
+                FlexibleTipMenu.show_command_error(event_msg.user);
+            }
         } else {
             FlexibleTipMenu.show_command_error(event_msg.user);
         }
@@ -2340,6 +2501,47 @@ cb.settings_choices.push({
     choice1: ftm.i18n('lbl_enabled'),
     choice2: ftm.i18n('lbl_not_applicable'),
     defaultValue: ftm.i18n('lbl_enabled'),
+});
+
+
+// tipnote collection module (triggered by tip amounts)
+cb.settings_choices.push({
+    name: settings_list.collect_tipnotes_trigger_flag,
+    label: ftm.i18n('collect_tipnotes_trigger_flag'),
+    type: 'choice',
+    choice1: ftm.i18n('lbl_broadcaster'),
+    choice2: ftm.i18n('lbl_mods'),
+    choice3: ftm.i18n('lbl_fans'),
+    choice4: ftm.i18n('lbl_everyone'),
+    choice5: ftm.i18n('lbl_not_applicable'),
+    defaultValue: ftm.i18n('lbl_not_applicable'),
+});
+
+cb.settings_choices.push({
+    name: settings_list.collect_tipnotes_trigger_tokens,
+    label: ftm.i18n('collect_tipnotes_trigger_tokens'),
+    type: 'str',
+    minLength: 1,
+    maxLength: 250,
+    required: false,
+});
+
+cb.settings_choices.push({
+    name: settings_list.collect_tipnotes_trigger_prev,
+    label: ftm.i18n('collect_tipnotes_trigger_prev'),
+    type: 'int',
+    minValue: 0,
+    maxValue: 9,
+    defaultValue: 1,
+});
+
+cb.settings_choices.push({
+    name: settings_list.collect_tipnotes_trigger_subseq,
+    label: ftm.i18n('collect_tipnotes_trigger_subseq'),
+    type: 'int',
+    minValue: 0,
+    maxValue: 9,
+    defaultValue: 3,
 });
 
 
@@ -2962,6 +3164,23 @@ cb.onStart(room_owner => {
         ftm.run_flags.collect_stats = true;
     }
 
+    if (ftm.is_disabled('collect_tipnotes_trigger_flag')) {
+        // possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
+    } else {
+        const cfg_previous = ftm.val('collect_tipnotes_trigger_prev');
+        const cfg_subsequent = ftm.val('collect_tipnotes_trigger_subseq');
+        const cfg_amounts = ftm.val('collect_tipnotes_trigger_tokens')
+            .split(',')
+            .map(x => x.trim())
+            .filter(x => !isNaN(x))
+            .map(x => parseInt(x));
+
+        FlexibleTipMenu.collect_tipnotes_cfg = {
+            trigger_tokens: cfg_amounts,
+            record_previous: isNaN(cfg_previous) ? 0 : parseInt(cfg_previous),
+            record_subsequent: isNaN(cfg_subsequent) ? 3 : parseInt(cfg_subsequent),
+        };
+    }
 
 
     if (ftm.is_disabled('best_tippers_flag')) {
