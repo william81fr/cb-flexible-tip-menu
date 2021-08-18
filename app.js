@@ -1923,40 +1923,6 @@ const FlexibleTipMenu = {
         }
 
         return txt_msg;
-
-        /*
-        const only_broadcaster = FlexibleTipMenu.is_broadcaster_only(decorator_gender_flag);
-        const is_bcaster = (user.user === cb.room_slug);
-        if(only_broadcaster && !is_bcaster) {
-        	return txt_msg; // change nothing
-        }
-
-        const only_mods = (FlexibleTipMenu.i18n('lbl_mods') === decorator_gender_flag);
-        const is_mod = user.is_mod;
-        if(only_mods && !(is_mod || is_bcaster)) {
-        	return txt_msg; // change nothing
-        }
-
-        const only_fans = (FlexibleTipMenu.i18n('lbl_fans') === decorator_gender_flag);
-        const is_fan = user.is_fan;
-        if(only_fans && !(is_fan || is_mod || is_bcaster)) {
-        	return txt_msg; // change nothing
-        }
-
-        const tk_groups = [
-        	FlexibleTipMenu.i18n('lbl_group_havetk'),
-        	FlexibleTipMenu.i18n('lbl_group_50tk'),
-        	FlexibleTipMenu.i18n('lbl_group_250tk'),
-        	FlexibleTipMenu.i18n('lbl_group_1000tk'),
-        ];
-        const only_havetk = tk_groups.includes(decorator_gender_flag);
-        const has_tokens = user.has_tokens;
-        if(only_havetk && !(has_tokens || is_fan || is_mod || is_bcaster)) {
-        	return txt_msg; // change nothing
-        }
-
-        return FlexibleTipMenu.decorator_gender_apply('{GENDER} '+txt_msg, user.user, user.gender);
-        */
     },
 
     decorator_tips: function(txt_msg, username) {
@@ -2303,6 +2269,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+
 // decorator modules
 cb.settings_choices.push({
     name: settings_list.decorator_gender_flag,
@@ -2376,7 +2343,6 @@ cb.settings_choices.push({
 
 
 // best tippers module
-
 cb.settings_choices.push({
     name: settings_list.best_tippers_flag,
     label: ftm.i18n('best_tippers_flag'),
@@ -2502,7 +2468,6 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('expl_autogreet_newcomer_format'),
 });
 
-
 // autogreet module: new fan club members
 cb.settings_choices.push({
     name: settings_list.autogreet_newfanclub_flag,
@@ -2553,7 +2518,6 @@ cb.settings_choices.push({
     maxLength: 250,
     defaultValue: ftm.i18n('expl_autogreet_newfanclub_format'),
 });
-
 
 // autothank module: new followers
 cb.settings_choices.push({
@@ -2722,6 +2686,7 @@ cb.settings_choices.push({
 });
 
 
+// variable number of tip menus
 for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
     const menu_idx_letter = az[i].toUpperCase();
 
@@ -2901,11 +2866,6 @@ cb.onStart(room_owner => {
         cb.sendNotice(ftm.basic_log(cb, 'cb').join("\n"), room_owner.user, colors_sample.white, colors_sample.black);
     } else if (ftm.is_disabled('tip_menu_flag')) {
         // possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
-        /*
-        cb.setTimeout(function () {
-        	ftm.alert_error('tip_menu_flag', ftm.i18n('errmsg_app_disabled'));
-        }, 1000 * 2);
-        */
     } else if (!ftm.check_template_format('menu_item_display_format', ['LABEL'])) {
         cb.setTimeout(function() {
             ftm.alert_error('menu_item_display_format', ftm.i18n('errmsg_app_errors'));
@@ -2959,11 +2919,6 @@ cb.onStart(room_owner => {
 
     if (ftm.is_disabled('autothank_follower_flag')) {
         // possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
-        /**
-        cb.setTimeout(function () {
-        	ftm.alert_error('autothank_follower_flag', ftm.i18n('errmsg_thanks_module_disabled'), colors_sample.black, colors_sample.white);
-        }, 1000 * 2);
-         */
     } else if (!ftm.check_template_format('autothank_follower_format', ['USER'])) {
         cb.setTimeout(function() {
             ftm.alert_error('autothank_follower_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
@@ -2980,11 +2935,6 @@ cb.onStart(room_owner => {
 
     if (ftm.is_disabled('autothank_tip_flag')) {
         // possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
-        /**
-        cb.setTimeout(function () {
-        	ftm.alert_error('autothank_tip_flag', ftm.i18n('errmsg_thanks_module_disabled'), colors_sample.black, colors_sample.white);
-        }, 1000 * 2);
-         */
     } else if (!ftm.check_template_format('autothank_tip_publicly_format', ['USER'])) {
         cb.setTimeout(function() {
             ftm.alert_error('autothank_tip_publicly_format', ftm.i18n('errmsg_thanks_module_errors'), colors_sample['pastel red'], colors_sample.black);
@@ -3006,11 +2956,6 @@ cb.onStart(room_owner => {
 
     if (ftm.is_disabled('collect_stats_flag')) {
         // possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
-        /**
-        cb.setTimeout(function () {
-        	ftm.alert_error('collect_stats_flag', ftm.i18n('errmsg_collect_stats_disabled'), colors_sample.black, colors_sample.white);
-        }, 1000 * 2);
-         */
     } else {
         // self-test passes: go on...
         ftm.run_flags.collect_stats = true;
