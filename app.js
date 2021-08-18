@@ -378,7 +378,7 @@ const i18n = {
         errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
         errmsg_automod_unicode: 'disallowed text',
         errmsg_automod_link: 'link attempt',
-        expl_commands_available: "Available commands for {LABEL}:",
+        expl_commands_available: "Available commands:",
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
@@ -499,7 +499,7 @@ const i18n = {
         errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
         errmsg_automod_unicode: 'disallowed text',
         errmsg_automod_link: 'link attempt',
-        expl_commands_available: "Available commands for {LABEL}:",
+        expl_commands_available: "Available commands:",
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
@@ -620,7 +620,7 @@ const i18n = {
         errmsg_automod_hidden: "[{APP}] The following message from {USER} was silently hidden from chat ({LABEL}):\n{MESSAGE}",
         errmsg_automod_unicode: 'disallowed text',
         errmsg_automod_link: 'link attempt',
-        expl_commands_available: "Available commands for {LABEL}:",
+        expl_commands_available: "Available commands:",
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
@@ -1493,8 +1493,8 @@ const FlexibleTipMenu = {
         }
 
         const errmsg_missing_tpl = FlexibleTipMenu.i18n('errmsg_missing');
-        for (const i in expected_options) {
-            const varname = '{' + expected_options[i] + '}';
+        for (const optname of expected_options) {
+            const varname = '{' + optname + '}';
             const regexp = new RegExp(varname, 'i');
             if (!regexp.test(notice_tpl)) {
                 const lbl = errmsg_missing_tpl.replace(label_patterns.varname, varname);
@@ -1510,15 +1510,15 @@ const FlexibleTipMenu = {
      * Replacement for the official cb.log() function, which does not appear to work;
      * This is meant for debugging and NOT for production
      * @param {*} obj The object to debug in chat
-     * @param {*} lbl To identify the object in chat
+     * @param {*} namespace To identify the object in chat
      * @returns {array} Debug lines to display in chat
      */
-    basic_log: function(obj, lbl) {
+    basic_log: function(obj, namespace) {
         let dbg_rows = [];
 
         const dbg_start = new Date();
         const dbg_lbl_start = FlexibleTipMenu.i18n('errmsg_dbg_start')
-            .replace(label_patterns.label, lbl)
+            .replace(label_patterns.label, namespace)
             .replace(label_patterns.time, dbg_start.toTimeString());
         dbg_rows.push(dbg_lbl_start);
 
@@ -1540,24 +1540,24 @@ const FlexibleTipMenu = {
                     break;
 
                 case 'object':
-                    let innerObj = [];
-                    for (const innerIdx in obj[idx]) {
-                        const innerType = obj[idx][innerIdx];
-                        innerObj.push(`in ${idx}[${innerIdx}]: ${innerType} (${obj[idx][innerIdx]})`);
+                    let inner_obj = [];
+                    for (const inner_idx in obj[idx]) {
+                        const inner_type = obj[idx][inner_idx];
+                        inner_obj.push(`in ${idx}[${inner_idx}]: ${inner_type} (${obj[idx][inner_idx]})`);
                     }
 
-                    if (0 === innerObj.length) {
+                    if (0 === inner_obj.length) {
                         dbg_rows.push(msg + ' (empty)');
                         continue;
                     }
 
                     if (idx === 'settings' || idx === 'settings_choices') {
-                        dbg_rows.push(msg + ' (' + innerObj.length + ' elements)');
+                        dbg_rows.push(msg + ' (' + inner_obj.length + ' elements)');
                         continue;
                     }
 
-                    dbg_rows.push(msg + ' (' + innerObj.length + ' elements):');
-                    dbg_rows.push(innerObj.join("\n"));
+                    dbg_rows.push(msg + ' (' + inner_obj.length + ' elements):');
+                    dbg_rows.push(inner_obj.join("\n"));
                     continue;
                     break;
 
@@ -1570,7 +1570,7 @@ const FlexibleTipMenu = {
 
         const dbg_end = new Date();
         const dbg_lbl_end = FlexibleTipMenu.i18n('errmsg_dbg_end')
-            .replace(label_patterns.label, lbl)
+            .replace(label_patterns.label, namespace)
             .replace(label_patterns.time, dbg_end.toTimeString());
         dbg_rows.push(dbg_lbl_end);
 
@@ -2070,7 +2070,8 @@ const FlexibleTipMenu = {
         }, 1000 * ++i);
 
         // use two different background colors to ensure all colored labels are shown
-        for (const bgcolor of[colors_sample.black, colors_sample.white]) {
+        const allow_list = [colors_sample.black, colors_sample.white];
+        for (const bgcolor of allow_list) {
             // set a timer to try and group the notices by their background
             cb.setTimeout(function() {
                 for (const color_lbl in colors_sample) {
