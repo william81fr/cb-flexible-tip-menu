@@ -879,7 +879,7 @@ const FlexibleTipMenu = {
         }
 
         const tip_user = tip.from_user;
-        if (!FlexibleTipMenu.collected_stats.tippers.keys().includes(tip_user)) {
+        if ('undefined' === typeof FlexibleTipMenu.collected_stats.tippers[tip_user]) {
             FlexibleTipMenu.collected_stats.tippers[tip_user] = {
                 total_amount: 0, // in tokens
             };
@@ -1664,7 +1664,7 @@ const FlexibleTipMenu = {
      * @param {string} username The username sending the automodded message
      */
     automod_infraction: function(username) {
-        if (!FlexibleTipMenu.automod_infractions.keys().includes(username)) {
+        if ('undefined' === typeof FlexibleTipMenu.automod_infractions[username]) {
             FlexibleTipMenu.automod_infractions[username] = 0;
         }
 
@@ -1930,7 +1930,7 @@ const FlexibleTipMenu = {
             return txt_msg; // no change
         }
 
-        if (!FlexibleTipMenu.collected_stats.tippers.keys().includes(username)) {
+        if ('undefined' === typeof FlexibleTipMenu.collected_stats.tippers[username]) {
             return txt_msg; // no change
         }
 
@@ -2143,7 +2143,7 @@ const FlexibleTipMenu = {
      * @returns {string} The value
      */
     val: function(name) {
-        if (!settings_list.keys().includes(name)) {
+        if ('undefined' === typeof settings_list[name]) {
             return null;
         }
 
@@ -2161,7 +2161,7 @@ const FlexibleTipMenu = {
      * @returns {string} The value
      */
     i18n: function(idx, do_trim = true) {
-        if (!i18n[lang].keys().includes(idx)) {
+        if ('undefined' === typeof i18n[lang][idx]) {
             return null;
         }
 
@@ -2179,7 +2179,7 @@ const FlexibleTipMenu = {
             return true;
         }
 
-        if (FlexibleTipMenu.run_flags.keys().includes(setting_name)) {
+        if ('undefined' !== typeof FlexibleTipMenu.run_flags[setting_name]) {
             return FlexibleTipMenu.run_flags[setting_name];
         }
 
@@ -2843,7 +2843,7 @@ if (!lang) {
     throw Exception('Please define the default language in the "lang" global variable');
 }
 
-if (!i18n.keys().includes(lang)) {
+if ('undefined' === typeof i18n[lang]) {
     throw Exception('Please define the "{LANG}" language in the "i18n" global variable'.replace('{LANG}', lang));
 }
 
