@@ -130,7 +130,7 @@ const command_patterns = {
     tip_menu: /^(?:tip)?_?menu$/i,
     colors_sample: /^colou?rs_?(?:list)?$/i,
     stats: /^stats$/i,
-    notes: /^notes$/i,
+    requests: /^(?:reqs|requests)$/i,
 };
 
 /**
@@ -303,12 +303,12 @@ const i18n = {
         autothank_tip_remind_note_format: "Template for the tip note reminder (variables are: {MESSAGE}) - english recommended",
         collect_stats_flag: "STATS COMMAND ------------",
         collect_stats_followers: 'Include new follower stats?',
-        collect_stats_newcomers: 'Include influx (chat members)?',
+        collect_stats_newcomers: 'Include room influx (chat members)?',
         collect_stats_fanclubs: 'Include fanclub subscriptions?',
-        collect_tipnotes_trigger_flag: 'REMEMBER TIPNOTES AFTER CERTAIN TIPS ------------',
-        collect_tipnotes_trigger_tokens: 'Tip amounts to trigger this (one or several, separate by commas)',
-        collect_tipnotes_trigger_prev: 'Record X tipnotes before the tip',
-        collect_tipnotes_trigger_subseq: 'Record X tipnotes after the tip',
+        collect_tipnotes_trigger_flag: 'REMEMBER TIPNOTES FOR CUSTOM REQUESTS ------------',
+        collect_tipnotes_trigger_tokens: 'Tip amounts to trigger this feature (one or several, separate by commas)',
+        collect_tipnotes_trigger_prev: 'Record X tipnotes before the custom request',
+        collect_tipnotes_trigger_subseq: 'Record X tipnotes after the custom request',
         best_tippers_flag: 'BEST TIPPER(S) ------------',
         best_tippers_start_tokens: 'Minimum tokens',
         best_tippers_repeat_minutes: 'Repeat every X minute',
@@ -392,7 +392,7 @@ const i18n = {
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
-        expl_command_collected_tipnotes: '/notes -- Display the tip notes collected for this streaming session',
+        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for special requests',
         errlbl_command_not_recognized: "[{APP}] Your command was not recognized.\nReminder: any message that starts with '/' or '!' is handled as a command for this bot.",
     },
     es: {
@@ -519,7 +519,7 @@ const i18n = {
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
-        expl_command_collected_tipnotes: '/notes -- Display the tip notes collected for this streaming session',
+        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for special requests',
         errlbl_command_not_recognized: "[{APP}] Su comando no ha funcionado.\nRecordatorio: todo mensaje que empieza por '/' o '!' se entiende como un comando por este bot.",
     },
     fr: {
@@ -646,7 +646,7 @@ const i18n = {
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
-        expl_command_collected_tipnotes: '/notes -- Display the tip notes collected for this streaming session',
+        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for special requests',
         errlbl_command_not_recognized: "[{APP}] Votre commande n'est pas reconnue.\nRappel : tout message commencant par '/' ou '!' est traite comme une commande par ce bot.",
     },
 };
@@ -1420,11 +1420,16 @@ const FlexibleTipMenu = {
         const disabled_counter = -1;
         const start_counter = 0;
         const max_counter = 1 + cfg.record_previous + cfg.record_subsequent;
-        if ('undefined' === typeof FlexibleTipMenu.collected_tipnotes[tip.from_user]) {
-            FlexibleTipMenu.collected_tipnotes[tip.from_user] = { counter: disabled_counter, messages: [], history: [] };
+        const is_empty_note = ('' === tip_note);
+        const is_valid_amount = cfg.trigger_tokens.includes(tip_amount);
+
+        if (!is_empty_note || is_valid_amount) {
+            if ('undefined' === typeof FlexibleTipMenu.collected_tipnotes[tip.from_user]) {
+                FlexibleTipMenu.collected_tipnotes[tip.from_user] = { counter: disabled_counter, messages: [], history: [] };
+            }
         }
 
-        if (cfg.trigger_tokens.includes(tip_amount)) {
+        if (is_valid_amount) {
             // this is the turning point: archive history + record current note + make sure the next few messages are saved
             FlexibleTipMenu.collected_tipnotes[tip.from_user].counter = start_counter;
             const hist = FlexibleTipMenu.collected_tipnotes[tip.from_user].history;
@@ -1433,18 +1438,14 @@ const FlexibleTipMenu = {
                 FlexibleTipMenu.collected_tipnotes[tip.from_user].history = [];
             }
 
-            const owner_notice = '[{APP}] starting to record {COUNT} tip notes from {USER} because of their special {AMOUNT}tk tip\nYou can call up the "/notes" command (without quotes) at any time to see these records'
+            const owner_notice = '[{APP}] starting to record {COUNT} tip notes from {USER} because of their special {AMOUNT}tk tip\nYou can call up the "/reqs" command (without quotes) at any time to see these records'
                 .replace(label_patterns.username, tip.from_user)
                 .replace(label_patterns.count, cfg.record_subsequent)
                 .replace(label_patterns.amount, tip_amount);
             cb.sendNotice(FlexibleTipMenu.clean_str(owner_notice), cb.room_slug, colors_sample.black, colors_sample.white, '');
         }
 
-        if ('' === tip_note) {
-            /*
-            const errlbl = 'missing tip note';
-            cb.sendNotice(errlbl, cb.room_slug, colors_sample.black, colors_sample.white, '');
-            */
+        if (is_empty_note) {
             return; // nothing to record
         }
 
@@ -1746,7 +1747,7 @@ const FlexibleTipMenu = {
         }
 
         if (!FlexibleTipMenu.is_disabled('collect_tipnotes_trigger_flag')) {
-            commands_list.push(FlexibleTipMenu.i18n('expl_command_collected_tipnotes'));
+            commands_list.push(FlexibleTipMenu.i18n('expl_commands_collected_tipnotes'));
         }
 
         if (!commands_list.length) {
@@ -2286,7 +2287,7 @@ const FlexibleTipMenu = {
             } else {
                 FlexibleTipMenu.show_command_error(event_msg.user);
             }
-        } else if (command_patterns.notes.test(txt_command)) {
+        } else if (command_patterns.requests.test(txt_command)) {
             if (event_msg.user === cb.room_slug) {
                 FlexibleTipMenu.show_collected_tipnotes(event_msg.user);
             } else {
@@ -2531,8 +2532,8 @@ cb.settings_choices.push({
     label: ftm.i18n('collect_tipnotes_trigger_prev'),
     type: 'int',
     minValue: 0,
-    maxValue: 9,
-    defaultValue: 1,
+    maxValue: 25,
+    defaultValue: 5,
 });
 
 cb.settings_choices.push({
@@ -2540,8 +2541,8 @@ cb.settings_choices.push({
     label: ftm.i18n('collect_tipnotes_trigger_subseq'),
     type: 'int',
     minValue: 0,
-    maxValue: 9,
-    defaultValue: 3,
+    maxValue: 25,
+    defaultValue: 5,
 });
 
 
