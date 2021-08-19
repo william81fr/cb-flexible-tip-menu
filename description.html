@@ -298,6 +298,39 @@
     <dd>&nbsp;</dd>
 </dl>
 
+<h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Custom requests via tip notes</span></h2>
+<dl>
+    <dt><span class="block" style="font-weight: bold; padding: 0">REMEMBER TIPNOTES FOR CUSTOM REQUESTS</span></dt>
+    <dd>&middot; whether to enable the feature at all, show it to everyone or to a subset of users</dd>
+    <dd>&middot; this feature lets the bot record several tip notes before and after a custom request is made</dd>
+    <dd>&middot; this way, users can first ask with cheap tip notes if you agree to their request, and send their big tip only if you do, and the bot helps you keep track</dd>
+    <dd>&middot; several of their tip notes are recorded before and after the big tip (configuration below), in addition to the tip note for the request itself</dd>
+    <dd>&middot; you can call up these records at any time with the "/reqs" or "/requests" command (without quotes)</dd>
+    <dd>&nbsp;</dd>
+
+    <dt><span class="block" style="font-weight: bold; padding: 0">Tip amounts to trigger this feature (one or several, separate by commas)</span></dt>
+    <dd>&middot; specify here the exact tip amounts that you expect for custom requests</dd>
+    <dd>&middot; example 1: 112</dd>
+    <dd>&middot; ^ this will trigger only on 112 tk tips</dd>
+    <dd>&middot; example 2: 112,223,556</dd>
+    <dd>&middot; ^ this will trigger for 112 tk tips as well as 223 tk tips and 556 tk tips</dd>
+    <dd>&nbsp;</dd>
+
+    <dt><span class="block" style="font-weight: bold; padding: 0">Record X tipnotes *before* the custom request</span></dt>
+    <dd>&middot; specify here how many tip notes to record prior to the custom request</dd>
+    <dd>&middot; for example, when a user asks in a 1 tk tip note if you agree and only then do they tip for the custom request, but they don't repeat their request</dd>
+    <dd>&middot; this setting lets you go back in time several tip notes to help you remember what they asked for</dd>
+    <dd>&middot; change this value to 0 (zero) to disable</dd>
+    <dd>&nbsp;</dd>
+
+    <dt><span class="block" style="font-weight: bold; padding: 0">Record X tipnotes *after* the custom request</span></dt>
+    <dd>&middot; specify here how many tip notes to record after the custom request</dd>
+    <dd>&middot; for example, when a user tips for a custom request, but they forget to include all the details and they need to send additional 1 tk tips to tell you</dd>
+    <dd>&middot; this setting helps you remember what they asked for</dd>
+    <dd>&middot; change this value to 0 (zero) to disable</dd>
+    <dd>&nbsp;</dd>
+</dl>
+
 <h2 class="debugmessage"><span style="font-size: 1.3em; line-height: 20px">Tip Menu settings in the admin panel</span></h2>
 <dl>
     <dt><span class="block" style="font-weight: bold; padding: 0">Tip menu shown to</span></dt>
