@@ -392,7 +392,7 @@ const i18n = {
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
-        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for special requests',
+        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
         errlbl_command_not_recognized: "[{APP}] Your command was not recognized.\nReminder: any message that starts with '/' or '!' is handled as a command for this bot.",
     },
     es: {
@@ -519,7 +519,7 @@ const i18n = {
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
-        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for special requests',
+        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
         errlbl_command_not_recognized: "[{APP}] Su comando no ha funcionado.\nRecordatorio: todo mensaje que empieza por '/' o '!' se entiende como un comando por este bot.",
     },
     fr: {
@@ -646,7 +646,7 @@ const i18n = {
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
-        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for special requests',
+        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
         errlbl_command_not_recognized: "[{APP}] Votre commande n'est pas reconnue.\nRappel : tout message commencant par '/' ou '!' est traite comme une commande par ce bot.",
     },
 };
@@ -904,7 +904,7 @@ const FlexibleTipMenu = {
             return;
         }
 
-        const tip_user = tip.from_user;
+        const tip_user = tip.from_user.trim();
         if ('undefined' === typeof FlexibleTipMenu.collected_stats.tippers[tip_user]) {
             FlexibleTipMenu.collected_stats.tippers[tip_user] = {
                 total_amount: 0, // in tokens
@@ -1349,7 +1349,7 @@ const FlexibleTipMenu = {
 
     /**
      * Entrypoint for onTip event; Hands off to various local handlers
-     * @param {*} tip
+     * @param {*} tip The tip object that was fired with the event
      */
     on_tip: function(tip) {
         if (tip.from_user === cb.room_slug) {
@@ -1380,8 +1380,9 @@ const FlexibleTipMenu = {
 
         const tip_amount = parseInt(tip.amount);
         const tip_note = tip.message.trim();
+        const tip_author = tip.from_user.trim();
 
-        const notice_raw = FlexibleTipMenu.get_autothank_tip_notice(tip_amount, tip.from_user);
+        const notice_raw = FlexibleTipMenu.get_autothank_tip_notice(tip_amount, tip_author);
 
         if (!notice_raw) {
             // never mind
@@ -1389,19 +1390,19 @@ const FlexibleTipMenu = {
             const background_color = FlexibleTipMenu.get_color_code('autothank_tip_publicly_background_color', colors_sample.white);
             const text_color = FlexibleTipMenu.get_color_code('autothank_tip_publicly_text_color', colors_sample.black);
             const boldness = FlexibleTipMenu.val('autothank_tip_publicly_boldness');
-            FlexibleTipMenu.send_notice(notice_raw, tip.from_user, background_color, text_color, boldness, 'autothank_tip_flag', 500);
+            FlexibleTipMenu.send_notice(notice_raw, tip_author, background_color, text_color, boldness, 'autothank_tip_flag', 500);
         } else {
             const background_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_background_color', colors_sample.white);
             const text_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_text_color', colors_sample.black);
             const boldness = FlexibleTipMenu.val('autothank_tip_privately_boldness');
-            FlexibleTipMenu.send_notice(notice_raw, tip.from_user, background_color, text_color, boldness, 'autothank_tip_flag', 500);
+            FlexibleTipMenu.send_notice(notice_raw, tip_author, background_color, text_color, boldness, 'autothank_tip_flag', 500);
         }
 
         const reminder_raw = FlexibleTipMenu.get_autothank_tip_remind_note_notice(tip_note);
         const background_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_background_color', colors_sample.white);
         const text_color = FlexibleTipMenu.get_color_code('autothank_tip_privately_text_color', colors_sample.black);
         const boldness = FlexibleTipMenu.val('autothank_tip_privately_boldness');
-        FlexibleTipMenu.send_notice(reminder_raw, tip.from_user, background_color, text_color, boldness, 'autothank_tip_remind_note_flag', 500);
+        FlexibleTipMenu.send_notice(reminder_raw, tip_author, background_color, text_color, boldness, 'autothank_tip_remind_note_flag', 500);
     },
 
     /**
@@ -1415,6 +1416,7 @@ const FlexibleTipMenu = {
 
         const tip_amount = parseInt(tip.amount);
         const tip_note = tip.message.trim();
+        const tip_author = tip.from_user.trim();
 
         const cfg = FlexibleTipMenu.collect_tipnotes_cfg;
         const disabled_counter = -1;
@@ -1424,22 +1426,22 @@ const FlexibleTipMenu = {
         const is_valid_amount = cfg.trigger_tokens.includes(tip_amount);
 
         if (!is_empty_note || is_valid_amount) {
-            if ('undefined' === typeof FlexibleTipMenu.collected_tipnotes[tip.from_user]) {
-                FlexibleTipMenu.collected_tipnotes[tip.from_user] = { counter: disabled_counter, messages: [], history: [] };
+            if ('undefined' === typeof FlexibleTipMenu.collected_tipnotes[tip_author]) {
+                FlexibleTipMenu.collected_tipnotes[tip_author] = { counter: disabled_counter, messages: [], history: [] };
             }
         }
 
         if (is_valid_amount) {
             // this is the turning point: archive history + record current note + make sure the next few messages are saved
-            FlexibleTipMenu.collected_tipnotes[tip.from_user].counter = start_counter;
-            const hist = FlexibleTipMenu.collected_tipnotes[tip.from_user].history;
+            FlexibleTipMenu.collected_tipnotes[tip_author].counter = start_counter;
+            const hist = FlexibleTipMenu.collected_tipnotes[tip_author].history;
             if (hist.length) {
-                FlexibleTipMenu.collected_tipnotes[tip.from_user].messages = FlexibleTipMenu.collected_tipnotes[tip.from_user].messages.concat(hist);
-                FlexibleTipMenu.collected_tipnotes[tip.from_user].history = [];
+                FlexibleTipMenu.collected_tipnotes[tip_author].messages = FlexibleTipMenu.collected_tipnotes[tip_author].messages.concat(hist);
+                FlexibleTipMenu.collected_tipnotes[tip_author].history = [];
             }
 
             const owner_notice = '[{APP}] starting to record {COUNT} tip notes from {USER} because of their special {AMOUNT}tk tip\nYou can call up the "/reqs" command (without quotes) at any time to see these records'
-                .replace(label_patterns.username, tip.from_user)
+                .replace(label_patterns.username, tip_author)
                 .replace(label_patterns.count, cfg.record_subsequent)
                 .replace(label_patterns.amount, tip_amount);
             cb.sendNotice(FlexibleTipMenu.clean_str(owner_notice), cb.room_slug, colors_sample.black, colors_sample.white, '');
@@ -1451,21 +1453,21 @@ const FlexibleTipMenu = {
 
         const log_lbl = '[{TIME}] {USER} tipped {AMOUNT}tk and said: {MESSAGE}'
             .replace(label_patterns.amount, tip_amount)
-            .replace(label_patterns.username, tip.from_user)
+            .replace(label_patterns.username, tip_author)
             .replace(label_patterns.time, FlexibleTipMenu.current_time_str().replace(date_patterns.time_short, ''))
             .replace(label_patterns.message, tip_note);
 
-        if (disabled_counter === FlexibleTipMenu.collected_tipnotes[tip.from_user].counter) {
+        if (disabled_counter === FlexibleTipMenu.collected_tipnotes[tip_author].counter) {
             if (0 < cfg.record_previous) {
                 // record separately in case the right tip amount comes later
-                FlexibleTipMenu.collected_tipnotes[tip.from_user].history.push(log_lbl);
+                FlexibleTipMenu.collected_tipnotes[tip_author].history.push(log_lbl);
                 /*
                 const errlbl = 'disabled counter: recorded in history';
                 cb.sendNotice(errlbl, cb.room_slug, colors_sample.black, colors_sample.white, '');
                 */
-                if (cfg.record_previous < FlexibleTipMenu.collected_tipnotes[tip.from_user].history.length) {
+                if (cfg.record_previous < FlexibleTipMenu.collected_tipnotes[tip_author].history.length) {
                     // keep the history mangeable
-                    FlexibleTipMenu.collected_tipnotes[tip.from_user].history = FlexibleTipMenu.collected_tipnotes[tip.from_user].history.slice(-1 * cfg.record_previous);
+                    FlexibleTipMenu.collected_tipnotes[tip_author].history = FlexibleTipMenu.collected_tipnotes[tip_author].history.slice(-1 * cfg.record_previous);
                     /*
                     const errlbl = 'keep the history mangeable';
                     cb.sendNotice(errlbl, cb.room_slug, colors_sample.black, colors_sample.white, '');
@@ -1482,13 +1484,13 @@ const FlexibleTipMenu = {
             return; // this user is irrelevant at the moment
         }
 
-        FlexibleTipMenu.collected_tipnotes[tip.from_user].messages.push(log_lbl);
-        ++FlexibleTipMenu.collected_tipnotes[tip.from_user].counter;
+        FlexibleTipMenu.collected_tipnotes[tip_author].messages.push(log_lbl);
+        ++FlexibleTipMenu.collected_tipnotes[tip_author].counter;
 
-        if (max_counter <= FlexibleTipMenu.collected_tipnotes[tip.from_user].counter) {
+        if (max_counter <= FlexibleTipMenu.collected_tipnotes[tip_author].counter) {
             // disable further recording
-            FlexibleTipMenu.collected_tipnotes[tip.from_user].counter = disabled_counter;
-            FlexibleTipMenu.collected_tipnotes[tip.from_user].history = []; // just in case but shouldn't be necessary here
+            FlexibleTipMenu.collected_tipnotes[tip_author].counter = disabled_counter;
+            FlexibleTipMenu.collected_tipnotes[tip_author].history = []; // just in case but shouldn't be necessary here
             /*
             const errlbl = 'already recorded {COUNT}'
                 .replace(label_patterns.count, max_counter);
@@ -2346,10 +2348,10 @@ const FlexibleTipMenu = {
             return FlexibleTipMenu.run_flags[setting_name];
         }
 
-        const flag_res = (null === FlexibleTipMenu.val(setting_name));
-        FlexibleTipMenu.run_flags[setting_name] = flag_res;
+        const is_disabled = (null === FlexibleTipMenu.val(setting_name));
 
-        return flag_res;
+        FlexibleTipMenu.run_flags[setting_name] = is_disabled;
+        return is_disabled;
     },
 };
 
@@ -3165,6 +3167,11 @@ cb.onStart(room_owner => {
         ftm.run_flags.collect_stats = true;
     }
 
+
+    //
+    // Start the custom request module
+    //
+
     if (ftm.is_disabled('collect_tipnotes_trigger_flag')) {
         // possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
     } else {
@@ -3176,13 +3183,21 @@ cb.onStart(room_owner => {
             .filter(x => !isNaN(x))
             .map(x => parseInt(x));
 
-        FlexibleTipMenu.collect_tipnotes_cfg = {
-            trigger_tokens: cfg_amounts,
-            record_previous: isNaN(cfg_previous) ? 0 : parseInt(cfg_previous),
-            record_subsequent: isNaN(cfg_subsequent) ? 3 : parseInt(cfg_subsequent),
-        };
+        if (!cfg_amounts.length) {
+            ftm.run_flags.collect_tipnotes_trigger_flag = false;
+        } else {
+            FlexibleTipMenu.collect_tipnotes_cfg = {
+                trigger_tokens: cfg_amounts,
+                record_previous: isNaN(cfg_previous) ? 0 : parseInt(cfg_previous),
+                record_subsequent: isNaN(cfg_subsequent) ? 3 : parseInt(cfg_subsequent),
+            };
+        }
     }
 
+
+    //
+    // Start the hightip module
+    //
 
     if (ftm.is_disabled('best_tippers_flag')) {
         // possibly show an alert to the broadcaster, or maybe not, I'm not sure yet
