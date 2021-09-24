@@ -700,7 +700,11 @@ const FlexibleTipMenu = {
     },
 
     collected_tipnotes: {},
-    collect_tipnotes_cfg: {},
+    collect_tipnotes_cfg: {
+        trigger_tokens: [],
+        record_previous: 0,
+        record_subsequent: 3,
+    },
 
     /**
      * Removes remaining {VAR} syntax from a notice template;
@@ -1414,11 +1418,15 @@ const FlexibleTipMenu = {
             return;
         }
 
+        const cfg = FlexibleTipMenu.collect_tipnotes_cfg;
+        if (!cfg.trigger_tokens.length) {
+            return;
+        }
+
         const tip_amount = parseInt(tip.amount);
         const tip_note = tip.message.trim();
         const tip_author = tip.from_user.trim();
 
-        const cfg = FlexibleTipMenu.collect_tipnotes_cfg;
         const disabled_counter = -1;
         const start_counter = 0;
         const max_counter = 1 + cfg.record_previous + cfg.record_subsequent;
