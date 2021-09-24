@@ -1858,7 +1858,7 @@ const FlexibleTipMenu = {
         }
 
         const allow_mods = (lbl_mods === module_flag);
-        const is_mod = message.is_mod;
+        const is_mod = event_msg.is_mod;
         if (allow_mods && (is_mod || is_bcaster)) {
             FlexibleTipMenu.automod_noaction(event_msg.user, module_lbl + ' & moderator');
             return event_msg; // change nothing
@@ -1887,7 +1887,7 @@ const FlexibleTipMenu = {
 
         // take action
         event_msg = FlexibleTipMenu.hide_message(event_msg);
-        FlexibleTipMenu.send_notice(notice_raw, event_msg.user, null, null, null, 'automods_verbosity', 100);
+        FlexibleTipMenu.send_notice(event_msg.m, event_msg.user, null, null, null, 'automods_verbosity', 100);
 
 
         if (!FlexibleTipMenu.is_disabled('automods_record_flag')) {
