@@ -139,6 +139,7 @@ const command_patterns = {
     colors_sample: /^colou?rs_?(?:list)?$/i,
     stats: /^stats$/i,
     requests: /^(?:reqs|requests)$/i,
+    backup: /^(?:bkp|backup)$/i,
 };
 
 /**
@@ -404,6 +405,7 @@ const i18n = {
         lbl_collect_stats_nochange: 'no change since last time',
         lbl_collect_tipnotes_header: '[{APP}] recorded tip notes for {USER}:',
         expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
+        expl_backup_details: '[{APP}] Here are your current settings:',
         errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' in {APP} {LABEL} (currently valued at '{VALUE}')",
         errmsg_app_disabled: "app is disabled",
         errmsg_app_errors: "has errors: app is stopped",
@@ -428,6 +430,7 @@ const i18n = {
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
         expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
+        expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes',
         errlbl_command_not_recognized: "[{APP}] Your command was not recognized.\nReminder: any message that starts with '/' or '!' is handled as a command for this bot.",
     },
     es: {
@@ -531,6 +534,7 @@ const i18n = {
         lbl_collect_stats_nochange: 'no change since last time',
         lbl_collect_tipnotes_header: '[{APP}] recorded tip notes for {USER}:',
         expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
+        expl_backup_details: '[{APP}] Here are your current settings:',
         errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' en {APP} {LABEL} (actualmente vale '{VALUE}')",
         errmsg_app_disabled: "el bot esta desactivado",
         errmsg_app_errors: "hay errores: el bot esta parado",
@@ -555,6 +559,7 @@ const i18n = {
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
         expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
+        expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes',
         errlbl_command_not_recognized: "[{APP}] Su comando no ha funcionado.\nRecordatorio: todo mensaje que empieza por '/' o '!' se entiende como un comando por este bot.",
     },
     fr: {
@@ -658,6 +663,7 @@ const i18n = {
         lbl_collect_stats_nochange: 'no change since last time',
         lbl_collect_tipnotes_header: '[{APP}] recorded tip notes for {USER}:',
         expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
+        expl_backup_details: '[{APP}] Here are your current settings:',
         errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' dans {APP} {LABEL} (vaut actuellement '{VALUE}')",
         errmsg_app_disabled: "l'app est desactivee",
         errmsg_app_errors: "a des erreurs : l'app est arretee",
@@ -682,6 +688,7 @@ const i18n = {
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
         expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
+        expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes',
         errlbl_command_not_recognized: "[{APP}] Votre commande n'est pas reconnue.\nRappel : tout message commencant par '/' ou '!' est traite comme une commande par ce bot.",
     },
 };
@@ -1122,6 +1129,54 @@ const FlexibleTipMenu = {
 
             FlexibleTipMenu.send_notice(header_lbl + "\n" + tipnotes_list.join("\n"), username, null, null, font_weights.bolder, 'collect_tipnotes_trigger_flag', 100, { user: username, gender: '' });
         }
+    },
+
+    /**
+     * Display a backup of the current app settings
+     * @param {string} username Specific user who may have asked for the list
+     */
+    show_settings_backup: function(username) {
+        const backup_details = [];
+
+        const header_lbl = FlexibleTipMenu.clean_str(FlexibleTipMenu.i18n('expl_backup_details'));
+        backup_details.push(header_lbl);
+
+        for (const setting_name of current_settings) {
+            let setting_label, setting_val;
+
+            if ('undefined' !== typeof settings_list[setting_name]) {
+                // straightforward
+                setting_val = cb.settings[settings_list[setting_name]];
+                setting_label = ftm.i18n(setting_name);
+                if (!setting_label) {
+                    // label was aliased from a shared label, let's look it up
+                    for (const cfg of cb.settings_choices) {
+                        if (settings_list[setting_name] === cfg.name) {
+                            setting_label = cfg.label;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                // auto generated from a loop, let's look it up
+                for (const cfg of cb.settings_choices) {
+                    if (setting_name === cfg.name) {
+                        setting_label = cfg.label;
+                        setting_val = cb.settings[cfg.name];
+                        break;
+                    }
+                }
+            }
+
+            const notice_lbl = '[{NAME}] {LBL}: {VAL}'
+                .replace('{NAME}', setting_name)
+                .replace('{LBL}', setting_label)
+                .replace('{VAL}', setting_val);
+
+            backup_details.push(notice_lbl);
+        }
+
+        cb.sendNotice(backup_details.join("\n"), username);
     },
 
     /**
@@ -1786,6 +1841,7 @@ const FlexibleTipMenu = {
         }
 
         commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist'));
+        commands_list.push(FlexibleTipMenu.i18n('expl_commands_settings_backup'));
 
         if (!FlexibleTipMenu.is_disabled('collect_stats_flag')) {
             commands_list.push(FlexibleTipMenu.i18n('expl_commands_stats'));
@@ -2325,6 +2381,12 @@ const FlexibleTipMenu = {
             } else {
                 FlexibleTipMenu.show_command_error(event_msg.user);
             }
+        } else if (command_patterns.backup.test(txt_command)) {
+            if (event_msg.user === cb.room_slug) {
+                FlexibleTipMenu.show_settings_backup(event_msg.user);
+            } else {
+                FlexibleTipMenu.show_command_error(event_msg.user);
+            }
         } else {
             FlexibleTipMenu.show_command_error(event_msg.user);
         }
@@ -2392,8 +2454,15 @@ const ftm = FlexibleTipMenu; // shorthand
 //
 // Start storing settings
 //
+
+/**
+ * List of config names for the current app's version; useful to know which settings are outdated
+ */
+const current_settings = [];
+
 cb.settings_choices = [];
 
+current_settings.push('app_name');
 cb.settings_choices.push({
     name: settings_list.app_name,
     label: ftm.i18n('app_name'),
@@ -2403,6 +2472,7 @@ cb.settings_choices.push({
     required: false,
 });
 
+current_settings.push('errors_flag');
 cb.settings_choices.push({
     name: settings_list.errors_flag,
     label: ftm.i18n('errors_flag'),
@@ -2415,6 +2485,7 @@ cb.settings_choices.push({
 
 
 // automod unicode module
+current_settings.push('automod_unicode_flag');
 cb.settings_choices.push({
     name: settings_list.automod_unicode_flag,
     label: ftm.i18n('automod_unicode_flag'),
@@ -2428,6 +2499,7 @@ cb.settings_choices.push({
 });
 
 // automod links module
+current_settings.push('automod_links_flag');
 cb.settings_choices.push({
     name: settings_list.automod_links_flag,
     label: ftm.i18n('automod_links_flag'),
@@ -2441,6 +2513,7 @@ cb.settings_choices.push({
 });
 
 // settings common to all automods
+current_settings.push('automods_verbosity');
 cb.settings_choices.push({
     name: settings_list.automods_verbosity,
     label: ftm.i18n('automods_verbosity'),
@@ -2451,6 +2524,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('automods_record_flag');
 cb.settings_choices.push({
     name: settings_list.automods_record_flag,
     label: ftm.i18n('automods_record_flag'),
@@ -2466,6 +2540,7 @@ cb.settings_choices.push({
 
 
 // decorator modules
+current_settings.push('decorator_gender_flag');
 cb.settings_choices.push({
     name: settings_list.decorator_gender_flag,
     label: ftm.i18n('decorator_gender_flag'),
@@ -2476,6 +2551,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('decorator_time_flag');
 cb.settings_choices.push({
     name: settings_list.decorator_time_flag,
     label: ftm.i18n('decorator_time_flag'),
@@ -2487,6 +2563,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('decorator_tips_flag');
 cb.settings_choices.push({
     name: settings_list.decorator_tips_flag,
     label: ftm.i18n('decorator_tips_flag'),
@@ -2499,6 +2576,7 @@ cb.settings_choices.push({
 
 
 // stats collection module
+current_settings.push('collect_stats_flag');
 cb.settings_choices.push({
     name: settings_list.collect_stats_flag,
     label: ftm.i18n('collect_stats_flag'),
@@ -2509,6 +2587,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('collect_stats_followers');
 cb.settings_choices.push({
     name: settings_list.collect_stats_followers,
     label: ftm.i18n('collect_stats_followers'),
@@ -2518,6 +2597,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_enabled'),
 });
 
+current_settings.push('collect_stats_newcomers');
 cb.settings_choices.push({
     name: settings_list.collect_stats_newcomers,
     label: ftm.i18n('collect_stats_newcomers'),
@@ -2527,6 +2607,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_enabled'),
 });
 
+current_settings.push('collect_stats_fanclubs');
 cb.settings_choices.push({
     name: settings_list.collect_stats_fanclubs,
     label: ftm.i18n('collect_stats_fanclubs'),
@@ -2538,6 +2619,7 @@ cb.settings_choices.push({
 
 
 // tipnote collection module (triggered by tip amounts)
+current_settings.push('collect_tipnotes_trigger_flag');
 cb.settings_choices.push({
     name: settings_list.collect_tipnotes_trigger_flag,
     label: ftm.i18n('collect_tipnotes_trigger_flag'),
@@ -2550,6 +2632,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('collect_tipnotes_trigger_tokens');
 cb.settings_choices.push({
     name: settings_list.collect_tipnotes_trigger_tokens,
     label: ftm.i18n('collect_tipnotes_trigger_tokens'),
@@ -2559,6 +2642,7 @@ cb.settings_choices.push({
     required: false,
 });
 
+current_settings.push('collect_tipnotes_trigger_prev');
 cb.settings_choices.push({
     name: settings_list.collect_tipnotes_trigger_prev,
     label: ftm.i18n('collect_tipnotes_trigger_prev'),
@@ -2568,6 +2652,7 @@ cb.settings_choices.push({
     defaultValue: 5,
 });
 
+current_settings.push('collect_tipnotes_trigger_subseq');
 cb.settings_choices.push({
     name: settings_list.collect_tipnotes_trigger_subseq,
     label: ftm.i18n('collect_tipnotes_trigger_subseq'),
@@ -2579,6 +2664,7 @@ cb.settings_choices.push({
 
 
 // best tippers module
+current_settings.push('best_tippers_flag');
 cb.settings_choices.push({
     name: settings_list.best_tippers_flag,
     label: ftm.i18n('best_tippers_flag'),
@@ -2589,6 +2675,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('best_tippers_start_tokens');
 cb.settings_choices.push({
     name: settings_list.best_tippers_start_tokens,
     label: ftm.i18n('best_tippers_start_tokens'),
@@ -2597,6 +2684,7 @@ cb.settings_choices.push({
     defaultValue: 1000,
 });
 
+current_settings.push('best_tippers_repeat_minutes');
 cb.settings_choices.push({
     name: settings_list.best_tippers_repeat_minutes,
     label: ftm.i18n('best_tippers_repeat_minutes'),
@@ -2606,6 +2694,7 @@ cb.settings_choices.push({
     defaultValue: 10,
 });
 
+current_settings.push('best_tippers_stack_size');
 cb.settings_choices.push({
     name: settings_list.best_tippers_stack_size,
     label: ftm.i18n('best_tippers_stack_size'),
@@ -2615,6 +2704,7 @@ cb.settings_choices.push({
     defaultValue: 3,
 });
 
+current_settings.push('best_tippers_background_color');
 cb.settings_choices.push({
     name: settings_list.best_tippers_background_color,
     label: ftm.i18n('expl_bgcolor'),
@@ -2624,6 +2714,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample.white,
 });
 
+current_settings.push('best_tippers_text_color');
 cb.settings_choices.push({
     name: settings_list.best_tippers_text_color,
     label: ftm.i18n('expl_txtcolor'),
@@ -2633,6 +2724,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample['pastel blue'],
 });
 
+current_settings.push('best_tippers_boldness');
 cb.settings_choices.push({
     name: settings_list.best_tippers_boldness,
     label: ftm.i18n('expl_boldness'),
@@ -2643,6 +2735,7 @@ cb.settings_choices.push({
     defaultValue: font_weights.bold,
 });
 
+current_settings.push('best_tippers_format');
 cb.settings_choices.push({
     name: settings_list.best_tippers_format,
     label: ftm.i18n('best_tippers_format'),
@@ -2654,6 +2747,7 @@ cb.settings_choices.push({
 
 
 // autogreet module: newcomers
+current_settings.push('autogreet_newcomer_flag');
 cb.settings_choices.push({
     name: settings_list.autogreet_newcomer_flag,
     label: ftm.i18n('autogreet_newcomer_flag'),
@@ -2667,6 +2761,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('autogreet_newcomer_background_color');
 cb.settings_choices.push({
     name: settings_list.autogreet_newcomer_background_color,
     label: ftm.i18n('expl_bgcolor'),
@@ -2676,6 +2771,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample.white,
 });
 
+current_settings.push('autogreet_newcomer_text_color');
 cb.settings_choices.push({
     name: settings_list.autogreet_newcomer_text_color,
     label: ftm.i18n('expl_txtcolor'),
@@ -2685,6 +2781,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample['pastel blue'],
 });
 
+current_settings.push('autogreet_newcomer_boldness');
 cb.settings_choices.push({
     name: settings_list.autogreet_newcomer_boldness,
     label: ftm.i18n('expl_boldness'),
@@ -2695,6 +2792,7 @@ cb.settings_choices.push({
     defaultValue: font_weights.bold,
 });
 
+current_settings.push('autogreet_newcomer_format');
 cb.settings_choices.push({
     name: settings_list.autogreet_newcomer_format,
     label: ftm.i18n('autogreet_newcomer_format'),
@@ -2705,6 +2803,7 @@ cb.settings_choices.push({
 });
 
 // autogreet module: new fan club members
+current_settings.push('autogreet_newfanclub_flag');
 cb.settings_choices.push({
     name: settings_list.autogreet_newfanclub_flag,
     label: ftm.i18n('autogreet_newfanclub_flag'),
@@ -2718,6 +2817,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('autogreet_newfanclub_background_color');
 cb.settings_choices.push({
     name: settings_list.autogreet_newfanclub_background_color,
     label: ftm.i18n('expl_bgcolor'),
@@ -2727,6 +2827,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample.white,
 });
 
+current_settings.push('autogreet_newfanclub_text_color');
 cb.settings_choices.push({
     name: settings_list.autogreet_newfanclub_text_color,
     label: ftm.i18n('expl_txtcolor'),
@@ -2736,6 +2837,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample['pastel green'],
 });
 
+current_settings.push('autogreet_newfanclub_boldness');
 cb.settings_choices.push({
     name: settings_list.autogreet_newfanclub_boldness,
     label: ftm.i18n('expl_boldness'),
@@ -2746,6 +2848,7 @@ cb.settings_choices.push({
     defaultValue: font_weights.bold,
 });
 
+current_settings.push('autogreet_newfanclub_format');
 cb.settings_choices.push({
     name: settings_list.autogreet_newfanclub_format,
     label: ftm.i18n('autogreet_newfanclub_format'),
@@ -2756,6 +2859,7 @@ cb.settings_choices.push({
 });
 
 // autothank module: new followers
+current_settings.push('autothank_follower_flag');
 cb.settings_choices.push({
     name: settings_list.autothank_follower_flag,
     label: ftm.i18n('autothank_follower_flag'),
@@ -2769,6 +2873,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('autothank_follower_background_color');
 cb.settings_choices.push({
     name: settings_list.autothank_follower_background_color,
     label: ftm.i18n('expl_bgcolor'),
@@ -2778,6 +2883,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample.white,
 });
 
+current_settings.push('autothank_follower_text_color');
 cb.settings_choices.push({
     name: settings_list.autothank_follower_text_color,
     label: ftm.i18n('expl_txtcolor'),
@@ -2787,6 +2893,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample['pastel red'],
 });
 
+current_settings.push('autothank_follower_boldness');
 cb.settings_choices.push({
     name: settings_list.autothank_follower_boldness,
     label: ftm.i18n('expl_boldness'),
@@ -2797,6 +2904,7 @@ cb.settings_choices.push({
     defaultValue: font_weights.bold,
 });
 
+current_settings.push('autothank_follower_format');
 cb.settings_choices.push({
     name: settings_list.autothank_follower_format,
     label: ftm.i18n('autothank_follower_format'),
@@ -2807,6 +2915,7 @@ cb.settings_choices.push({
 });
 
 // autothank module: tips
+current_settings.push('autothank_tip_flag');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_flag,
     label: ftm.i18n('autothank_tip_flag'),
@@ -2820,6 +2929,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('autothank_tip_above_tokens');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_above_tokens,
     label: ftm.i18n('autothank_tip_above_tokens'),
@@ -2829,6 +2939,7 @@ cb.settings_choices.push({
     defaultValue: 24,
 });
 
+current_settings.push('autothank_tip_publicly_background_color');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_publicly_background_color,
     label: ftm.i18n('autothank_tip_publicly_background_color'),
@@ -2838,6 +2949,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample.white,
 });
 
+current_settings.push('autothank_tip_publicly_text_color');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_publicly_text_color,
     label: ftm.i18n('autothank_tip_publicly_text_color'),
@@ -2847,6 +2959,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample.black,
 });
 
+current_settings.push('autothank_tip_publicly_boldness');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_publicly_boldness,
     label: ftm.i18n('autothank_tip_publicly_boldness'),
@@ -2857,6 +2970,7 @@ cb.settings_choices.push({
     defaultValue: font_weights.bold,
 });
 
+current_settings.push('autothank_tip_publicly_format');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_publicly_format,
     label: ftm.i18n('autothank_tip_publicly_format'),
@@ -2866,6 +2980,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('expl_autothank_tip_publicly_format'),
 });
 
+current_settings.push('autothank_tip_privately_background_color');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_privately_background_color,
     label: ftm.i18n('autothank_tip_privately_background_color'),
@@ -2875,6 +2990,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample.white,
 });
 
+current_settings.push('autothank_tip_privately_text_color');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_privately_text_color,
     label: ftm.i18n('autothank_tip_privately_text_color'),
@@ -2884,6 +3000,7 @@ cb.settings_choices.push({
     defaultValue: colors_sample.black,
 });
 
+current_settings.push('autothank_tip_privately_boldness');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_privately_boldness,
     label: ftm.i18n('autothank_tip_privately_boldness'),
@@ -2894,6 +3011,7 @@ cb.settings_choices.push({
     defaultValue: font_weights.bold,
 });
 
+current_settings.push('autothank_tip_privately_format');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_privately_format,
     label: ftm.i18n('autothank_tip_privately_format'),
@@ -2903,6 +3021,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('expl_autothank_tip_privately_format'),
 });
 
+current_settings.push('autothank_tip_remind_note_flag');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_remind_note_flag,
     label: ftm.i18n('autothank_tip_remind_note_flag'),
@@ -2912,6 +3031,7 @@ cb.settings_choices.push({
     defaultValue: ftm.i18n('lbl_not_applicable'),
 });
 
+current_settings.push('autothank_tip_remind_note_format');
 cb.settings_choices.push({
     name: settings_list.autothank_tip_remind_note_format,
     label: ftm.i18n('autothank_tip_remind_note_format'),
@@ -2926,11 +3046,15 @@ cb.settings_choices.push({
 for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
     const menu_idx_letter = az[i].toUpperCase();
 
-    // the first offset should retain settigns from earlier versions
+    // the first offset should retain settings from earlier versions
     const settings_idx_offset = (0 === i) ? '' : menu_idx_letter;
 
+    let tmp_setting_name = null;
+
+    tmp_setting_name = settings_list.tip_menu_flag + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.tip_menu_flag + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('tip_menu_flag').replace(label_patterns.menu, menu_idx_letter),
         type: 'choice',
         choice1: ftm.i18n('lbl_broadcaster'),
@@ -2941,8 +3065,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         defaultValue: (0 === i) ? ftm.i18n('lbl_broadcaster') : ftm.i18n('lbl_not_applicable'),
     });
 
+    tmp_setting_name = settings_list.tip_menu_header + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.tip_menu_header + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('tip_menu_header').replace(label_patterns.menu, menu_idx_letter),
         type: 'str',
         minLength: 1,
@@ -2950,8 +3076,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         required: false,
     });
 
+    tmp_setting_name = settings_list.tip_menu_footer + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.tip_menu_footer + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('tip_menu_footer').replace(label_patterns.menu, menu_idx_letter),
         type: 'str',
         minLength: 1,
@@ -2959,8 +3087,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         required: false,
     });
 
+    tmp_setting_name = settings_list.inline_separator + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.inline_separator + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('inline_separator').replace(label_patterns.menu, menu_idx_letter),
         type: 'str',
         minLength: 0,
@@ -2968,8 +3098,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         required: false,
     });
 
+    tmp_setting_name = settings_list.inline_spacing + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.inline_spacing + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('inline_spacing').replace(label_patterns.menu, menu_idx_letter),
         type: 'choice',
         choice1: ftm.i18n('lbl_inline_spacing_before'),
@@ -2980,8 +3112,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         required: false,
     });
 
+    tmp_setting_name = settings_list.menu_background_color + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.menu_background_color + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('menu_background_color').replace(label_patterns.menu, menu_idx_letter),
         type: 'str',
         minLength: 6,
@@ -2989,8 +3123,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         defaultValue: colors_sample.black,
     });
 
+    tmp_setting_name = settings_list.menu_text_color + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.menu_text_color + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('menu_text_color').replace(label_patterns.menu, menu_idx_letter),
         type: 'str',
         minLength: 6,
@@ -2998,8 +3134,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         defaultValue: colors_sample.white,
     });
 
+    tmp_setting_name = settings_list.menu_boldness + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.menu_boldness + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('menu_boldness').replace(label_patterns.menu, menu_idx_letter),
         type: 'choice',
         choice1: font_weights.normal,
@@ -3008,8 +3146,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         defaultValue: font_weights.normal,
     });
 
+    tmp_setting_name = settings_list.menu_repeat_minutes + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.menu_repeat_minutes + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('menu_repeat_minutes').replace(label_patterns.menu, menu_idx_letter),
         type: 'int',
         minValue: 0,
@@ -3017,8 +3157,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         defaultValue: 10,
     });
 
+    tmp_setting_name = settings_list.menu_item_prefix + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.menu_item_prefix + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('menu_item_prefix').replace(label_patterns.menu, menu_idx_letter),
         type: 'str',
         minLength: 1,
@@ -3026,8 +3168,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         required: false,
     });
 
+    tmp_setting_name = settings_list.menu_item_suffix + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.menu_item_suffix + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('menu_item_suffix').replace(label_patterns.menu, menu_idx_letter),
         type: 'str',
         minLength: 1,
@@ -3035,8 +3179,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         required: false,
     });
 
+    tmp_setting_name = settings_list.menu_item_display_format + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.menu_item_display_format + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('menu_item_display_format').replace(label_patterns.menu, menu_idx_letter),
         type: 'str',
         minLength: 1,
@@ -3044,8 +3190,10 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
         defaultValue: ftm.i18n('expl_menu_item_display_format'),
     });
 
+    tmp_setting_name = settings_list.sort_order + settings_idx_offset;
+    current_settings.push(tmp_setting_name);
     cb.settings_choices.push({
-        name: settings_list.sort_order + settings_idx_offset,
+        name: tmp_setting_name,
         label: ftm.i18n('sort_order').replace(label_patterns.menu, menu_idx_letter),
         type: 'choice',
         choice1: ftm.i18n('lbl_sort_amount_asc'),
@@ -3056,13 +3204,16 @@ for (let i = 0; i < nb_of_distinct_menus && i < az.length; ++i) {
 
     const item_lbl_tpl = ftm.i18n('menu_item_lbl');
     for (let j = 0; j < nb_of_menu_items; ++j) {
-        const item_lbl = item_lbl_tpl
+        const tmp_setting_name = settings_list.menu_item_lbl + settings_idx_offset + (j + 1);
+
+        const tmp_setting_label = item_lbl_tpl
             .replace(label_patterns.menu_idx, menu_idx_letter)
             .replace(label_patterns.item_idx, j + 1);
 
+        current_settings.push(tmp_setting_name);
         const new_item = {
-            name: settings_list.menu_item_lbl + settings_idx_offset + (j + 1),
-            label: item_lbl,
+            name: tmp_setting_name,
+            label: tmp_setting_label,
             type: 'str',
             minLength: 1,
             maxLength: 250,
