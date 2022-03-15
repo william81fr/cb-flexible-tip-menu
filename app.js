@@ -432,7 +432,7 @@ const i18n = {
         expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
         expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
         expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
-        expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes',
+        expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes -- Write "/backup text" or "/backup json" without quotes for more format control',
         errlbl_command_not_recognized: "[{APP}] Your command was not recognized.\nReminder: any message that starts with '/' or '!' is handled as a command for this bot.",
     },
     es: {
