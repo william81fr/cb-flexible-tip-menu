@@ -171,6 +171,27 @@ const specific_patterns = {
     all_var_names: /\s*\{[0-9A-Z_ -]+\}\s*/g,
 };
 
+/**
+ * Gender identifiers and their label
+ * cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
+ * cf. https://en.wikipedia.org/wiki/Planet_symbols#Mars
+ * ♀ U+2640 Female sign
+ * ♂ U+2642 Male sign
+ * ⚥ U+26A5 Male and female sign
+ * ⚧ U+26A7 Transsexualism
+ * ⚲ U+26B2 Neutral, genderless
+ * ⚤ U+26A4 Heterosexuality
+ * ⚣ U+26A3 Male homosexuality
+ * ⚢ U+26A2 Lesbianism
+ * ⚥⚥ U+26A5 Bisexuality
+ */
+const genders = {
+    m: '\u2642', // male
+    f: '\u2640', // female
+    s: '\u26A7', // trans
+    c: '\u26A4', // couple
+};
+
 
 /**
  * CB has this feature where a setting name is transposed directly as a label in the admin UI
@@ -277,7 +298,7 @@ const i18n = {
         automods_record_flag: 'Record automod infractions in chat (all automods)',
         automods_noaction: '[{APP}] Message from {USER} was ignored by autobot ({LABEL})',
         automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
-        decorator_gender_flag: "INDICATOR OF USER'S SEX IN CHAT ------------",
+        decorator_gender_flag: "INDICATOR OF USER'S GENDER IN CHAT ------------",
         decorator_time_flag: 'INDICATOR OF TIME IN CHAT (GMT/UTC) ------------',
         lbl_time_short: 'HH:MM',
         lbl_time_medium: 'HH:MM:SS',
@@ -404,7 +425,7 @@ const i18n = {
         automods_record_flag: 'Guardar las infracciones automod en el chat (todos los autmods)',
         automods_noaction: '[{APP}] El message de {USER} ha sido ignorado por autobot ({LABEL})',
         automods_user_count: '[{APP}] Automod recorded {COUNT} infractions for {USER}',
-        decorator_gender_flag: 'INDICACION DEL SEXO DE LOS USUARIOS EN EL CHAT ------------',
+        decorator_gender_flag: 'INDICACION DEL GENERO DE LOS USUARIOS EN EL CHAT ------------',
         decorator_time_flag: 'INDICACION DEL TIEMPO EN EL CHAT (GMT/UTC) ------------',
         lbl_time_short: 'HH:MM',
         lbl_time_medium: 'HH:MM:SS',
@@ -531,7 +552,7 @@ const i18n = {
         automods_record_flag: 'Enregistrer les infractions automod dans le chat (tous les autmods)',
         automods_noaction: '[{APP}] Le message de {USER} a ete ignore par autobot ({LABEL})',
         automods_user_count: '[{APP}] Automod a enregistre {COUNT} infractions pour {USER}',
-        decorator_gender_flag: 'INDICATEUR DU SEXE DES UTILISATEURS DU CHAT ------------',
+        decorator_gender_flag: 'INDICATEUR DU GENRE DES UTILISATEURS DU CHAT ------------',
         decorator_time_flag: 'INDICATEUR DU TEMPS DANS LE CHAT (GMT/UTC) ------------',
         lbl_time_short: 'HH:MM',
         lbl_time_medium: 'HH:MM:SS',
@@ -2023,25 +2044,12 @@ const FlexibleTipMenu = {
     },
 
     decorator_gender_apply: function(txt_msg, username, gender_code) {
-        // cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
-        // cf. https://en.wikipedia.org/wiki/Planet_symbols#Mars
-        // ♀ U+2640 Female sign
-        // ♂ U+2642 Male sign
-        // ⚥ U+26A5 Male and female sign
-        // ⚧ U+26A7 Transsexualism
-        // ⚲ U+26B2 Neutral, genderless
-        // ⚤ U+26A4 Heterosexuality
-        // ⚣ U+26A3 Male homosexuality
-        // ⚢ U+26A2 Lesbianism
-        // ⚥⚥ U+26A5 Bisexuality
 
-        let gender_str = '';
-        if ('m' === gender_code) gender_str = '\u2642'; // male
-        else if ('f' === gender_code) gender_str = '\u2640'; // female
-        else if ('s' === gender_code) gender_str = '\u26A7'; // trans
-        else if ('c' === gender_code) gender_str = '\u26A4'; // couple
-        else return txt_msg.replace(label_patterns.gender, '').trim();
+        if ('undefined' === typeof genders[gender_code]) {
+            return txt_msg.replace(label_patterns.gender, '').trim();
+        }
 
+        const gender_str = genders[gender_code];
         let decorated_msg = txt_msg
             .replace(label_patterns.username, username);
 
