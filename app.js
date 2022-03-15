@@ -148,6 +148,7 @@ const command_patterns = {
 const label_patterns = {
     amount: /\{(:?AMOUNT|TK|TOKEN|TOKENS)\}/gi,
     app_name: /\{APP\}/gi,
+    app_id: /\{APPID\}/gi,
     broadcaster_name: /\{(:?BCASTER|BROADCASTER|SLUG|MODEL|SELF)\}/gi,
     count: /\{COUNT\}/gi,
     item_idx: /\{ITEMIDX\}/gi,
@@ -405,7 +406,8 @@ const i18n = {
         lbl_collect_stats_nochange: 'no change since last time',
         lbl_collect_tipnotes_header: '[{APP}] recorded tip notes for {USER}:',
         expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
-        expl_backup_details: '[{APP}] Here are your current settings:',
+        expl_backup_header: '[{APP} #{APPID}] Here are your current settings at {TIME}:',
+        expl_backup_footer: '[{APP} #{APPID}] End settings export.',
         errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' in {APP} {LABEL} (currently valued at '{VALUE}')",
         errmsg_app_disabled: "app is disabled",
         errmsg_app_errors: "has errors: app is stopped",
@@ -534,7 +536,8 @@ const i18n = {
         lbl_collect_stats_nochange: 'no change since last time',
         lbl_collect_tipnotes_header: '[{APP}] recorded tip notes for {USER}:',
         expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
-        expl_backup_details: '[{APP}] Here are your current settings:',
+        expl_backup_header: '[{APP} #{APPID}] Here are your current settings at {TIME}:',
+        expl_backup_footer: '[{APP} #{APPID}] End settings export.',
         errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' en {APP} {LABEL} (actualmente vale '{VALUE}')",
         errmsg_app_disabled: "el bot esta desactivado",
         errmsg_app_errors: "hay errores: el bot esta parado",
@@ -663,7 +666,8 @@ const i18n = {
         lbl_collect_stats_nochange: 'no change since last time',
         lbl_collect_tipnotes_header: '[{APP}] recorded tip notes for {USER}:',
         expl_menu_item_display_format: "{LABEL} ({AMOUNT}tk)",
-        expl_backup_details: '[{APP}] Here are your current settings:',
+        expl_backup_header: '[{APP} #{APPID}] Here are your current settings at {TIME}:',
+        expl_backup_footer: '[{APP} #{APPID}] End settings export.',
         errmsg_format: "/!\\ ATTN {BCASTER}: '{SETTING}' dans {APP} {LABEL} (vaut actuellement '{VALUE}')",
         errmsg_app_disabled: "l'app est desactivee",
         errmsg_app_errors: "a des erreurs : l'app est arretee",
@@ -1138,8 +1142,11 @@ const FlexibleTipMenu = {
     show_settings_backup: function(username) {
         const backup_details = [];
 
-        const header_lbl = FlexibleTipMenu.clean_str(FlexibleTipMenu.i18n('expl_backup_details'));
-        backup_details.push(header_lbl);
+        const header_lbl = FlexibleTipMenu.i18n('expl_backup_header')
+            .replace(label_patterns.time, new Date().toTimeString())
+            .replace(label_patterns.app_id, cb.app_id);
+
+        backup_details.push(FlexibleTipMenu.clean_str(header_lbl));
 
         for (const setting_name of current_settings) {
             let setting_label, setting_val;
@@ -1175,6 +1182,12 @@ const FlexibleTipMenu = {
 
             backup_details.push(notice_lbl);
         }
+
+        const footer_lbl = FlexibleTipMenu.i18n('expl_backup_footer')
+            .replace(label_patterns.time, new Date().toTimeString())
+            .replace(label_patterns.app_id, cb.app_id);
+
+        backup_details.push(FlexibleTipMenu.clean_str(footer_lbl));
 
         cb.sendNotice(backup_details.join("\n"), username);
     },
