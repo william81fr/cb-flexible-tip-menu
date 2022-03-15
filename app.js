@@ -3096,9 +3096,6 @@ cb.onStart(room_owner => {
     }, 1000 / 2);
 
 
-    cb.sendNotice('automod_unicode_allowed: ' + specific_patterns.automod_unicode_allowed, room_owner.user, colors_sample.black, colors_sample.white)
-
-
     if (is_debug) {
         cb.sendNotice(ftm.basic_log(cbjs, 'cbjs').join("\n"), room_owner.user, colors_sample.black, colors_sample.white);
         cb.sendNotice(ftm.basic_log(cb, 'cb').join("\n"), room_owner.user, colors_sample.white, colors_sample.black);
