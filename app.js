@@ -139,7 +139,7 @@ const command_patterns = {
     colors_sample: /^colou?rs_?(?:list)?$/i,
     stats: /^stats$/i,
     requests: /^(?:reqs|requests)$/i,
-    backup: /^(?:bkp|backup)$/i,
+    backup: /^(?:bkp|backup)( text| txt| json)?$/i,
 };
 
 /**
@@ -1139,15 +1139,13 @@ const FlexibleTipMenu = {
      * Display a backup of the current app settings
      * @param {string} username Specific user who may have asked for the list
      */
-    show_settings_backup: function(username) {
+    show_settings_backup: function(username, export_format) {
+        const allowed_formats = ['text', 'txt', 'json'];
+        if (!allowed_formats.includes(export_format)) {
+            export_format = 'txt';
+        }
+
         const backup_details = [];
-
-        const header_lbl = FlexibleTipMenu.i18n('expl_backup_header')
-            .replace(label_patterns.time, new Date().toTimeString())
-            .replace(label_patterns.app_id, cb.app_id);
-
-        backup_details.push(FlexibleTipMenu.clean_str(header_lbl));
-
         for (const setting_name of current_settings) {
             let setting_label, setting_val;
 
@@ -1183,13 +1181,31 @@ const FlexibleTipMenu = {
             backup_details.push(notice_lbl);
         }
 
+
+        const export_rows = [];
+
+        const header_lbl = FlexibleTipMenu.i18n('expl_backup_header')
+            .replace(label_patterns.time, new Date().toTimeString())
+            .replace(label_patterns.app_id, cb.app_id);
+
+        export_rows.push(FlexibleTipMenu.clean_str(header_lbl) + ' (' + export_format + ')');
+
+        if ('json' === export_format) {
+            export_rows.push(JSON.stringify(backup_details));
+        } else {
+            for (const detail_row of backup_details) {
+                export_rows.push(detail_row);
+            }
+        }
+
         const footer_lbl = FlexibleTipMenu.i18n('expl_backup_footer')
             .replace(label_patterns.time, new Date().toTimeString())
             .replace(label_patterns.app_id, cb.app_id);
 
-        backup_details.push(FlexibleTipMenu.clean_str(footer_lbl));
+        export_rows.push(FlexibleTipMenu.clean_str(footer_lbl));
 
-        cb.sendNotice(backup_details.join("\n"), username);
+
+        cb.sendNotice(export_rows.join("\n"), username);
     },
 
     /**
@@ -2370,40 +2386,52 @@ const FlexibleTipMenu = {
 
         if (command_patterns.help.test(txt_command)) {
             FlexibleTipMenu.show_commands_help(event_msg.user);
-        } else if (command_patterns.tip_menu.test(txt_command)) {
+            return event_msg;
+        }
+
+        if (command_patterns.tip_menu.test(txt_command)) {
             if (event_msg.user === cb.room_slug || event_msg.is_mod) {
                 FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_everyone'));
             } else {
                 FlexibleTipMenu.show_menu(FlexibleTipMenu.i18n('lbl_single_user'), event_msg.user);
             }
-        } else if (command_patterns.colors_sample.test(txt_command)) {
-            if (event_msg.user === cb.room_slug) {
-                FlexibleTipMenu.show_colors_sample(event_msg.user);
-            } else {
-                FlexibleTipMenu.show_command_error(event_msg.user);
-            }
-        } else if (command_patterns.stats.test(txt_command)) {
-            if (event_msg.user === cb.room_slug) {
-                FlexibleTipMenu.show_stats(event_msg.user);
-            } else {
-                FlexibleTipMenu.show_command_error(event_msg.user);
-            }
-        } else if (command_patterns.requests.test(txt_command)) {
-            if (event_msg.user === cb.room_slug) {
-                FlexibleTipMenu.show_collected_tipnotes(event_msg.user);
-            } else {
-                FlexibleTipMenu.show_command_error(event_msg.user);
-            }
-        } else if (command_patterns.backup.test(txt_command)) {
-            if (event_msg.user === cb.room_slug) {
-                FlexibleTipMenu.show_settings_backup(event_msg.user);
-            } else {
-                FlexibleTipMenu.show_command_error(event_msg.user);
-            }
-        } else {
-            FlexibleTipMenu.show_command_error(event_msg.user);
+            return event_msg;
         }
 
+        if (command_patterns.colors_sample.test(txt_command)) {
+            if (event_msg.user === cb.room_slug) {
+                FlexibleTipMenu.show_colors_sample(event_msg.user);
+                return event_msg;
+            }
+        }
+
+        if (command_patterns.stats.test(txt_command)) {
+            if (event_msg.user === cb.room_slug) {
+                FlexibleTipMenu.show_stats(event_msg.user);
+                return event_msg;
+            }
+        }
+
+        if (command_patterns.requests.test(txt_command)) {
+            if (event_msg.user === cb.room_slug) {
+                FlexibleTipMenu.show_collected_tipnotes(event_msg.user);
+                return event_msg;
+            }
+        }
+
+        const matches = command_patterns.backup.exec(txt_command);
+        if (null !== matches) {
+            if (event_msg.user === cb.room_slug) {
+                const export_format = ('string' !== typeof matches[1]) ?
+                    '' :
+                    matches[1].trim().toLowerCase();
+
+                FlexibleTipMenu.show_settings_backup(event_msg.user, export_format);
+                return event_msg;
+            }
+        }
+
+        FlexibleTipMenu.show_command_error(event_msg.user);
         return event_msg;
     },
 
