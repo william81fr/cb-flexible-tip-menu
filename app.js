@@ -17,20 +17,23 @@
 const lang = 'en';
 
 /**
- * Max number of configurable menu items
+ * Max number of configurable menu items (per menu)
  */
 const nb_of_menu_items = 50;
 
 /**
- * Number of configurable menus, not more than 26
+ * Number of configurable menus, not more than 26;
  * Please leave at 1 for now
  */
 const nb_of_distinct_menus = 1;
 
 
+
+
 //
-// don't modify anything from here on
+// DO NOT modify anything from here on
 //
+
 
 /**
  * This prevents the app from running, and instead shows debug info in the chat
@@ -98,21 +101,26 @@ const font_weights = {
     bolder: 'bolder',
 };
 
-let shown_errors = []; // Used to show error messages only once
+/**
+ * Used to show error messages only once
+ */
+let shown_errors = [];
 
-
-// cf. https://en.wikipedia.org/wiki/List_of_Unicode_characters
-// cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
-// cf. https://en.wikipedia.org/wiki/Emoji#Unicode_blocks
 
 /**
  * Used by automod "unicode" to identify ranges of Unicode characters to test for
+ *
+ * cf.
+ * https://en.wikipedia.org/wiki/List_of_Unicode_characters
+ * https://en.wikipedia.org/wiki/Miscellaneous_Symbols
+ * https://en.wikipedia.org/wiki/Emoji#Unicode_blocks
  */
 const automod_unicode_allowranges = {
     text: [
         '\u{20}-\u{7E}', // most of ASCII 128
         '\u{A0}-\u{FF}', // some of latin1
-        '\u{2600}-\u{26D4} \u{2700}-\u{27BF}', // early emotes
+        '\u{2600}-\u{26D4}', // early emotes 1
+        '\u{2700}-\u{27BF}', // early emotes 2
     ],
     emoji: [
         { start: parseInt('1F300', 16), end: parseInt('1F64F', 16) },
@@ -155,6 +163,9 @@ const label_patterns = {
     visibility: /\{VISIBILITY\}/gi,
 };
 
+/**
+ * RegExp patterns to identify dates or times
+ */
 const date_patterns = {
     time_short: /:[0-9]{2} .+$/,
     time_medium: / .+$/,
@@ -164,7 +175,7 @@ const date_patterns = {
  * RegExp patterns used in specific contexts (except commands and mere labels)
  */
 const specific_patterns = {
-    automod_unicode_allowed: new RegExp('^[' + automod_unicode_allowranges.text.join(' ') + ']+$'),
+    automod_unicode_allowed: new RegExp('^[' + automod_unicode_allowranges.text.join('') + ']+$'),
     automod_link: /[0-9a-z]+:\/\/?[0-9a-z._-]+/i,
     hex_color: /^#?([0-9a-f]{6})$/i,
     menu_item: /^([0-9]+)(.+)$/,
@@ -172,9 +183,12 @@ const specific_patterns = {
 };
 
 /**
- * Gender identifiers and their label
- * cf. https://en.wikipedia.org/wiki/Miscellaneous_Symbols
- * cf. https://en.wikipedia.org/wiki/Planet_symbols#Mars
+ * Gender identifiers (in CB's "user" object) and their default label (in this bot)
+ *
+ * cf.
+ * https://en.wikipedia.org/wiki/Miscellaneous_Symbols
+ * https://en.wikipedia.org/wiki/Planet_symbols#Mars
+ *
  * ♀ U+2640 Female sign
  * ♂ U+2642 Male sign
  * ⚥ U+26A5 Male and female sign
@@ -197,12 +211,12 @@ const genders = {
  * CB has this feature where a setting name is transposed directly as a label in the admin UI
  *   for example, a setting called "app_name" is shown as "App name" in the UI
  *   except if you specify a "label", which is what we do in this app
-
+ *
  * All variable names are reused as:
  *   - CSS class names (unless next to punctuation or as the last word)
  *   	- this is currently not working on the Live website (2021-04)
  *   - HTML IDs (unless next to puncutation or as the first word)
-
+ *
  * Here are a few examples:
  *   - avoid "banner" in your variable name because it breaks the page layout (2020-02-29)
  *   - use "subject" in your variable name to hide the setting name in the admin panel (but still display the user input)
@@ -213,7 +227,7 @@ const genders = {
  *   - placing "cambouncernotes" in your variable name sets a bright yellow color as the background
  *   - placing "creat" in your variable name makes a big button with orange background and white text, but also with a white arrow
  *   - placing "code" in your variable name will use a fixed-size font
-
+ *
  * In order to keep our code readable, here is a map of variables internal to our app's workings VS in the Chaturbate UI:
  */
 const settings_list = {
@@ -3081,6 +3095,8 @@ cb.onStart(room_owner => {
         ftm.show_commands_help('', user_groups.mods);
     }, 1000 / 2);
 
+
+    cb.sendNotice('automod_unicode_allowed: ' + specific_patterns.automod_unicode_allowed, room_owner.user, colors_sample.black, colors_sample.white)
 
 
     if (is_debug) {
