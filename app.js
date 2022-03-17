@@ -51,11 +51,6 @@ const default_app_name = 'Flexible Tip Menu';
 const az = 'abcdefghijklmnopqrstuvwxyz';
 
 /**
- * Messages starting with these characters will be interpreted as commands
- */
-const command_prefixes_allow_list = ['/', '!'];
-
-/**
  * For date formatting in chat
  */
 const date_tz = 'en-US';
@@ -134,6 +129,7 @@ const automod_unicode_allowranges = {
  * RegExp patterns used for commands (in chat)
  */
 const command_patterns = {
+    cmd_prefix: /^(?:\: ?)?[:/](.*)$/,
     help: /^he?lp$/i,
     tip_menu: /^(?:tip)?_?menu$/i,
     colors_sample: /^colou?rs_?(?:list)?$/i,
@@ -428,10 +424,11 @@ const i18n = {
         errmsg_automod_unicode: 'disallowed text',
         errmsg_automod_link: 'link attempt',
         expl_commands_available: "Available commands:",
+        expl_commands_help: '/help or /hlp -- Display this menu (only the model can see it)',
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
-        expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
-        expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
-        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
+        expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes (only the model can see them)",
+        expl_commands_stats: "/stats -- Display the statistics collected for this streaming session (only the model can see them)",
+        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests (only the model can see them)',
         expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes -- Write "/backup text" or "/backup json" without quotes for more format control',
         errlbl_command_not_recognized: "[{APP}] Your command was not recognized.\nReminder: any message that starts with '/' or '!' is handled as a command for this bot.",
     },
@@ -558,11 +555,12 @@ const i18n = {
         errmsg_automod_unicode: 'disallowed text',
         errmsg_automod_link: 'link attempt',
         expl_commands_available: "Available commands:",
+        expl_commands_help: '/help or /hlp -- Display this menu (only the model can see it)',
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
-        expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
-        expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
-        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
-        expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes',
+        expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes (only the model can see them)",
+        expl_commands_stats: "/stats -- Display the statistics collected for this streaming session (only the model can see them)",
+        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests (only the model can see them)',
+        expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes (only the model can see them)',
         errlbl_command_not_recognized: "[{APP}] Su comando no ha funcionado.\nRecordatorio: todo mensaje que empieza por '/' o '!' se entiende como un comando por este bot.",
     },
     fr: {
@@ -688,11 +686,12 @@ const i18n = {
         errmsg_automod_unicode: 'disallowed text',
         errmsg_automod_link: 'link attempt',
         expl_commands_available: "Available commands:",
+        expl_commands_help: '/help or /hlp -- Display this menu (only the model can see it)',
         expl_commands_tipmenu: "/menu or /tipmenu -- Display the tip menu in the chat (broadcaster and moderators display for everyone, and anyone else just for themselves)",
-        expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes",
-        expl_commands_stats: "/stats -- Display the statistics collected for this streaming session",
-        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests',
-        expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes',
+        expl_commands_colorslist: "/colors or /colorslist -- Display a list of color codes (only the model can see them)",
+        expl_commands_stats: "/stats -- Display the statistics collected for this streaming session (only the model can see them)",
+        expl_commands_collected_tipnotes: '/reqs or /requests -- Display the tip notes collected for custom requests (only the model can see them)',
+        expl_commands_settings_backup: '/bkp or /backup -- Display the app settings for backup purposes (only the model can see them)',
         errlbl_command_not_recognized: "[{APP}] Votre commande n'est pas reconnue.\nRappel : tout message commencant par '/' ou '!' est traite comme une commande par ce bot.",
     },
 };
@@ -1865,12 +1864,14 @@ const FlexibleTipMenu = {
      */
     show_commands_help: function(username, usergroup = null) {
         let commands_list = [];
+
+        commands_list.push(FlexibleTipMenu.i18n('expl_commands_help'));
+        commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist'));
+        commands_list.push(FlexibleTipMenu.i18n('expl_commands_settings_backup'));
+
         if (!FlexibleTipMenu.is_disabled('tip_menu_flag')) {
             commands_list.push(FlexibleTipMenu.i18n('expl_commands_tipmenu'));
         }
-
-        commands_list.push(FlexibleTipMenu.i18n('expl_commands_colorslist'));
-        commands_list.push(FlexibleTipMenu.i18n('expl_commands_settings_backup'));
 
         if (!FlexibleTipMenu.is_disabled('collect_stats_flag')) {
             commands_list.push(FlexibleTipMenu.i18n('expl_commands_stats'));
@@ -1884,7 +1885,7 @@ const FlexibleTipMenu = {
             return;
         }
 
-        commands_list.unshift(FlexibleTipMenu.i18n('expl_commands_available'));
+        commands_list.unshift(FlexibleTipMenu.i18n('expl_commands_available')); // always first
         const notice = FlexibleTipMenu.clean_str(commands_list.join("\n"));
 
         cb.sendNotice(notice, username, colors_sample.black, colors_sample.white, '', usergroup);
@@ -1911,11 +1912,11 @@ const FlexibleTipMenu = {
      * @returns {message} The updated message
      */
     message_handler: function(event_msg) {
-        const txt_msg = event_msg.m.trim();
-        if (command_prefixes_allow_list.includes(txt_msg.substring(0, 1))) {
-            event_msg = FlexibleTipMenu.commands_handler(event_msg); // that's a command, not a plain message
-        } else {
+        const matches = command_patterns.cmd_prefix.exec(event_msg.m.trim());
+        if (null === matches) {
             event_msg = FlexibleTipMenu.plaintext_handler(event_msg); // not a command
+        } else {
+            event_msg = FlexibleTipMenu.commands_handler(event_msg, matches[1]); // that's a command, not a plain message
         }
 
         return event_msg;
@@ -2378,10 +2379,7 @@ const FlexibleTipMenu = {
      * @param {message} event_msg The message that came in with the fired Event
      * @returns {message} The updated message
      */
-    commands_handler: function(event_msg) {
-        const txt_msg = event_msg.m.trim();
-        const txt_command = txt_msg.substring(1).trim();
-
+    commands_handler: function(event_msg, txt_command) {
         event_msg = FlexibleTipMenu.hide_message(event_msg, true);
 
         if (command_patterns.help.test(txt_command)) {
