@@ -129,7 +129,7 @@ const automod_unicode_allowranges = {
  * RegExp patterns used for commands (in chat)
  */
 const command_patterns = {
-    cmd_prefix: /^(?:\: ?)?[:/](.*)$/,
+    cmd_prefix: /^(?:\: ?)?[!/](.*)$/,
     help: /^he?lp$/i,
     tip_menu: /^(?:tip)?_?menu$/i,
     colors_sample: /^colou?rs_?(?:list)?$/i,
