@@ -58,4 +58,4 @@ Examples of menu item display formats (here an example where the service is a PM
 - `tip {AMOUNT} tokens for: {LABEL}` to send a notice like `tip 25 tokens for: PM`
 - simply write `{AMOUNT}` and `{LABEL}` anywhere in the box, with anything around them
 
-[1] Feel free to use [a tool like this one](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Colors/Color_picker_tool) to pick your colors (focus on the "HEXA" label that changes as you click on different colors). Flexible Tip Menu accepts both lowercase and uppercase color codes, and the # symbol is not required at the start.
+[1] Feel free to use [a tool like this one](https://mdn.github.io/css-examples/tools/color-picker/) to pick your colors (focus on the "HEXA" label that changes as you click on different colors). Flexible Tip Menu accepts both lowercase and uppercase color codes, and the # symbol is not required at the start.
